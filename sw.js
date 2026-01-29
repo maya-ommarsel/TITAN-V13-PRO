@@ -1,9 +1,8 @@
-const CACHE_NAME = 'titan-v13-master-cache';
+const CACHE_NAME = 'titan-v13-ultimate-cache';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/sw.js',
   'https://cdn.tailwindcss.com',
   'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',
   'https://cdn.jsdelivr.net/npm/chart.js',
@@ -19,7 +18,7 @@ self.addEventListener('fetch', (e) => {
 });
 
 self.addEventListener('push', (e) => {
-  const data = e.data ? e.data.json() : { title: 'TITAN V13', body: 'Sinyal Terdeteksi!' };
+  const data = e.data ? e.data.json() : { title: 'TITAN V13', body: 'Sinyal Baru Terdeteksi!' };
   self.registration.showNotification(data.title, {
     body: data.body,
     icon: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
