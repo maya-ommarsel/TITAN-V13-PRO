@@ -219,299 +219,143 @@
 </footer>
 
 <script>
+// --- INTEGRASI SERVICE WORKER & PUSH ---
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then((reg) => {
+            console.log('TITAN SW Registered');
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') console.log('Notif Granted');
+            });
+        });
+    });
+}
+
 (function() {
     // --- KONFIGURASI PRIVASI MASTER (BASE64) ---
     const SECRETS = {
-        BT: "ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0", // Bot Token
-        CI: "LTEwMDMyNTQzNzkzMzM=", // Chat ID Admin
-        MK: "TWFoYWRoYXJlVjEzTWFzdGVy", // Master Password
-        ADMIN_ID: "MTAwMzI1NDM3OTMzMw==", // Jalur Ketuk
-        TG: "aHR0cHM6Ly90Lm1lL3RpdGFudjEzcHJv", // Channel Telegram
-        JU: "aHR0cHM6Ly9qdW8uYWcvP3JlZklkPXl1ZjBkaDRpbDF4cw==", // Jupiter
-        GA: "aHR0cHM6Ly93d3cuZ2F0ZS5jb20vcmVmZXJyYWwvY2FzaGJhY2s/cmVmPVZRVVFWVldKVUcmcmVmX3R5cGU9MTAzJnBhZ2U9ZWFyblZvdWNoZXImdXRtX2NtcD1QRVlFUWRTYg==", // Gate
-        IDX: "aHR0cHM6Ly9pbmRvZGF4Lm9uZWxpbmsubWUvcXlZWS9yZWZlcnJhbD9kZWVwX2xpbmtfdmFsdWU9cGFnZTpyZWdpc3RlcixpZDptYXJzZWxzYWxtb24=" // Indodax
+        BT: "ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0",
+        CI: "LTEwMDMyNTQzNzkzMzM=",
+        MK: "TWFoYWRoYXJlVjEzTWFzdGVy", // Master Pass
+        ADMIN_ID: "MTAwMzI1NDM3OTMzMw==", // Secret Tap ID
+        TG: "aHR0cHM6Ly90Lm1lL3RpdGFudjEzcHJv",
+        JU: "aHR0cHM6Ly9qdW8uYWcvP3JlZklkPXl1ZjBkaDRpbDF4cw==",
+        GA: "aHR0cHM6Ly93d3cuZ2F0ZS5jb20vcmVmZXJyYWwvY2FzaGJhY2s/cmVmPVZRVVFWVldKVUcmcmVmX3R5cGU9MTAzJnBhZ2U9ZWFyblZvdWNoZXImdXRtX2NtcD1QRVlFUWRTYg==",
+        IDX: "aHR0cHM6Ly9pbmRvZGF4Lm9uZWxpbmsubWUvcXlZWS9yZWZlcnJhbD9kZWVwX2xpbmtfdmFsdWU9cGFnZTpyZWdpc3RlcixpZDptYXJzZWxzYWxtb24="
     };
     function decode(k) { return atob(SECRETS[k]); }
 
-    // --- MANAJEMEN STATE (HISTORY & SESSION) ---
+    // --- MANAJEMEN STATE ---
     let currentIP = "0.0.0.0", tapCount = 0, tapTimer, autoLockTimer;
     let saved = JSON.parse(localStorage.getItem('titan_v13_stable_final_safe'));
-    let state = saved || {
-        status: 'STANDART',
-        initCap: 0,
-        capProfit: 0,
-        streak: 0,
-        cards: [],
-        log: [],
-        isMaster: false
-    };
+    let state = saved || { status: 'STANDART', initCap: 0, capProfit: 0, streak: 0, cards: [], log: [], isMaster: false };
 
-    // --- TRACKING IP HARDWARE ---
-    fetch('https://api.ipify.org?format=json')
-        .then(r => r.json())
-        .then(d => {
-            currentIP = d.ip;
-            document.getElementById('ip-display').innerText = "DEVICE IP: " + currentIP;
-        });
+    // --- TRACKING IP ---
+    fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
+        currentIP = d.ip;
+        document.getElementById('ip-display').innerText = "DEVICE IP: " + currentIP;
+    });
 
-    // --- KEAMANAN: AUTO-LOCK (5 MENIT) ---
+    // --- KEAMANAN AUTO-LOCK (5 MENIT) ---
     function resetAutoLock() {
         clearTimeout(autoLockTimer);
-        autoLockTimer = setTimeout(() => {
-            if(localStorage.getItem('titan_active')) manualLogout();
-        }, 300000);
+        autoLockTimer = setTimeout(() => { if(localStorage.getItem('titan_active')) manualLogout(); }, 300000);
     }
-    ['mousemove', 'keypress', 'touchstart'].forEach(e => document.addEventListener(e, resetAutoLock));
+    ['touchstart', 'click', 'keypress'].forEach(e => document.addEventListener(e, resetAutoLock));
 
-    // --- LOGOUT MANUAL (HISTORY TIDAK HILANG) ---
+    // --- LOGOUT ---
     window.manualLogout = function() {
-        saveData();
-        localStorage.removeItem('titan_active');
-        location.reload();
+        saveData(); localStorage.removeItem('titan_active'); location.reload();
     }
 
-    // --- JALUR RAHASIA MASTER (5x KETUK POJOK KIRI ATAS) ---
+    // --- MASTER SECRET TAP ---
     window.handleSecretTap = function() {
-        tapCount++;
-        clearTimeout(tapTimer);
+        tapCount++; clearTimeout(tapTimer);
         tapTimer = setTimeout(() => { tapCount = 0; }, 1500);
-        
         if (tapCount === 5) {
-            const check = prompt("ADMIN IDENTIFICATION:");
+            const check = prompt("ADMIN ID:");
             if (check === decode('ADMIN_ID')) {
-                state.isMaster = true;
-                state.status = 'ELITE';
+                state.isMaster = true; state.status = 'ELITE';
                 localStorage.setItem('master_perm_lock', 'true');
-                smartNotif("MASTER AUTHORIZED PERMANENTLY");
                 enterApp();
             }
         }
     }
 
-    // --- PENDAFTARAN & BIOMETRIK SCAN ---
+    // --- DAFTAR & BIOMETRIK ---
     window.startRegistration = async function() {
-        const ph = document.getElementById('auth-phone').value;
-        const ps = document.getElementById('auth-pass').value;
-        
-        if(!ph || ps.length < 8) return smartNotif("ISI NOMOR TELEGRAM & PASSWORD (MIN 8)");
-
+        const ph = document.getElementById('auth-phone').value, ps = document.getElementById('auth-pass').value;
+        if(!ph || ps.length < 8) return smartNotif("ISI NOMOR & PASSWORD (MIN 8)");
         document.getElementById('biometric-area').classList.remove('hidden');
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             document.getElementById('face-video').srcObject = stream;
-            smartNotif("MEMINDAI WAJAH...");
-            
             setTimeout(() => {
                 stream.getTracks().forEach(t => t.stop());
                 document.getElementById('biometric-area').classList.add('hidden');
-                
-                // Kunci Data ke Hardware IP
-                localStorage.setItem('u_ph', ph);
-                localStorage.setItem('u_ps', ps);
-                localStorage.setItem('u_ip', currentIP);
-                
-                smartNotif("DAFTAR BERHASIL: PERANGKAT DIKUNCI");
+                localStorage.setItem('u_ph', ph); localStorage.setItem('u_ps', ps); localStorage.setItem('u_ip', currentIP);
+                smartNotif("PENDAFTARAN BERHASIL (IP LOCKED)");
             }, 3000);
-        } catch(e) {
-            smartNotif("KAMERA WAJIB UNTUK VERIFIKASI BIOMETRIK");
-        }
+        } catch(e) { smartNotif("KAMERA DIBUTUHKAN"); }
     }
 
-    // --- PROSES LOGIN ---
+    // --- LOGIN ---
     window.handleAuth = function() {
-        const ph = document.getElementById('auth-phone').value;
-        const ps = document.getElementById('auth-pass').value;
-        
-        // Master Pass Bypass
-        if (ps === decode('MK')) {
-            state.isMaster = true;
-            state.status = 'ELITE';
-            localStorage.setItem('master_perm_lock', 'true');
-            return enterApp();
-        }
-
-        // Verifikasi Hardware IP + Data
-        const savedPh = localStorage.getItem('u_ph');
-        const savedPs = localStorage.getItem('u_ps');
-        const savedIP = localStorage.getItem('u_ip');
-
-        if (ph === savedPh && ps === savedPs && currentIP === savedIP) {
-            state.chatID = ph;
-            enterApp();
-        } else {
-            smartNotif("AKSES DITOLAK: IP ATAU DATA TIDAK SESUAI");
-        }
+        const ph = document.getElementById('auth-phone').value, ps = document.getElementById('auth-pass').value;
+        if (ps === decode('MK')) { state.isMaster = true; state.status = 'ELITE'; return enterApp(); }
+        const sPh = localStorage.getItem('u_ph'), sPs = localStorage.getItem('u_ps'), sIp = localStorage.getItem('u_ip');
+        if (ph === sPh && ps === sPs && currentIP === sIp) { state.chatID = ph; enterApp(); }
+        else smartNotif("AKSES DITOLAK");
     }
 
-    // --- PANDUAN CERDAS (STANDART VS ELITE) ---
+    // --- TUTORIAL ---
     window.showTutorial = function() {
-        let title, body;
-        if (state.status === 'ELITE') {
-            title = "ELITE MASTER PROTOCOL";
-            body = "1. TARGET: Limit profit harian 10% aktif.\n2. AUTOMATION: TSL Guard 2% bekerja otomatis mengunci profit.\n3. EXECUTION: Tombol 'Secure Profit' terhubung langsung ke link referral Master.\n4. AUDIT: Gunakan fitur XLSX di History untuk ekspor data.\n5. NOTIF: Sinyal otomatis dikirim ke DM Telegram pribadi.";
-        } else {
-            title = "STANDART MEMBER MISSION";
-            body = "1. LIMIT: Profit harian dibatasi maksimal 5%.\n2. MISSION: Capai profit 5% selama 7 hari berturut-turut untuk lulus.\n3. CERTIFICATE: Sertifikat kelulusan akan muncul otomatis di hari ke-7.\n4. MANUAL: Pantau harga manual, fitur TSL Guard dinonaktifkan.";
-        }
+        const isE = (state.status === 'ELITE');
+        const title = isE ? "ELITE MASTER PROTOCOL" : "STANDART MEMBER MISSION";
+        const body = isE ? "1. Limit 10% Aktif.\n2. TSL Guard 2%.\n3. Referral Master Aktif." : "1. Limit 5%.\n2. Misi 7 Hari.\n3. No TSL Guard.";
         showModal(title, body);
     }
 
-    // --- CORE TRADING ENGINE ---
+    // --- ENGINE ---
     async function startEngine() {
         try {
-            const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&per_page=20&sparkline=true');
+            const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&per_page=15');
             const data = await res.json();
-            processMarket(data);
-        } catch (e) { console.warn("Syncing..."); }
+            state.cards = data.map(c => ({ id: c.id, name: c.symbol.toUpperCase(), price: c.current_price, status: 'ANALYSIS' }));
+            renderUI();
+        } catch (e) { console.warn("Sync..."); }
         setTimeout(startEngine, 10000);
     }
 
-    function processMarket(coins) {
-        coins.forEach(coin => {
-            let card = state.cards.find(c => c.coinId === coin.id);
-            if (card) {
-                card.current = coin.current_price;
-                card.sparkline = coin.sparkline_in_7d.price.slice(-12);
-                if (card.current > card.high) card.high = card.current;
-                
-                // TSL Guard 2% Otomatis (Elite Only)
-                if (state.status === 'ELITE' && (card.high - card.current) / card.high >= 0.02) {
-                    handleAction(card.id, "TSL GUARD");
-                }
-            } else if (Math.random() > 0.8 && state.cards.length < 12) {
-                state.cards.push({
-                    id: Date.now() + Math.random(), 
-                    coinId: coin.id, 
-                    name: coin.symbol.toUpperCase(),
-                    entry: coin.current_price, 
-                    current: coin.current_price, 
-                    high: coin.current_price,
-                    img: coin.image, 
-                    status: 'ANALYSIS', 
-                    sparkline: coin.sparkline_in_7d.price.slice(-12)
-                });
-            }
-        });
-        renderUI();
-    }
-
-    window.handleAction = function(id, trigger) {
-        const card = state.cards.find(c => c.id === id);
-        if (!card) return;
-
-        if (card.status === 'ANALYSIS') {
-            const limit = (state.status === 'ELITE' ? 0.10 : 0.05);
-            if (state.capProfit / (state.initCap || 1) >= limit) {
-                return showModal("LIMIT HARI INI", `Target profit harian Anda telah tercapai.`);
-            }
-            card.status = 'EXECUTION';
-            card.stake = state.initCap * 0.1;
-            notifyTelegram(`🛰 LOCK: $${card.name}\nStake: ${formatIDR(card.stake)}`, true);
-        } else {
-            const pnl = ((card.current / card.entry) - 1);
-            const profit = card.stake * pnl;
-            
-            state.capProfit += profit;
-            state.initCap += profit; // Auto-Compound
-
-            state.log.unshift({
-                asset: card.name,
-                profit: profit,
-                time: new Date().toLocaleTimeString()
-            });
-
-            if (state.status === 'ELITE') window.open(decode('IDX'), '_blank');
-            state.cards = state.cards.filter(c => c.id !== id);
-            notifyTelegram(`🚨 TP SECURED: $${card.name}\nGain: ${formatIDR(profit)}`, true);
-        }
-        saveData();
-        renderUI();
-    }
-
-    // --- UI RENDERER ---
     function renderUI() {
-        const isElite = (state.status === 'ELITE');
-        document.body.className = isElite ? 'elite-bg-glow' : 'bg-[#020308]';
-        
+        const isE = (state.status === 'ELITE');
+        document.body.className = isE ? 'elite-bg-glow' : 'bg-[#020308]';
         document.getElementById('cap-main').innerText = formatIDR(state.capProfit);
-        document.getElementById('b-scalp').innerText = formatIDR(state.initCap * 0.4);
-        document.getElementById('b-smart').innerText = formatIDR(state.initCap * 0.4);
-        document.getElementById('b-moon').innerText = formatIDR(state.initCap * 0.2);
-        
-        document.getElementById('mode-text').innerText = `${state.status} MODE`;
-        document.getElementById('mode-dot').className = `w-2 h-2 rounded-full ${isElite ? 'bg-yellow-500 animate-pulse' : 'bg-emerald-500'}`;
-        
-        document.getElementById('tg-btn').classList.toggle('opacity-100', isElite);
-        document.getElementById('excel-btn').classList.toggle('hidden', !isElite);
-        document.getElementById('master-switch-btn').classList.toggle('hidden', !state.isMaster && localStorage.getItem('master_perm_lock') !== 'true');
-
-        const aDiv = document.getElementById('list-analysis');
-        const eDiv = document.getElementById('list-execution');
-        aDiv.innerHTML = ''; eDiv.innerHTML = '';
-
-        state.cards.forEach(c => {
-            const pnl = ((c.current / c.entry) - 1) * 100;
-            const html = `
-                <div class="glass-premium p-4 flex flex-col gap-2 ${c.status === 'EXECUTION' ? 'blink-execute' : ''}">
-                    <div class="flex justify-between items-center text-[8px] font-black uppercase">
-                        <span>${c.name}/IDR</span><img src="${c.img}" class="w-3 h-3 rounded-full">
-                    </div>
-                    <div class="h-10 w-full"><canvas id="chart-${c.id.toString().replace('.','')}" height="40"></canvas></div>
-                    <div class="text-center">
-                        <p class="${pnl >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-black text-xs">${pnl.toFixed(2)}%</p>
-                    </div>
-                    <button onclick="handleAction(${c.id})" class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-xl uppercase shadow-lg">
-                        ${c.status === 'ANALYSIS' ? 'Lock Signal' : 'Secure Profit'}
-                    </button>
-                </div>`;
-            if (c.status === 'ANALYSIS') aDiv.innerHTML += html; else eDiv.innerHTML += html;
-            setTimeout(() => drawTrend(c), 100);
-        });
-
+        document.getElementById('mode-text').innerText = state.status + " MODE";
+        document.getElementById('mode-dot').className = `w-2 h-2 rounded-full ${isE ? 'bg-yellow-500 animate-pulse' : 'bg-emerald-500'}`;
         document.getElementById('list-history').innerHTML = state.log.slice(0, 15).map(l => `
-            <div class="p-2 rounded bg-white/5 border-l-2 ${l.profit>=0?'border-emerald-500':'border-rose-500'} flex justify-between text-[7px] font-black mb-1">
+            <div class="p-2 bg-white/5 border-l-2 ${l.profit>=0?'border-emerald-500':'border-rose-500'} text-[7px] mb-1 flex justify-between">
                 <span>${l.asset}</span><span>${formatIDR(l.profit)}</span>
             </div>`).join('');
     }
 
-    function drawTrend(c) {
-        const ctx = document.getElementById(`chart-${c.id.toString().replace('.','')}`);
-        if(!ctx) return;
-        new Chart(ctx, {
-            type: 'line',
-            data: { 
-                labels: c.sparkline.map((_,i)=>i), 
-                datasets: [{ data: c.sparkline, borderColor: '#ffd700', borderWidth: 1, pointRadius: 0, fill: false, tension: 0.4 }] 
-            },
-            options: { plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } }, responsive: true, maintainAspectRatio: false }
-        });
-    }
-
-    // --- FINALISASI & AUTH ---
     function enterApp() {
         document.getElementById('auth-screen').style.display = 'none';
         localStorage.setItem('titan_active', 'true');
         if(state.initCap === 0) document.getElementById('modal-vault').classList.remove('hidden');
         startEngine(); resetAutoLock();
     }
-
-    window.finalizeCapital = function() {
+    function finalizeCapital() {
         state.initCap = parseInt(document.getElementById('vault-input').value);
-        document.getElementById('modal-vault').classList.add('hidden');
-        saveData(); enterApp();
+        document.getElementById('modal-vault').classList.add('hidden'); saveData(); enterApp();
     }
-
-    window.saveData = function() { localStorage.setItem('titan_v13_stable_final_safe', JSON.stringify(state)); }
-    window.formatIDR = (v) => "Rp " + Math.floor(v).toLocaleString('id-ID');
-    window.smartNotif = (t) => { const el = document.createElement('div'); el.className="toast-premium titan-font text-yellow-500 text-[9px]"; el.innerText = t; document.getElementById('notif-area').appendChild(el); setTimeout(()=>el.remove(), 3000); }
+    function saveData() { localStorage.setItem('titan_v13_stable_final_safe', JSON.stringify(state)); }
+    function formatIDR(v) { return "Rp " + Math.floor(v).toLocaleString('id-ID'); }
+    function smartNotif(t) { const el = document.createElement('div'); el.className="toast-premium titan-font text-yellow-500 text-[9px]"; el.innerText = t; document.getElementById('notif-area').appendChild(el); setTimeout(()=>el.remove(), 3000); }
+    function showModal(title, body) { const modal = document.createElement('div'); modal.className = "modal-overlay"; modal.innerHTML = `<div class="glass-premium p-8 w-64 text-center border-yellow-500/40"><h4 class="titan-font text-yellow-500 text-xs mb-4 uppercase underline">${title}</h4><p class="text-[8px] mb-6 opacity-60 uppercase whitespace-pre-wrap">${body}</p><button onclick="this.parentElement.parentElement.remove()" class="w-full py-3 bg-yellow-500 text-black font-black text-[9px] rounded-xl uppercase">OK</button></div>`; document.body.appendChild(modal); }
     window.openExternal = (k) => window.open(decode(k), '_blank');
-    window.masterStatusToggle = function() { state.status = (state.status === 'ELITE') ? 'STANDART' : 'ELITE'; saveData(); renderUI(); }
-    window.showModal = (title, body) => { const modal = document.createElement('div'); modal.className = "modal-overlay"; modal.innerHTML = `<div class="glass-premium p-8 w-64 text-center border-yellow-500/40"><h4 class="titan-font text-yellow-500 text-xs mb-4 uppercase underline">${title}</h4><p class="text-[8px] mb-6 opacity-60 uppercase whitespace-pre-wrap">${body}</p><button onclick="this.parentElement.parentElement.remove()" class="w-full py-3 bg-yellow-500 text-black font-black text-[9px] rounded-xl uppercase">OK</button></div>`; document.body.appendChild(modal); }
-    function notifyTelegram(t, g) { const c = g ? decode('CI') : state.chatID; if(c) fetch(`https://api.telegram.org/bot${decode('BT')}/sendMessage?chat_id=${c}&text=${encodeURIComponent(t)}`); }
-    window.exportExcel = () => { const ws = XLSX.utils.json_to_sheet(state.log); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "History"); XLSX.writeFile(wb, "Titan_Audit_V13.xlsx"); };
 
-    if (localStorage.getItem('titan_active') || localStorage.getItem('master_perm_lock')) enterApp();
-    renderUI();
+    if (localStorage.getItem('titan_active')) enterApp();
 })();
 </script>
 </body>
