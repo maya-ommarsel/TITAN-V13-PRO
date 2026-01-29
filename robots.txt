@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+Disallow: /config/
+
+# TITAN V13 - Security Protocol Active
+Sitemap: https://your-github-username.github.io/sitemap.xml
