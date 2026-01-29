@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /private/
-Disallow: /config/
-Sitemap: https://watch60-coder.github.io/sitemap.xml
+Disallow: /cgi-bin/
