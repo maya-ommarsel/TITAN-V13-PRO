@@ -8,90 +8,106 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
         :root { --gold: #ffd700; --emerald: #10b981; }
         body { color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; user-select: none; background: #020308; }
-        
         .bg-level-1 { background: radial-gradient(circle at top, #0a0a14 0%, #020308 100%); }
         .bg-level-2 { background: radial-gradient(circle at top, #0a140a 0%, #020803 100%); }
         .bg-level-3 { background: radial-gradient(circle at top, #14140a 0%, #080802 100%); }
-
         .titan-font { font-family: 'Orbitron', sans-serif; }
         .glass-premium { background: rgba(10, 10, 18, 0.98); backdrop-filter: blur(30px); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 2rem; position: relative; z-index: 50; }
         .btn-gold { background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%); color: black; font-weight: 900; text-transform: uppercase; cursor: pointer; }
-        
-        /* Fixed UI Components */
         .bucket-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1.5rem; padding: 1rem; text-align: center; }
         .card-radar { height: 260px; border-radius: 2rem; background: rgba(255,255,255,0.03); border: 2px solid rgba(255,215,0,0.1); padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between; align-items: center; position: relative; z-index: 10; }
-        .chart-container { height: 70px; width: 100%; pointer-events: none; }
-        
-        /* Toast & Modal Animasi */
         .toast-float { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000000; animation: slideDown 0.4s ease-out; }
         @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
-        
         #master-trigger { width: 50px; height: 50px; position: fixed; bottom: 0; left: 0; z-index: 99999; cursor: pointer; opacity: 0; }
         .sw-active { background: #ffd700 !important; color: black !important; font-weight: 900; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes scanLine { 0% { top: 0%; opacity: 0; } 50% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
     </style>
 </head>
 <body class="bg-level-1 no-scrollbar">
 
-    <div id="master-trigger" onclick="handleMasterAccess()"></div>
+    <div id="master-trigger" onclick="showMasterLogin()"></div>
     <div id="notif-area"></div>
     <div id="modal-container"></div>
 
     <div id="auth-screen" class="fixed inset-0 z-[10000] bg-[#020308] flex flex-col items-center justify-center p-6 text-center">
         <div class="w-full max-w-sm">
             <i class="fa-solid fa-eye text-5xl text-yellow-500 mb-6 drop-shadow-[0_0_15px_rgba(255,215,0,0.4)]"></i>
-            <h1 class="titan-font text-2xl text-yellow-500 mb-8 font-black uppercase">Titan V.13</h1>
+            <h1 class="titan-font text-2xl text-yellow-500 mb-8 font-black uppercase tracking-widest">Titan V.13</h1>
             <input type="password" id="auth-pass" placeholder="PASSWORD" class="w-full bg-white/5 p-5 rounded-2xl border border-white/10 outline-none text-white text-center mb-4">
-            <button onclick="handleAuth()" class="btn-gold w-full py-5 rounded-2xl titan-font text-xs font-black uppercase">Enter App</button>
+            <button onclick="handleAuth()" class="btn-gold w-full py-5 rounded-2xl titan-font text-xs font-black">Authorize</button>
         </div>
+    </div>
+
+    <div id="face-scan-screen" class="fixed inset-0 z-[15000] bg-[#020308] hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="relative w-64 h-64 mb-10">
+            <div class="absolute inset-0 border-4 border-yellow-500/20 rounded-full animate-pulse"></div>
+            <div class="absolute inset-4 border-2 border-yellow-500 rounded-full border-t-transparent animate-spin"></div>
+            <div class="absolute inset-0 flex items-center justify-center"><i class="fa-solid fa-eye text-6xl text-yellow-500"></i></div>
+            <div class="absolute left-0 right-0 h-1 bg-yellow-500 shadow-[0_0_15px_#ffd700] animate-[scanLine_2s_infinite]"></div>
+        </div>
+        <h2 class="titan-font text-yellow-500 text-lg mb-2 font-black uppercase">Biometric Scan</h2>
+        <p id="scan-status" class="text-[9px] text-white/50 titan-font uppercase tracking-widest">Verifying Identity...</p>
+    </div>
+
+    <div id="member-card-screen" class="fixed inset-0 z-[16000] bg-black/95 hidden flex flex-col items-center justify-center p-6 backdrop-blur-3xl">
+        <div class="glass-premium p-1 w-full max-w-sm rounded-[2.5rem] border-yellow-500 shadow-2xl">
+            <div class="bg-[#0a0a0a] rounded-[2.3rem] p-8 text-center relative overflow-hidden">
+                <h3 class="titan-font text-yellow-500 text-[10px] tracking-[0.3em] mb-8">OFFICIAL ID MEMBER</h3>
+                <i class="fa-solid fa-eye text-6xl text-white/10 mb-6"></i>
+                <h4 class="titan-font text-white text-sm mb-1 uppercase">Active Member</h4>
+                <p id="card-id" class="text-yellow-500/50 text-[9px] mb-8 titan-font">ID: TITAN-XXXX</p>
+                <div class="border-t border-white/5 pt-6 flex justify-between items-center">
+                    <div class="text-left"><p class="text-[7px] opacity-40 uppercase">Level</p><p id="card-lvl" class="text-[9px] font-black text-white">Standart</p></div>
+                    <div class="text-right"><p class="text-[7px] opacity-40 uppercase">Date</p><p id="card-date" class="text-[9px] font-black text-white">--/--/--</p></div>
+                </div>
+            </div>
+        </div>
+        <button onclick="closeMemberCard()" class="btn-gold mt-10 px-12 py-4 rounded-2xl titan-font text-[9px] font-black">Mulai Trading</button>
     </div>
 
     <header class="p-6 flex flex-col gap-6 sticky top-0 z-[5000]">
         <div class="flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <div class="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
-                <span id="live-count" class="titan-font text-[9px] text-emerald-500 font-black tracking-widest uppercase">Syncing...</span>
+                <span id="live-count" class="titan-font text-[9px] text-emerald-500 font-black tracking-widest uppercase">Live: 0 Active</span>
             </div>
             <div class="flex items-center gap-6 text-yellow-500">
-                <button onclick="showVaultModal()"><i class="fa-solid fa-book-bookmark text-2xl"></i></button>
+                <button onclick="showVaultInput()"><i class="fa-solid fa-book-bookmark text-2xl"></i></button>
                 <button onclick="showLogoutConfirm()"><i class="fa-solid fa-power-off text-2xl text-rose-500"></i></button>
             </div>
         </div>
-        
         <div id="admin-panel" class="hidden flex justify-center gap-2">
             <div class="flex bg-black/40 p-1 rounded-full border border-yellow-500/20 backdrop-blur-xl">
-                <button onclick="setMode(1)" id="sw-1" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase transition-all">Std</button>
-                <button onclick="setMode(2)" id="sw-2" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase transition-all">Elt</button>
-                <button onclick="setMode(3)" id="sw-3" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase transition-all">Mst</button>
+                <button onclick="setMode(1)" id="sw-1" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase">Std</button>
+                <button onclick="setMode(2)" id="sw-2" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase">Elt</button>
+                <button onclick="setMode(3)" id="sw-3" class="px-5 py-2 text-[7px] font-black titan-font rounded-full uppercase">Mst</button>
             </div>
-            <button onclick="showApiVaultModal()" class="bg-yellow-500/10 border border-yellow-500/20 px-4 py-2 rounded-full text-[7px] titan-font font-black text-yellow-500 uppercase">Api Vault</button>
+            <button onclick="showApiVault()" class="bg-yellow-500/10 border border-yellow-500/20 px-4 py-2 rounded-full text-[7px] titan-font font-black text-yellow-500 uppercase">Api Vault</button>
         </div>
     </header>
 
     <main class="p-6 h-full overflow-y-auto pb-64 no-scrollbar relative z-10">
         <section class="glass-premium p-8 text-center mb-10 shadow-2xl">
-            <p id="level-label" class="text-[9px] uppercase opacity-60 titan-font mb-4">Level 1: Standart</p>
+            <p id="level-label" class="text-[9px] uppercase opacity-60 titan-font mb-4 tracking-widest">Level 1: Standart</p>
             <h2 id="cap-main" class="titan-font text-4xl text-yellow-500 font-black mb-6">Rp 0</h2>
-            
             <div class="grid grid-cols-3 gap-3 mb-8">
                 <div class="bucket-card"><p class="text-[7px] opacity-40 uppercase mb-2 font-bold">Scalp</p><p id="b-scalp" class="text-[10px] font-black text-emerald-400">Rp 0</p></div>
                 <div class="bucket-card"><p class="text-[7px] opacity-40 uppercase mb-2 font-bold">Smart</p><p id="b-smart" class="text-[10px] font-black text-blue-400">Rp 0</p></div>
                 <div class="bucket-card"><p class="text-[7px] opacity-40 uppercase mb-2 font-bold">Moon</p><p id="b-moon" class="text-[10px] font-black text-violet-400">Rp 0</p></div>
             </div>
-            
             <div id="xp-container" class="w-full bg-white/5 h-1.5 rounded-full overflow-hidden mb-2"><div id="xp-bar" class="bg-yellow-500 h-full w-0 transition-all duration-1000"></div></div>
-            <p id="xp-text" class="text-[8px] titan-font opacity-40 uppercase font-bold">Target: 0/150 XP</p>
+            <p id="xp-text" class="text-[8px] titan-font opacity-40 uppercase font-black">Target: 0/150 XP</p>
         </section>
 
         <div class="grid grid-cols-3 gap-6">
-            <div><h3 class="titan-font text-[10px] text-yellow-500 mb-6 uppercase font-black underline">Mata Dewa</h3><div id="list-analysis" class="space-y-6"></div></div>
-            <div><h3 class="titan-font text-[10px] text-blue-500 mb-2 uppercase font-black underline">Eksekusi</h3><p id="slot-indicator" class="text-center text-[8px] opacity-40 mb-6 uppercase font-black">Slots: 0/10</p><div id="list-execution" class="space-y-6"></div></div>
-            <div><div class="flex justify-between items-center mb-6"><h3 class="titan-font text-[10px] text-emerald-500 uppercase font-black underline">Histori</h3><button onclick="exportExcel()" class="bg-emerald-500 text-black px-2 py-1 rounded-lg text-[8px] font-black uppercase">Export</button></div><div id="list-history" class="space-y-3"></div></div>
+            <div><h3 class="titan-font text-[10px] text-yellow-500 mb-6 uppercase font-black underline">Analysis</h3><div id="list-analysis" class="space-y-6"></div></div>
+            <div><h3 class="titan-font text-[10px] text-blue-500 mb-2 uppercase font-black underline">Execution</h3><p id="slot-indicator" class="text-center text-[8px] opacity-40 mb-6 font-black uppercase">Slots: 0/10</p><div id="list-execution" class="space-y-6"></div></div>
+            <div><div class="flex justify-between items-center mb-6"><h3 class="titan-font text-[10px] text-emerald-500 uppercase font-black underline">History</h3><button onclick="exportExcel()" class="bg-emerald-500 text-black px-2 py-1 rounded-lg text-[8px] font-black uppercase">Export</button></div><div id="list-history" class="space-y-3"></div></div>
         </div>
     </main>
 
@@ -104,7 +120,7 @@
     </footer>
 
     <script>
-        (function TITAN_V13_ZERO_POPUP() {
+        (function TITAN_V13_FINISH() {
             const SECRETS = {
                 BT: "ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0", GRP: "LTEwMDMyNTQzNzkzMzM=", ADM: "MTMxOTcwMDg2Ng==", MK: "TWFoYWRoYXJlVjEzTWFzdGVy",
                 IDX: "aHR0cHM6Ly9pbmRvZGF4Lm9uZWxpbmsubWUvcXlZWS9yZWZlcnJhbD9kZWVwX2xpbmtfdmFsdWU9cGFnZTpyZWdpc3RlcixpZDptYXJzZWxzYWxtb24=",
@@ -112,31 +128,24 @@
             };
             function decode(k) { return atob(SECRETS[k]); }
 
-            let state = JSON.parse(localStorage.getItem('titan_db')) || { level: 1, xp: 0, cap: 0, profit: 0, execution: [], history: [], isMaster: false, eliteJoinDate: null, apiKeys: { key: '', secret: '', active: false } };
+            let state = JSON.parse(localStorage.getItem('titan_db')) || { level: 1, xp: 0, cap: 0, profit: 0, execution: [], history: [], isMaster: false, eliteJoinDate: null, apiKeys: { active: false } };
             const save = () => localStorage.setItem('titan_db', JSON.stringify(state));
 
-            // AUDIT: Semua alert/confirm/prompt diganti Custom Modal
             window.smartToast = (m) => { const a = document.getElementById('notif-area'), t = document.createElement('div'); t.className="toast-float bg-yellow-500 text-black px-6 py-3 rounded-2xl titan-font text-[10px] font-black uppercase shadow-2xl"; t.innerText=m; a.appendChild(t); setTimeout(()=>t.remove(), 2500); };
-            
             window.showCustomModal = (title, content, btnText, callback, isInput = false, type = 'text') => {
                 const m = document.getElementById('modal-container');
-                m.innerHTML = `<div class="fixed inset-0 z-[200000] bg-black/98 flex items-center justify-center p-6 backdrop-blur-3xl"><div class="glass-premium p-10 w-full max-w-sm text-center border-yellow-500 shadow-2xl"><h2 class="titan-font text-yellow-500 text-sm mb-4 uppercase underline">${title}</h2><div class="text-[9px] text-white/70 mb-8 uppercase leading-relaxed font-bold">${content}</div>${isInput ? `<input type="${type}" id="modal-input" class="w-full bg-white/5 p-4 rounded-xl mb-8 border border-yellow-500/30 text-white text-center font-bold outline-none focus:border-yellow-500" placeholder="...">` : ''}<div class="flex gap-2"><button id="modal-btn" class="btn-gold w-full py-4 rounded-xl titan-font text-[9px] font-black uppercase">${btnText}</button><button onclick="document.getElementById('modal-container').innerHTML=''" class="bg-white/5 border border-white/10 text-white w-full py-4 rounded-xl titan-font text-[9px]">Cancel</button></div></div></div>`;
+                m.innerHTML = `<div class="fixed inset-0 z-[200000] bg-black/98 flex items-center justify-center p-6 backdrop-blur-3xl"><div class="glass-premium p-10 w-full max-w-sm text-center border-yellow-500 shadow-2xl"><h2 class="titan-font text-yellow-500 text-sm mb-4 uppercase underline">${title}</h2><div class="text-[9px] text-white/70 mb-8 uppercase leading-relaxed font-bold">${content}</div>${isInput ? `<input type="${type}" id="modal-input" class="w-full bg-white/5 p-4 rounded-xl mb-8 border border-white/10 text-white text-center outline-none focus:border-yellow-500">` : ''}<div class="flex gap-2"><button id="modal-btn" class="btn-gold w-full py-4 rounded-xl titan-font text-[9px] font-black uppercase">${btnText}</button><button onclick="document.getElementById('modal-container').innerHTML=''" class="bg-white/5 border border-white/10 text-white w-full py-4 rounded-xl titan-font text-[9px]">Cancel</button></div></div></div>`;
                 document.getElementById('modal-btn').onclick = () => { const val = document.getElementById('modal-input') ? document.getElementById('modal-input').value : null; m.innerHTML = ''; if(callback) callback(val); };
             };
 
             function logTransaction(asset, gain) {
                 state.history.unshift({ asset, gain, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() });
                 state.profit += gain; save(); renderUI(); renderHistory();
+                notifyAdmin(`Profit: ${asset} | Rp ${gain.toLocaleString()}`);
             }
 
-            window.handleMasterAccess = () => { 
-                showCustomModal("Master Authority", "Masukkan Kunci Akses Master.", "Authorize", (v) => { if(v === decode('MK')) { state.isMaster = true; state.level = 3; save(); location.reload(); } else { smartToast("Access Denied"); } }, true, 'password');
-            };
-
-            window.showLogoutConfirm = () => {
-                showCustomModal("Security Alert", "Anda yakin ingin keluar dan membersihkan sesi?", "Logout Now", () => { localStorage.clear(); location.reload(); });
-            };
-
+            window.showMasterLogin = () => { showCustomModal("Master Access", "Input Authority Key.", "Authorize", (v) => { if(v === decode('MK')) { state.isMaster = true; state.level = 3; save(); location.reload(); } else { smartToast("Denied"); } }, true, 'password'); };
+            window.showLogoutConfirm = () => { showCustomModal("Security Alert", "Clear session and logout?", "Logout", () => { localStorage.clear(); location.reload(); }); };
             window.setMode = (lvl) => { state.level = lvl; save(); location.reload(); };
 
             async function mataDewaScan() {
@@ -149,23 +158,22 @@
                         if(s) { sendGroupSignal(s); if(state.level === 3 && state.apiKeys.active && state.execution.length < 10) autoLock(s); }
                     }
                     renderAnalysis(filtered);
-                } catch(e) { console.warn("Sync Delay"); }
+                } catch(e) { console.warn("API Offline"); }
                 setTimeout(mataDewaScan, 10000);
             }
 
             function renderAnalysis(cards) {
                 const div = document.getElementById('list-analysis'); div.innerHTML = '';
                 cards.forEach(c => {
-                    div.innerHTML += `<div class="card-radar"><div class="flex justify-between w-full font-black text-[9px] uppercase"><span>${c.symbol}</span><img src="${c.img}" class="w-4 h-4 rounded-full"></div><div class="chart-container"><canvas id="chart-${c.id}"></canvas></div><div class="text-center w-full"><p class="${c.change >= 0 ? 'text-emerald-400' : 'text-rose-500'} font-black text-[10px]">${c.change.toFixed(2)}%</p></div><button onclick='lockSignalById("${c.id}", ${c.price}, "${c.symbol}")' class="btn-gold w-full py-3 rounded-2xl text-[8px] titan-font">Lock Signal</button></div>`;
+                    div.innerHTML += `<div class="card-radar"><div class="flex justify-between w-full font-black text-[9px]"><span>${c.symbol}</span><img src="${c.img}" class="w-4 h-4 rounded-full"></div><div style="height:70px;width:100%"><canvas id="chart-${c.id}"></canvas></div><p class="${c.change >= 0 ? 'text-emerald-400' : 'text-rose-500'} font-black text-[10px]">${c.change.toFixed(2)}%</p><button onclick='lockSignalById("${c.id}", ${c.price}, "${c.symbol}")' class="btn-gold w-full py-3 rounded-2xl text-[8px] titan-font">Lock Signal</button></div>`;
                     setTimeout(() => drawChart(c), 100);
                 });
             }
 
             function renderExecution() {
                 const div = document.getElementById('list-execution'); div.innerHTML = '';
-                document.getElementById('slot-indicator').innerText = `Slots: ${state.execution.length}/10`;
                 state.execution.forEach(e => {
-                    div.innerHTML += `<div class="card-radar border-emerald-500/30"><span class="titan-font font-black text-[9px] uppercase">${e.symbol}</span><div class="text-center w-full"><p class="text-[10px] text-emerald-400 font-black">Entry: Rp ${e.entry.toLocaleString()}</p></div><button onclick="handleTP('${e.id}')" class="btn-gold w-full py-3 rounded-2xl text-[8px] titan-font bg-emerald-500 text-black">Secure Profit</button></div>`;
+                    div.innerHTML += `<div class="card-radar border-emerald-500/30"><span class="titan-font font-black text-[9px] uppercase">${e.symbol}</span><p class="text-[10px] text-emerald-400 font-black">Rp ${e.entry.toLocaleString()}</p><button onclick="handleTP('${e.id}')" class="btn-gold w-full py-3 rounded-2xl text-[8px] titan-font">Secure Profit</button></div>`;
                 });
             }
 
@@ -178,7 +186,7 @@
 
             function drawChart(c) {
                 const ctx = document.getElementById(`chart-${c.id}`); if(!ctx) return;
-                new Chart(ctx, { type: 'line', data: { labels: c.sparkline.map((_, i) => i), datasets: [{ data: c.sparkline, borderColor: '#ffd700', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.4 }] }, options: { plugins: { legend: false }, scales: { x: { display: false }, y: { display: false } }, maintainAspectRatio: false } });
+                new Chart(ctx, { type: 'line', data: { labels: c.sparkline.map((_, i) => i), datasets: [{ data: c.sparkline, borderColor: '#ffd700', borderWidth: 1.5, pointRadius: 0, fill: false }] }, options: { plugins: { legend: false }, scales: { x: { display: false }, y: { display: false } }, maintainAspectRatio: false } });
             }
 
             function renderUI() {
@@ -189,30 +197,37 @@
                 document.getElementById('b-smart').innerText = "Rp " + Math.floor(state.cap * 0.4).toLocaleString('id-ID');
                 document.getElementById('b-moon').innerText = "Rp " + Math.floor(state.cap * 0.2).toLocaleString('id-ID');
                 document.getElementById('admin-panel').classList.toggle('hidden', !state.isMaster);
-                if(!isE && !isM) { document.getElementById('xp-bar').style.width = (state.xp/150*100) + "%"; document.getElementById('xp-text').innerText = `Progress: ${state.xp}/150 XP`; }
-                else { document.getElementById('xp-container').classList.add('hidden'); document.getElementById('xp-text').innerText = isM ? "Master Autopilot Active" : "Elite Access Granted"; }
+                if(!isE && !isM) { document.getElementById('xp-bar').style.width = (state.xp/150*100) + "%"; }
+                else { document.getElementById('xp-container').classList.add('hidden'); }
                 [1,2,3].forEach(l => { const btn = document.getElementById('sw-'+l); if(btn) btn.classList.toggle('sw-active', state.level === l); });
             }
 
-            window.lockSignalById = (id, price, symbol) => {
-                if(state.execution.length >= 10 || state.cap <= 0) return smartToast("Slots Full / No Cap");
-                state.execution.push({ id, symbol, entry: price, stake: state.cap * 0.1 });
-                save(); renderExecution(); smartToast("Signal Locked");
+            window.handleAuth = () => {
+                const v = document.getElementById('auth-pass').value;
+                if(v === decode('MK')) { state.isMaster = true; state.level = 3; save(); enterApp(); }
+                else if(v === "member") { startFaceScan(); }
+                else if(state.cap > 0) enterApp();
+                else smartToast("Denied");
             };
 
-            window.handleTP = (id) => {
-                const e = state.execution.find(x => x.id === id);
-                if(e) { logTransaction(e.symbol, e.stake * 0.05); state.execution = state.execution.filter(x => x.id !== id); if(state.level === 2) window.open(decode('IDX'), '_blank'); save(); renderExecution(); }
-            };
+            function startFaceScan() {
+                document.getElementById('auth-screen').style.display='none';
+                document.getElementById('face-scan-screen').classList.remove('hidden');
+                setTimeout(() => {
+                    document.getElementById('face-scan-screen').classList.add('hidden');
+                    generateMemberCard();
+                }, 3000);
+            }
 
+            function generateMemberCard() {
+                document.getElementById('card-id').innerText = `ID: TITAN-2026-${Math.floor(1000+Math.random()*9000)}`;
+                document.getElementById('card-date').innerText = new Date().toLocaleDateString();
+                document.getElementById('member-card-screen').classList.remove('hidden');
+            }
+
+            window.closeMemberCard = () => { document.getElementById('member-card-screen').classList.add('hidden'); enterApp(); };
             window.smartScanTrigger = () => { smartToast("Scanning..."); mataDewaScan(); if(state.level === 1 && state.xp < 150) { state.xp += 15; if(state.xp >= 150) { state.level = 2; state.eliteJoinDate = Date.now(); } save(); renderUI(); } };
-            
-            window.handleAuth = () => { const v = document.getElementById('auth-pass').value; if(v === decode('MK')) { state.isMaster = true; state.level = 3; save(); enterApp(); } else if(state.cap > 0 || v === "member") enterApp(); else smartToast("Access Denied"); };
-            
-            window.showVaultModal = () => { showCustomModal("Vault Entry", "Input modal simulasi Anda.", "Initialize", (v) => { state.cap = parseInt(v); state.profit = parseInt(v); save(); renderUI(); }, true, 'number'); };
-            
-            window.showApiVaultModal = () => { if(!state.isMaster) return; showCustomModal("API Configuration", "Input API & Secret Key Indodax.", "Connect", (v) => { state.apiKeys.active = true; save(); smartToast("API Connected"); }, true, 'password'); };
-
+            window.showVaultInput = () => { showCustomModal("Vault Configuration", "Initialize capital.", "Activate", (v) => { state.cap = parseInt(v); state.profit = parseInt(v); save(); renderUI(); }, true, 'number'); };
             function enterApp() { document.getElementById('auth-screen').style.display='none'; renderUI(); renderHistory(); renderExecution(); mataDewaScan(); }
             if(state.isMaster || state.cap > 0) enterApp();
         })();
