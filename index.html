@@ -6,8 +6,6 @@
     <title>TITAN V13 - OFFICIAL</title>
 
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,22 +13,24 @@
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
+        
         :root { --gold: #ffd700; --emerald: #10b981; --glass: rgba(10, 10, 18, 0.98); }
         body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; user-select: none; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
+        
         .glass-premium { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 1.5rem; }
         .btn-gold { background: linear-gradient(135deg, #ffd700 0%, #b8860b 100%); color: black; font-weight: 900; text-transform: uppercase; }
         
-        /* Master Switch UI */
+        /* Master & Admin Switch UI */
         .switch-container { display: flex; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 50px; border: 1px solid rgba(255,215,0,0.2); }
         .switch-btn { padding: 6px 14px; border-radius: 50px; font-size: 8px; font-weight: 900; transition: 0.3s; color: white; opacity: 0.5; }
         .switch-active { background: var(--gold); color: black; opacity: 1; box-shadow: 0 0 15px rgba(255,215,0,0.3); }
 
-        /* Card Optimization */
-        .card-radar { height: 160px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; }
-        .chart-layer { position: absolute; bottom: 0; left: 0; right: 0; height: 70px; pointer-events: none; z-index: 1; }
-        .card-content { position: relative; z-index: 10; }
-
+        /* Card Design - Seperti Gambar */
+        .card-radar { height: 190px; position: relative; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.1); border-radius: 1.5rem; background: rgba(255,255,255,0.02); }
+        .chart-layer { position: absolute; top: 35%; left: 0; right: 0; height: 70px; pointer-events: none; z-index: 1; }
+        .card-content { position: relative; z-index: 10; padding: 1rem; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+        
         .toast-premium { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 10010; background: rgba(10,10,18,0.95); border: 1px solid var(--gold); padding: 12px 20px; border-radius: 12px; font-size: 10px; animation: slideDown 0.4s ease; }
         @keyframes slideDown { from { top: -100px; } to { top: 20px; } }
         #face-video { width: 100%; height: 180px; border-radius: 1rem; object-fit: cover; border: 2px solid var(--gold); background: #000; }
@@ -51,7 +51,7 @@
             <h1 class="titan-font text-2xl text-yellow-500 mb-8 font-black tracking-widest uppercase">Titan V.13</h1>
             <div id="biometric-area" class="hidden mb-6">
                 <video id="face-video" autoplay muted playsinline></video>
-                <p class="text-[9px] text-yellow-500 titan-font mt-2 uppercase tracking-widest">Scanning Face Identity...</p>
+                <p class="text-[9px] text-yellow-500 titan-font mt-2 uppercase">Verifikasi Biometrik Wajah...</p>
             </div>
             <div class="space-y-4">
                 <input type="text" id="auth-phone" placeholder="CHAT ID TELEGRAM" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 outline-none focus:border-yellow-500 text-white text-center">
@@ -75,11 +75,12 @@
                 <button onclick="logout()"><i class="fa-solid fa-power-off text-xl text-rose-500"></i></button>
             </div>
         </div>
-        <div id="owner-panel" class="hidden flex justify-center">
+        
+        <div id="admin-panel" class="hidden flex justify-center">
             <div class="switch-container">
-                <button id="sw-1" onclick="setMode(1)" class="switch-btn switch-active">STANDART</button>
-                <button id="sw-2" onclick="setMode(2)" class="switch-btn">ELITE</button>
-                <button id="sw-3" onclick="setMode(3)" class="switch-btn">MASTER</button>
+                <button id="sw-std" onclick="setMode(1)" class="switch-btn">STANDART</button>
+                <button id="sw-elt" onclick="setMode(2)" class="switch-btn">ELITE</button>
+                <button id="sw-mst" onclick="setMode(3)" class="switch-btn hidden">MASTER BYPASS</button>
             </div>
         </div>
     </header>
@@ -98,14 +99,14 @@
         </section>
 
         <div class="grid grid-cols-3 gap-3">
-            <div><h3 class="titan-font text-[9px] text-yellow-500 mb-4 uppercase underline underline-offset-4">Analysis</h3><div id="list-analysis" class="space-y-3"></div></div>
+            <div><h3 class="titan-font text-[9px] text-yellow-500 mb-4 uppercase font-black underline underline-offset-4">Analysis</h3><div id="list-analysis" class="space-y-4"></div></div>
             <div>
-                <h3 class="titan-font text-[9px] text-blue-500 mb-1 uppercase underline underline-offset-4">Execution</h3>
+                <h3 class="titan-font text-[9px] text-blue-500 mb-1 uppercase font-black underline underline-offset-4">Execution</h3>
                 <p id="slot-indicator" class="text-center text-[7px] opacity-40 titan-font mb-4">SLOTS: 0/10</p>
-                <div id="list-execution" class="space-y-3"></div>
+                <div id="list-execution" class="space-y-4"></div>
             </div>
             <div>
-                <div class="flex justify-between items-center mb-4"><h3 class="titan-font text-[9px] text-emerald-500 uppercase underline underline-offset-4">History</h3><button id="btn-excel" onclick="exportExcel()" class="hidden bg-emerald-500 text-black px-1 rounded text-[7px] font-black">XLSX</button></div>
+                <div class="flex justify-between items-center mb-4"><h3 class="titan-font text-[9px] text-emerald-500 uppercase font-black underline underline-offset-4">History</h3><button id="btn-excel" onclick="exportExcel()" class="hidden bg-emerald-500 text-black px-1 rounded text-[7px] font-black">XLSX</button></div>
                 <div id="list-history" class="space-y-2"></div>
             </div>
         </div>
@@ -114,16 +115,15 @@
     <footer class="fixed bottom-0 left-0 right-0 p-5 bg-black border-t border-white/5 z-50 flex justify-around items-center">
         <button onclick="openLink('IDX')"><i class="fa-solid fa-wallet text-xl text-yellow-500"></i></button>
         <button onclick="openLink('TG')"><i class="fa-brands fa-telegram text-2xl text-sky-400"></i></button>
-        <div onclick="smartScanTrigger()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-[0_0_30px_rgba(255,215,0,0.3)] cursor-pointer active:scale-90 transition-all">
-            <i class="fa-solid fa-bolt-lightning text-black text-2xl"></i>
+        <div onclick="smartScanTrigger()" class="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center -mt-10 shadow-lg cursor-pointer transition-all active:scale-90">
+            <i class="fa-solid fa-bolt-lightning text-black text-xl"></i>
         </div>
         <button onclick="openLink('JU')"><i class="fa-solid fa-rocket text-xl text-emerald-400"></i></button>
         <button onclick="openLink('GA')"><i class="fa-solid fa-globe text-xl text-blue-400"></i></button>
     </footer>
 
     <script>
-        (function TITAN_V13_SUPREME() {
-            // --- DATA MASTER ENKRIPSI ---
+        (function TITAN_V13_FINALE() {
             const SECRETS = {
                 BT: "ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0",
                 CI: "LTEwMDMyNTQzNzkzMzM=",
@@ -131,38 +131,35 @@
                 IDX: "aHR0cHM6Ly9pbmRvZGF4Lm9uZWxpbmsubWUvcXlZWS9yZWZlcnJhbD9kZWVwX2xpbmtfdmFsdWU9cGFnZTpyZWdpc3RlcixpZDptYXJzZWxzYWxtb24=",
                 TG: "aHR0cHM6Ly90Lm1lL3RpdGFudjEzcHJv",
                 JU: "aHR0cHM6Ly9qdXAuYWcvP3JlZklkPXl1ZjBkaDRpbDF4cw==",
-                GA: "aHR0cHM6Ly93d3cuZ2F0ZS5jb20vcmVmZXJyYWwvY2FzaGJhY2s/cmVmPVZRVVFWVldKVUcmcmVmX3R5cGU9MTAzJnBhZ2U9ZWFyblZvdWNoZXImdXRtX2NtcD1QRVlFUWRTYg=="
+                GA: "aHR0cHM6Ly93d3cuZ2F0ZS5jb20vcmVmZXJyYWwvY2FzaGJhY2s/cmVmPVZRVVFWVldKVUcmcmVmX3R5cGU9MTAzJnBhZ2U9ZWFyblZvdWNoZXImdXRt_cmp=PEYEQdSb"
             };
 
             let state = JSON.parse(localStorage.getItem('titan_db')) || { 
                 user: null, level: 1, xp: 0, cap: 0, profit: 0, 
-                cards: [], history: [], loginAttempts: 0 
+                cards: [], history: [], isMaster: false 
             };
             let tapCount = 0, tapTimer;
 
             const save = () => localStorage.setItem('titan_db', JSON.stringify(state));
 
-            // --- MASTER SWITCH MODE ---
+            // MASTER & ADMIN SWITCH LOGIC
             window.setMode = (lvl) => {
                 state.level = lvl; save(); renderUI();
-                document.querySelectorAll('.switch-btn').forEach((b, i) => b.classList.toggle('switch-active', i + 1 === lvl));
-                smartToast("MODE: " + (lvl === 1 ? "STANDART" : lvl === 2 ? "ELITE" : "MASTER"));
+                smartToast("SWITCH TO " + (lvl === 1 ? "STANDART" : lvl === 2 ? "ELITE" : "MASTER"));
             };
 
             window.handleSecretTap = () => {
                 tapCount++; clearTimeout(tapTimer);
                 tapTimer = setTimeout(() => tapCount = 0, 2000);
                 if(tapCount >= 5) {
-                    const p = prompt("MASTER SYSTEM KEY:");
-                    if(p === atob(SECRETS.MK)) { 
-                        state.level = 3; state.user = "MASTER"; 
-                        localStorage.setItem('master_perm_lock', 'true');
-                        save(); location.reload(); 
+                    const pass = prompt("MASTER KEY:");
+                    if(pass === atob(SECRETS.MK)) {
+                        state.isMaster = true; state.level = 3; save(); location.reload();
                     }
                 }
             };
 
-            // --- TRADING ENGINE: DUAL API ---
+            // DUAL API ENGINE (Indodax & CoinGecko)
             async function mataDewaScan() {
                 try {
                     const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&per_page=12&sparkline=true');
@@ -170,38 +167,37 @@
                     state.cards = coins.map(c => ({
                         id: c.id, symbol: c.symbol.toUpperCase(), price: c.current_price, img: c.image,
                         sparkline: c.sparkline_in_7d.price.slice(-20), status: 'ANALYSIS',
-                        rsi: Math.floor(Math.random()*40+20)
+                        rsi: Math.floor(Math.random()*40+20), change: c.price_change_percentage_24h
                     }));
                     renderCards();
-                } catch(e) { console.warn("API Offline"); }
-                setTimeout(mataDewaScan, 10000);
+                } catch(e) { console.warn("Syncing..."); }
+                setTimeout(mataDewaScan, 8000);
             }
-
-            window.lockSignal = (id) => {
-                if(state.cap <= 0) return showInputModal();
-                const card = state.cards.find(c => c.id === id);
-                card.status = 'EXECUTION'; card.entry = card.price; card.stake = state.cap * 0.1;
-                smartToast(`LOCKED: ${card.symbol}`); save(); renderCards();
-            };
 
             function renderCards() {
                 const aDiv = document.getElementById('list-analysis'), eDiv = document.getElementById('list-execution');
                 aDiv.innerHTML = ''; eDiv.innerHTML = '';
+                
                 state.cards.forEach(c => {
-                    const pnl = ((c.price / (c.entry || c.price)) - 1) * 100;
                     const html = `
-                        <div class="glass-premium card-radar p-3 ${c.status === 'EXECUTION' ? 'blink-execute' : ''}">
+                        <div class="card-radar ${c.status === 'EXECUTION' ? 'blink-execute' : ''}">
                             <div class="card-content">
-                                <div class="flex items-center gap-2 mb-1">
-                                    <img src="${c.img}" class="w-4 h-4 rounded-full">
-                                    <span class="text-[8px] titan-font font-black">${c.symbol}</span>
-                                    <span class="text-[6px] text-yellow-500 font-bold ml-auto">${c.rsi < 25 ? 'MOONSHOT' : 'SMART'}</span>
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <img src="${c.img}" class="w-5 h-5 rounded-full">
+                                        <span class="text-[9px] titan-font font-black">${c.symbol}/IDR</span>
+                                    </div>
+                                    <span class="text-[7px] font-black ${c.change >= 0 ? 'text-emerald-400' : 'text-rose-500'}">${c.change?.toFixed(2)}%</span>
                                 </div>
-                                <p class="text-[9px] font-black">Rp ${c.price.toLocaleString()}</p>
-                                ${c.status === 'EXECUTION' ? `<p class="text-[7px] text-emerald-400 font-bold">${pnl.toFixed(2)}%</p>` : ''}
+                                <div class="text-center">
+                                    <p class="text-[12px] font-black">Rp ${c.price.toLocaleString()}</p>
+                                    <p class="text-[7px] opacity-40 uppercase">STAKE: Rp ${(state.cap * 0.1 || 0).toLocaleString()}</p>
+                                </div>
+                                <button onclick="${c.status === 'EXECUTION' ? 'handleTP' : 'lockSignal'}('${c.id}')" class="btn-gold w-full py-2 rounded-xl text-[8px] tracking-widest relative z-20">
+                                    ${c.status === 'EXECUTION' ? 'SECURE PROFIT' : 'LOCK SIGNAL'}
+                                </button>
                             </div>
                             <div class="chart-layer"><canvas id="chart-${c.id}"></canvas></div>
-                            <button onclick="${c.status === 'EXECUTION' ? 'handleTP' : 'lockSignal'}('${c.id}')" class="btn-gold text-[7px] py-1 rounded-lg mt-auto relative z-20">${c.status === 'EXECUTION' ? 'SECURE' : 'LOCK'}</button>
                         </div>`;
                     if(c.status === 'EXECUTION') eDiv.innerHTML += html; else aDiv.innerHTML += html;
                     setTimeout(() => drawChart(c), 100);
@@ -210,7 +206,7 @@
 
             function drawChart(c) {
                 const ctx = document.getElementById(`chart-${c.id}`); if(!ctx) return;
-                new Chart(ctx, { type: 'line', data: { labels: c.sparkline.map((_, i) => i), datasets: [{ data: c.sparkline, borderColor: '#ffd700', borderWidth: 1, pointRadius: 0, fill: false, tension: 0.4 }] }, options: { plugins: { legend: false }, scales: { x: { display: false }, y: { display: false } }, maintainAspectRatio: false } });
+                new Chart(ctx, { type: 'line', data: { labels: c.sparkline.map((_, i) => i), datasets: [{ data: c.sparkline, borderColor: '#ffd700', borderWidth: 1.5, pointRadius: 0, fill: false, tension: 0.4 }] }, options: { plugins: { legend: false }, scales: { x: { display: false }, y: { display: false } }, maintainAspectRatio: false } });
             }
 
             function renderUI() {
@@ -219,32 +215,46 @@
                 document.getElementById('b-scalp').innerText = formatIDR(state.cap * 0.4);
                 document.getElementById('b-smart').innerText = formatIDR(state.cap * 0.4);
                 document.getElementById('b-moon').innerText = formatIDR(state.cap * 0.2);
-                document.getElementById('level-label').innerText = isM ? "LEVEL 3: MASTER SYSTEM OVERRIDE" : (isE ? "LEVEL 2: ELITE MODE" : "LEVEL 1: STANDART MODE");
-                document.getElementById('owner-panel').classList.toggle('hidden', !isM);
+                document.getElementById('level-label').innerText = isM ? "LEVEL 3: MASTER SYSTEM" : (isE ? "LEVEL 2: ELITE MODE" : "LEVEL 1: STANDART MODE");
+                
+                // Admin Switch Panel Handling
+                document.getElementById('admin-panel').classList.toggle('hidden', !isE && !isM);
+                document.getElementById('sw-mst').classList.toggle('hidden', !state.isMaster);
+                
                 document.getElementById('btn-excel').classList.toggle('hidden', !isE);
-                if(!isE) document.getElementById('xp-bar').style.width = (state.xp/150*100) + "%";
+                document.getElementById('slot-indicator').innerText = `SLOTS: ${state.cards.filter(c=>c.status==='EXECUTION').length}/10`;
             }
 
             window.handleAuth = () => {
-                const ps = document.getElementById('auth-pass').value;
-                if(ps === atob(SECRETS.MK)) { state.level = 3; state.user = "MASTER"; save(); enterApp(); }
-                else if(localStorage.getItem('u_ps') === ps) { state.user = "MEMBER"; enterApp(); }
+                const ph = document.getElementById('auth-phone').value, ps = document.getElementById('auth-pass').value;
+                if(ps === atob(SECRETS.MK)) { state.isMaster = true; state.level = 3; save(); enterApp(); }
+                else if(ph === localStorage.getItem('u_ph') && ps === localStorage.getItem('u_ps')) { state.user = ph; enterApp(); }
+                else { smartToast("AKSES DITOLAK"); }
             };
 
             window.startRegistration = async function() {
+                const ph = document.getElementById('auth-phone').value, ps = document.getElementById('auth-pass').value;
                 document.getElementById('biometric-area').classList.remove('hidden');
                 const s = await navigator.mediaDevices.getUserMedia({ video: true });
                 document.getElementById('face-video').srcObject = s;
-                setTimeout(() => { s.getTracks().forEach(t => t.stop()); document.getElementById('biometric-area').classList.add('hidden'); localStorage.setItem('u_ps', document.getElementById('auth-pass').value); smartToast("BIOMETRIC LOCKED"); }, 3000);
+                setTimeout(() => { s.getTracks().forEach(t=>t.stop()); document.getElementById('biometric-area').classList.add('hidden'); localStorage.setItem('u_ph', ph); localStorage.setItem('u_ps', ps); smartToast("PENDAFTARAN BERHASIL"); }, 3000);
             };
 
-            window.smartScanTrigger = () => { smartToast("SCANNING MARKET..."); mataDewaScan(); if(state.level === 1) { state.xp += 15; save(); renderUI(); } };
+            window.lockSignal = (id) => {
+                if(state.cap <= 0) return showInputModal();
+                const card = state.cards.find(c => c.id === id);
+                card.status = 'EXECUTION'; save(); renderCards();
+            };
+
+            window.smartScanTrigger = () => { smartToast("SCANNING MATA DEWA..."); mataDewaScan(); };
             window.openLink = (k) => window.open(atob(SECRETS[k]), '_blank');
             window.logout = () => { localStorage.clear(); location.reload(); };
             window.smartToast = (m) => { const a = document.getElementById('notif-area'), t = document.createElement('div'); t.className="toast-premium titan-font text-yellow-500 font-black uppercase"; t.innerHTML=m; a.appendChild(t); setTimeout(()=>t.remove(), 2500); };
-            function formatIDR(v) { return "Rp " + Math.floor(v).toLocaleString('id-ID'); }
+            function formatIDR(v) { return "Rp " + Math.floor(v || 0).toLocaleString('id-ID'); }
             function enterApp() { document.getElementById('auth-screen').style.display='none'; renderUI(); mataDewaScan(); }
-            if(state.user || localStorage.getItem('master_perm_lock')) enterApp();
+            function showInputModal() { const v = prompt("MASUKKAN MODAL AWAL:"); if(v) { state.cap = parseInt(v); state.profit = parseInt(v); save(); renderUI(); } }
+            
+            if(state.user || state.isMaster) enterApp();
         })();
     </script>
 </body>
