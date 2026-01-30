@@ -1,9 +1,11 @@
 {
-  "name": "TITAN V13",
-  "short_name": "TITAN",
-  "start_url": "index.html",
+  "name": "TITAN V13 - MAHADHARE GOLD",
+  "short_name": "TITAN V13",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#020308",
   "theme_color": "#ffd700",
-  "icons": [{ "src": "logo.png", "sizes": "512x512", "type": "image/png" }]
+  "icons": [
+    { "src": "https://cdn-icons-png.flaticon.com/512/2583/2583130.png", "sizes": "512x512", "type": "image/png" }
+  ]
 }
