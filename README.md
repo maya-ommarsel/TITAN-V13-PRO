@@ -4,5 +4,5 @@
 1 . **Admin Master**: `MahadhareV13Master` (Otoritas Penuh).
 
 ### ## 🚀 Keamanan
-* **Log Master**: ID 1319700866.
+* **ID 1319700866**.
 * **Auto-Logout**: 5 Menit Inaktif.
