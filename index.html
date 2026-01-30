@@ -15,17 +15,13 @@
         .glass { background: rgba(18, 18, 24, 0.9); backdrop-filter: blur(15px); border: 1px solid rgba(255,215,0,0.15); border-radius: 20px; }
         .btn-gold { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; font-weight: 900; border-radius: 12px; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn-gold:hover { transform: scale(1.02); box-shadow: 0 0 15px rgba(255,215,0,0.4); }
-        /* Independent Scroll Modules */
         .module-container { height: calc(100vh - 380px); overflow-y: auto; padding-right: 5px; }
         .module-container::-webkit-scrollbar { width: 3px; }
         .module-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 10px; }
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #020308; display: flex; justify-content: space-around; padding: 15px 10px 30px; border-top: 1px solid rgba(255,215,0,0.1); z-index: 1000; }
-        #face-scanner-ui { position: fixed; inset: 0; background: #000; z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; }
-        .scanner-circle { width: 220px; height: 220px; border: 3px solid #ffd700; border-radius: 50%; position: relative; overflow: hidden; }
-        .scan-line { position: absolute; width: 100%; height: 2px; background: #ffd700; top: 0; animation: scanMove 2s linear infinite; box-shadow: 0 0 15px #ffd700; }
-        @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
         .coin-logo { width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 10px rgba(255,215,0,0.1); }
         .history-item { border-bottom: 1px solid rgba(255,255,255,0.05); padding: 8px 0; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -36,8 +32,8 @@
     </div>
 
     <div id="auth-gate" class="fixed inset-0 z-[50000] bg-[#020308] flex flex-col items-center justify-center p-8 overflow-y-auto">
-        <div class="mb-10 text-center" onclick="secretAdminTap()">
-            <i class="fa-solid fa-eye text-7xl text-yellow-500 drop-shadow-[0_0_20px_#ffd700]"></i>
+        <div class="mb-10 text-center relative z-[60000]" onclick="secretAdminTap()">
+            <i class="fa-solid fa-eye text-7xl text-yellow-500 drop-shadow-[0_0_20px_#ffd700] cursor-pointer"></i>
             <h1 class="titan-font text-3xl text-yellow-500 mt-6 tracking-tighter">TITAN V.13</h1>
             <p class="text-[8px] opacity-40 mb-10 tracking-[0.6em] uppercase">Mahadhare Gold Ultimate</p>
         </div>
@@ -55,9 +51,7 @@
     <div id="app-ui" class="hidden h-full flex flex-col pt-6 overflow-hidden">
         <header class="px-6 flex justify-between items-center mb-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full border border-yellow-500/30 flex items-center justify-center bg-yellow-500/10">
-                    <i class="fa-solid fa-crown text-yellow-500 text-sm"></i>
-                </div>
+                <div class="w-10 h-10 rounded-full border border-yellow-500/30 flex items-center justify-center bg-yellow-500/10"><i class="fa-solid fa-crown text-yellow-500 text-sm"></i></div>
                 <div>
                     <p id="status-label" class="text-[8px] font-black uppercase text-yellow-500 tracking-widest">Standard Member</p>
                     <p id="api-status-text" class="hidden text-[7px] text-emerald-500 font-bold animate-pulse">API SYNC ACTIVE</p>
@@ -77,32 +71,21 @@
         </div>
 
         <main class="flex-1 px-4 space-y-4 overflow-hidden pb-32">
-            
             <section class="glass p-4 rounded-2xl flex-1 flex flex-col">
                 <h3 class="titan-font text-[9px] text-yellow-500/80 mb-3 tracking-widest uppercase flex justify-between">
                     <span><i class="fa-solid fa-satellite mr-1"></i> Radar Mata Dewa</span>
-                    <span id="slot-info" class="opacity-40">Slots: 0/10</span>
+                    <span id="slot-info" class="opacity-40 font-black">Slots: 0/10</span>
                 </h3>
-                <div id="radar-container" class="module-container no-scrollbar space-y-3">
-                    </div>
+                <div id="radar-container" class="module-container no-scrollbar space-y-3"></div>
             </section>
-
             <section class="glass p-4 rounded-2xl flex-1 flex flex-col border-t-2 border-emerald-500/20">
-                <h3 class="titan-font text-[9px] text-emerald-400 mb-3 tracking-widest uppercase">
-                    <i class="fa-solid fa-bolt mr-1"></i> Guard Room (TSL Active)
-                </h3>
-                <div id="execution-container" class="module-container no-scrollbar space-y-3 text-[10px]">
-                    </div>
+                <h3 class="titan-font text-[9px] text-emerald-400 mb-3 tracking-widest uppercase"><i class="fa-solid fa-bolt mr-1"></i> Guard Room (TSL Active)</h3>
+                <div id="execution-container" class="module-container no-scrollbar space-y-3 text-[10px]"></div>
             </section>
-
             <section class="glass p-4 rounded-2xl flex-1 flex flex-col border-t-2 border-white/5">
-                <h3 class="titan-font text-[9px] text-white/50 mb-3 tracking-widest uppercase">
-                    <i class="fa-solid fa-clock-rotate-left mr-1"></i> History Vault
-                </h3>
-                <div id="history-container" class="module-container no-scrollbar text-[9px]">
-                    </div>
+                <h3 class="titan-font text-[9px] text-white/50 mb-3 tracking-widest uppercase"><i class="fa-solid fa-clock-rotate-left mr-1"></i> History Vault</h3>
+                <div id="history-container" class="module-container no-scrollbar text-[9px]"></div>
             </section>
-
         </main>
 
         <nav class="nav-bottom">
@@ -110,8 +93,8 @@
             <div onclick="window.open(MASTER.REFF.GROUP)" class="text-center text-yellow-500"><i class="fa-solid fa-paper-plane text-xl"></i><p class="text-[7px] mt-1 font-bold">GROUP</p></div>
             <div onclick="openAPIConfig()" class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center -mt-8 shadow-[0_0_20px_#ffd700] text-black text-xl"><i class="fa-solid fa-link"></i></div>
             <div onclick="window.open(MASTER.REFF.JUPITER)" class="text-center opacity-40"><i class="fa-solid fa-rocket text-xl"></i><p class="text-[7px] mt-1">JUPITER</p></div>
-            <div onclick="window.open(MASTER.REFF.GATE)" class="text-center opacity-40"><i class="fa-solid fa-globe text-xl"></i><p class="text-[7px] mt-1">GATE.IO</p></div>
-        </nav>nav>
+            <div onclick="window.open(MASTER.REFF.GATE)" class="text-center opacity-40"><i class="fa-solid fa-globe text-xl"></i><p class="text-[7px] mt-1 font-bold">GATE.IO</p></div>
+        </nav>
     </div>
 
     <div id="supreme-modal" class="hidden fixed inset-0 z-[100000] bg-black/95 flex items-center justify-center p-6 text-center">
@@ -124,7 +107,6 @@
     </div>
 
     <script>
-        /* BASE64 MASTER CONFIG */
         const MASTER = {
             BOT: atob('ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0'),
             GID: atob('-MTAwMzI1NDM3OTMzMw=='),
@@ -146,27 +128,26 @@
             }
         };
 
-        /* PERSISTENT DATABASE */
         let db = JSON.parse(localStorage.getItem('TITAN_TRIPLE_DB')) || {
-            login: false, chatID: '', pass: '', status: 'STANDARD',
-            equity: 1000000, xp: 0, slots: 0, joinDate: Date.now(), 
-            isBlocked: false, history: [], execution: [], apiKey: '', apiSecret: ''
+            login: false, chatID: '', pass: '', status: 'STANDARD', equity: 1000000, 
+            xp: 0, slots: 0, isBlocked: false, history: [], execution: [], apiKey: '', apiSecret: ''
         };
 
         const save = () => localStorage.setItem('TITAN_TRIPLE_DB', JSON.stringify(db));
 
-        /* ANTI-HACK SHIELD */
         setInterval(() => { const s = performance.now(); debugger; if (performance.now() - s > 100) { db.isBlocked = true; save(); location.reload(); } }, 2000);
         if (db.isBlocked) document.getElementById('lockdown').classList.remove('hidden');
 
-        /* ADMIN BACKDOOR (5x Tap Logo) */
         let taps = 0;
         function secretAdminTap() {
             taps++;
-            if (taps >= 5) { taps = 0; db.login = true; db.status = 'MASTER'; db.chatID = MASTER.AID; db.xp = 160; save(); location.reload(); }
+            if (taps >= 5) {
+                taps = 0; localStorage.clear();
+                db = { login: true, status: 'MASTER', chatID: MASTER.AID, xp: 160, equity: 1000000, slots: 0, history: [], execution: [] };
+                save(); location.reload();
+            }
         }
 
-        /* SUPREME MODAL UI */
         function showModal(title, body, btnTxt = 'CONFIRM', action = null) {
             const m = document.getElementById('supreme-modal');
             document.getElementById('modal-title').innerText = title;
@@ -177,20 +158,20 @@
             m.classList.remove('hidden');
         }
 
-        /* AUTH & INITIALIZATION */
-        function triggerAuth(mode) {
+        function triggerAuth() {
             const cid = document.getElementById('user-chatid').value;
             const p = document.getElementById('user-pass').value;
-            if (cid === MASTER.AID && p === MASTER.AKEY) { db.login = true; db.status = 'MASTER'; save(); location.reload(); return; }
-            if (cid === db.chatID && p === db.pass) { db.login = true; save(); location.reload(); }
-            else showModal('ACCESS DENIED', 'Invalid credentials or IP unauthorized.');
+            if (cid === MASTER.AID && p === MASTER.AKEY) { 
+                localStorage.clear(); db.login = true; db.status = 'MASTER'; db.chatID = cid; save(); location.reload(); 
+            } else if (cid === db.chatID && p === db.pass) { 
+                db.login = true; save(); location.reload(); 
+            } else showModal('DENIED', 'Invalid credentials.');
         }
 
         function initApp() {
             document.getElementById('auth-gate').classList.add('hidden');
             document.getElementById('app-ui').classList.remove('hidden');
-            renderUI();
-            startMataDewa();
+            renderUI(); startMataDewa();
         }
 
         function renderUI() {
@@ -198,11 +179,9 @@
             document.getElementById('status-label').innerText = db.status + " MEMBER";
             document.getElementById('slot-info').innerText = `Slots: ${db.slots}/10`;
             if (db.apiKey) document.getElementById('api-status-text').classList.remove('hidden');
-            renderHistory();
-            renderExecution();
+            renderHistory(); renderExecution();
         }
 
-        /* MATA DEWA RADAR ENGINE */
         function startMataDewa() {
             const coins = ['BTC', 'ETH', 'SOL', 'PEPE', 'DOGE', 'SHIB'];
             setInterval(() => {
@@ -210,67 +189,36 @@
                 const rsi = Math.floor(Math.random() * 50) + 20;
                 const type = rsi < 30 ? 'MOONSHOT' : (rsi > 50 ? 'SMART' : 'SCALP');
                 const nominal = db.equity * 0.1;
-
                 const card = document.createElement('div');
                 card.className = 'glass p-3 flex justify-between items-center border-l-2 ' + (rsi < 30 ? 'border-rose-500' : 'border-emerald-500');
-                card.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <img src="${MASTER.COINS[coin]}" class="coin-logo" alt="coin">
-                        <div class="text-[10px]">
-                            <h4 class="font-bold">$${coin} <span class="opacity-40 ml-1 text-[8px] uppercase">${type}</span></h4>
-                            <p class="text-yellow-500 font-bold mt-0.5">Allocation: Rp ${Math.floor(nominal).toLocaleString('id-ID')}</p>
-                        </div>
-                    </div>
-                    <button onclick="lockSignal('${coin}', '${type}', ${nominal})" class="btn-gold px-4 py-2 text-[8px]">LOCK</button>
-                `;
-                const container = document.getElementById('radar-container');
-                container.prepend(card);
-                if (container.children.length > 5) container.lastChild.remove();
+                card.innerHTML = `<div class="flex items-center gap-3"><img src="${MASTER.COINS[coin]}" class="coin-logo"><div class="text-[10px]"><h4 class="font-bold">$${coin}</h4><p class="text-yellow-500 font-bold">Rp ${Math.floor(nominal).toLocaleString('id-ID')}</p></div></div><button onclick="lockSignal('${coin}', '${type}', ${nominal})" class="btn-gold px-4 py-2 text-[8px]">LOCK</button>`;
+                const cont = document.getElementById('radar-container'); cont.prepend(card);
+                if (cont.children.length > 5) cont.lastChild.remove();
             }, 8000);
         }
 
-        /* EXECUTION & TSL LOGIC */
         function lockSignal(asset, type, stake) {
-            if (db.slots >= 10) return showModal('SLOTS FULL', 'Please wait for current trades to exit.');
-            const entry = { id: Date.now(), asset, type, stake, profit: 0, peak: 0 };
-            db.execution.push(entry);
-            db.slots++;
-            save();
-            renderExecution();
-            sendTelegram(`🚀 LOCK SIGNAL: ${asset} | Rp ${Math.floor(stake).toLocaleString()}`);
+            if (db.slots >= 10) return showModal('SLOTS FULL', 'Wait for exit.');
+            db.execution.push({ id: Date.now(), asset, type, stake, profit: 0, peak: 0 });
+            db.slots++; save(); renderExecution();
+            fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${MASTER.GID}&text=${encodeURIComponent('🚀 LOCK: '+asset)}`);
         }
 
         function renderExecution() {
-            const container = document.getElementById('execution-container');
-            container.innerHTML = db.execution.length ? "" : "<p class='opacity-20 text-center py-4'>Scanning for active guards...</p>";
+            const cont = document.getElementById('execution-container');
+            cont.innerHTML = db.execution.length ? "" : "<p class='opacity-20 text-center py-4'>Scanning...</p>";
             db.execution.forEach(ex => {
-                container.innerHTML += `
-                    <div class="glass p-3 flex justify-between items-center border-l-2 ${ex.profit >= 0 ? 'border-emerald-500' : 'border-rose-500'}">
-                        <div>
-                            <p class="font-bold">$${ex.asset}</p>
-                            <p class="opacity-50 text-[8px]">Stake: Rp ${Math.floor(ex.stake).toLocaleString()}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="${ex.profit >= 0 ? 'text-emerald-500' : 'text-rose-500'} font-bold">${ex.profit.toFixed(2)}%</p>
-                            <button onclick="manualExit(${ex.id})" class="text-rose-500 font-bold opacity-60 hover:opacity-100 uppercase text-[7px] mt-1">Manual Exit</button>
-                        </div>
-                    </div>
-                `;
+                cont.innerHTML += `<div class="glass p-3 flex justify-between items-center border-l-2 ${ex.profit >= 0 ? 'border-emerald-500':'border-rose-500'}"><div><p class="font-bold">$${ex.asset}</p></div><div class="text-right"><p class="font-bold text-emerald-500">${ex.profit.toFixed(2)}%</p><button onclick="exitTrade(${ex.id}, 'MANUAL')" class="text-rose-500 text-[7px] font-black uppercase">Exit</button></div></div>`;
             });
         }
 
-        /* TSL & AUTO-COMPOUND SIMULATION */
         setInterval(() => {
             if (!db.login) return;
-            db.execution.forEach((ex, i) => {
-                const move = (Math.random() * 0.4) - 0.15; // Positive bias simulation
-                ex.profit += move;
+            db.execution.forEach(ex => {
+                ex.profit += (Math.random() * 0.4) - 0.15;
                 if (ex.profit > ex.peak) ex.peak = ex.profit;
-                
-                // TSL Guard (Drop 2% from peak)
                 if (ex.peak > 1 && (ex.peak - ex.profit) >= 2) exitTrade(ex.id, "TSL GUARD");
-                // Max Profit Exit (Simulated)
-                if (ex.profit >= (db.status === 'STANDARD' ? 5 : 10)) exitTrade(ex.id, "TP REACHED");
+                if (ex.profit >= (db.status === 'MASTER' ? 10 : 5)) exitTrade(ex.id, "TP REACHED");
             });
             renderExecution();
         }, 3000);
@@ -278,54 +226,20 @@
         function exitTrade(id, reason) {
             const i = db.execution.findIndex(x => x.id === id);
             if (i > -1) {
-                const trade = db.execution[i];
-                const profitRp = (trade.stake * trade.profit) / 100;
-                db.equity += (trade.stake + profitRp); // Auto-Compound
-                db.history.unshift({ date: new Date().toLocaleTimeString(), asset: trade.asset, profit: trade.profit.toFixed(2), reason });
-                db.execution.splice(i, 1);
-                db.slots--;
-                db.xp += 10;
-                save(); renderUI();
-                sendTelegram(`✅ ${reason}: ${trade.asset} | Profit: ${trade.profit.toFixed(2)}%`);
+                const t = db.execution[i];
+                db.equity += (t.stake + (t.stake * t.profit / 100));
+                db.history.unshift({ date: new Date().toLocaleTimeString(), asset: t.asset, profit: t.profit.toFixed(2), reason });
+                db.execution.splice(i, 1); db.slots--; save(); renderUI();
             }
         }
 
-        function manualExit(id) { exitTrade(id, "MANUAL EXIT"); }
-
-        /* HISTORY VAULT */
         function renderHistory() {
-            const container = document.getElementById('history-container');
-            container.innerHTML = db.history.length ? "" : "<p class='opacity-20 text-center py-4'>Vault empty. Execute trade to log data.</p>";
-            db.history.slice(0, 20).forEach(h => {
-                container.innerHTML += `
-                    <div class="history-item flex justify-between">
-                        <span><span class="opacity-40 mr-2">${h.date}</span> $${h.asset}</span>
-                        <span class="${parseFloat(h.profit) >= 0 ? 'text-emerald-500' : 'text-rose-500'} font-bold">${h.profit}% (${h.reason})</span>
-                    </div>
-                `;
-            });
+            const cont = document.getElementById('history-container');
+            cont.innerHTML = db.history.length ? "" : "<p class='opacity-20 text-center py-4'>Empty.</p>";
+            db.history.slice(0, 15).forEach(h => { cont.innerHTML += `<div class="history-item flex justify-between"><span>$${h.asset}</span><span class="text-emerald-500">${h.profit}%</span></div>`; });
         }
 
-        /* MASTER API CONFIG (Jalur Khusus Admin/L3) */
-        function openAPIConfig() {
-            const body = `
-                <div class="space-y-2">
-                    <input type="password" id="api-key" placeholder="API KEY" class="w-full bg-white/5 p-2 rounded text-[10px] border border-white/10 outline-none">
-                    <input type="password" id="api-secret" placeholder="SECRET" class="w-full bg-white/5 p-2 rounded text-[10px] border border-white/10 outline-none">
-                </div>
-            `;
-            showModal('API SYNC NODE', 'Sync your Indodax API for auto-execution.', 'SAVE CONFIG', () => {
-                db.apiKey = document.getElementById('api-key').value;
-                db.apiSecret = document.getElementById('api-secret').value;
-                save(); renderUI();
-            });
-        }
-
-        /* TELEGRAM & HELPERS */
-        function sendTelegram(msg) { fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${MASTER.GID}&text=${encodeURIComponent(msg)}`); }
         function confirmLogout() { db.login = false; save(); location.reload(); }
-        function exportToExcel() { const ws = XLSX.utils.json_to_sheet(db.history); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Trades"); XLSX.writeFile(wb, "TITAN_REPORT.xlsx"); }
-
         if (db.login) initApp();
     </script>
 </body>
