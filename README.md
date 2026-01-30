@@ -1,8 +1,2 @@
-# TITAN V13 - OFFICIAL ENGINE
-
-### ## 🔐 Gerbang Login
-1 . **Admin Master**: `MahadhareV13Master` (Otoritas Penuh).
-
-### ## 🚀 Keamanan
-* **ID 1319700866**.
-* **Auto-Logout**: 5 Menit Inaktif.
+TITAN V13 PRO 
+The Best Simulation Trading Crypto
