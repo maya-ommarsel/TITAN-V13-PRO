@@ -2,177 +2,162 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>TITAN V13 - FINAL SUPREME</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;700&display=swap');
-        body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; user-select: none; }
+        body { background: #0b0c10; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; user-select: none; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* PING MONITOR SEJAJAR (GAMBAR 2) */
-        .ping-bar { display: flex; justify-content: space-between; gap: 6px; padding: 0 15px; margin-bottom: 20px; }
+        /* CUSTOM MODAL (SOLUSI NOTIF JELEK) */
+        #custom-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 20000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-box { background: rgba(20, 20, 25, 0.98); border: 1px solid rgba(255,215,0,0.2); border-radius: 25px; padding: 30px; width: 85%; text-align: center; }
+
+        /* MONITOR LIVE PING SEJAJAR */
+        .ping-bar { display: flex; justify-content: space-between; gap: 8px; padding: 0 15px; margin-bottom: 20px; }
         .ping-card { flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 10px 5px; display: flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* DASHBOARD & KARTU UTAMA */
-        .card-main { background: rgba(10, 10, 18, 0.98); border: 1px solid rgba(255,215,0,0.2); border-radius: 25px; padding: 20px; margin: 0 15px 15px 15px; position: relative; }
+        .card-main { background: rgba(18, 18, 24, 0.98); border: 1px solid rgba(255,215,0,0.15); border-radius: 25px; padding: 20px; margin: 0 15px 15px 15px; }
         
-        /* GRAFIK FLUKTUASI DENGAN TRAILING LINE */
-        .graph-container { position: relative; width: 100%; height: 60px; margin-bottom: 10px; }
-        .graph-svg { width: 100%; height: 100%; stroke-linecap: round; }
-        .trailing-line { stroke: #f43f5e; stroke-width: 1; stroke-dasharray: 4; filter: drop-shadow(0 0 3px #f43f5e); }
-        .price-line { stroke: #ffd700; stroke-width: 2; fill: none; filter: drop-shadow(0 0 5px #ffd700); }
+        /* GRAFIK KUNING DENGAN TRAILING LINE MERAH */
+        .graph-container { position: relative; width: 100%; height: 70px; margin: 15px 0; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; }
+        .trailing-line { stroke: #f43f5e; stroke-width: 1.5; stroke-dasharray: 4; filter: drop-shadow(0 0 3px #f43f5e); }
+        .price-line { stroke: #ffd700; stroke-width: 2.5; fill: none; filter: drop-shadow(0 0 8px #ffd700); }
+
+        /* NAVIGASI BAWAH TERKUNCI LEVEL 1 */
+        .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #0b0c10; display: flex; justify-content: space-around; padding: 15px 10px 30px 10px; border-top: 1px solid rgba(255,255,255,0.05); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; gap: 5px; transition: 0.3s; }
+        .nav-locked { opacity: 0.15; filter: grayscale(1); pointer-events: none; }
+        .nav-center { width: 60px; height: 60px; background: #ffd700; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-top: -40px; box-shadow: 0 0 25px #ffd700; color: #000; font-size: 24px; }
 
         .btn-supreme { background: #ffd700; color: black; font-weight: 900; border-radius: 15px; padding: 15px; width: 100%; font-size: 11px; text-transform: uppercase; cursor: pointer; border: none; }
-        .btn-logout { position: absolute; top: 20px; right: 20px; color: #f43f5e; font-size: 26px; z-index: 100; cursor: pointer; }
-        .btn-tutor { position: fixed; bottom: 30px; right: 20px; background: #ffd700; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; box-shadow: 0 0 20px #ffd700; z-index: 999; }
     </style>
 </head>
 <body class="no-scrollbar">
 
-    <div id="login-gate" class="fixed inset-0 z-[10000] bg-[#020308] flex flex-col items-center justify-center p-10 text-center">
-        <i class="fa-solid fa-eye text-5xl text-yellow-500 mb-6 animate-pulse"></i>
-        <h1 class="titan-font text-2xl text-yellow-500 mb-10 tracking-widest uppercase">Titan V.13</h1>
-        <input type="password" id="key-access" placeholder="INPUT ACCESS KEY" class="w-full bg-white/5 p-5 rounded-2xl border border-white/10 text-white text-center mb-6 outline-none font-black uppercase tracking-[0.3em]">
-        <button onclick="startAudit()" class="btn-supreme">Authorize System</button>
+    <div id="custom-modal">
+        <div class="modal-box">
+            <i class="fa-solid fa-power-off text-rose-500 text-3xl mb-4"></i>
+            <h3 class="titan-font text-sm text-white mb-2 uppercase">RESET SESSION</h3>
+            <p class="text-[10px] text-white/60 mb-8 px-4">Apakah Anda ingin keluar? Data histori WIB Anda akan tetap aman di sistem Master.</p>
+            <div class="flex justify-between px-2 gap-4">
+                <button onclick="closeModal()" class="flex-1 bg-white/5 py-3 rounded-xl text-[10px] font-bold">BATAL</button>
+                <button onclick="confirmLogout()" class="flex-1 bg-rose-500 py-3 rounded-xl text-[10px] font-bold text-white">OKE</button>
+            </div>
+        </div>
     </div>
 
-    <div id="app-ui" class="hidden h-full flex flex-col pt-6">
-        <header class="px-5 mb-6 relative">
-            <p id="date-wib" class="text-[9px] text-emerald-500 font-bold uppercase"></p>
-            <h1 id="time-wib" class="titan-font text-sm font-black text-white"></h1>
-            <i onclick="doLogout()" class="fa-solid fa-power-off btn-logout"></i>
+    <div id="login-gate" class="fixed inset-0 z-[10000] bg-[#0b0c10] flex flex-col items-center justify-center p-10 text-center">
+        <i class="fa-solid fa-eye text-5xl text-yellow-500 mb-6 drop-shadow-[0_0_15px_#ffd700]"></i>
+        <h1 class="titan-font text-2xl text-yellow-500 mb-10 tracking-widest uppercase">Titan V.13</h1>
+        <input type="password" id="key-access" placeholder="INPUT KEY" class="w-full bg-white/5 p-5 rounded-2xl border border-white/10 text-white text-center mb-6 outline-none font-black tracking-[0.3em] uppercase">
+        <button onclick="startAudit()" class="btn-supreme">Authorize</button>
+    </div>
+
+    <div id="app-ui" class="hidden h-full flex flex-col pt-4">
+        <header class="px-5 mb-6 flex justify-between items-center">
+            <div>
+                <p id="date-wib" class="text-[8px] text-emerald-500 font-bold uppercase"></p>
+                <h1 id="time-wib" class="titan-font text-[10px] font-black text-white"></h1>
+            </div>
+            <i onclick="showModal()" class="fa-solid fa-power-off text-rose-500 text-2xl cursor-pointer"></i>
         </header>
 
         <div class="ping-bar">
-            <div class="ping-card text-yellow-500"><div class="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div><span class="text-[8px] font-black uppercase">L1: <span id="l1-val">8.421</span></span></div>
-            <div class="ping-card text-emerald-500"><div class="w-2 h-2 bg-emerald-500 rounded-full"></div><span class="text-[8px] font-black uppercase">L2: 1.240</span></div>
-            <div class="ping-card text-blue-500"><div class="w-2 h-2 bg-blue-500 rounded-full"></div><span class="text-[8px] font-black uppercase">L3: 482/500</span></div>
+            <div class="ping-card text-yellow-500"><div class="w-1.5 h-1.5 bg-yellow-500 rounded-full animate-pulse"></div><span class="text-[7px] font-black uppercase">L1: 8.421</span></div>
+            <div class="ping-card text-emerald-500"><div class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div><span class="text-[7px] font-black uppercase">L2: 1.240</span></div>
+            <div class="ping-card text-blue-500"><div class="w-1.5 h-1.5 bg-blue-500 rounded-full"></div><span class="text-[7px] font-black uppercase">L3: 482/500</span></div>
         </div>
 
-        <main class="flex-1 overflow-y-auto pb-24">
+        <main class="flex-1 overflow-y-auto no-scrollbar pb-32">
             <div class="card-main text-center">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-[9px] titan-font text-rose-500 uppercase">Mission Progress</span>
-                    <span id="xp-text" class="text-[9px] font-black text-yellow-500">0 / 150 XP</span>
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-[8px] titan-font text-rose-500 uppercase">MISSION PROGRESS</span>
+                    <span id="xp-text" class="text-[8px] font-black text-yellow-500">0 / 150 XP</span>
                 </div>
-                <div class="w-full bg-white/10 h-2 rounded-full mb-4 overflow-hidden">
-                    <div id="xp-bar" class="bg-yellow-500 h-full transition-all duration-1000 shadow-[0_0_10px_#ffd700]" style="width: 0%"></div>
+                <div class="w-full bg-white/5 h-1.5 rounded-full mb-5 overflow-hidden">
+                    <div id="xp-bar" class="bg-yellow-500 h-full transition-all duration-1000" style="width: 0%"></div>
                 </div>
-                <p id="lv-label" class="text-[8px] opacity-40 uppercase font-black mb-1 tracking-widest">LEVEL 1</p>
-                <h2 id="balance" class="titan-font text-3xl text-yellow-500 font-black mb-6 tracking-tighter">Rp 1.000.000</h2>
-                
-                <div class="grid grid-cols-3 gap-2 text-[8px] font-black uppercase opacity-60">
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/5">Scalp (40%)<br><span id="s1" class="text-white">400.000</span></div>
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/5">Smart (40%)<br><span id="s2" class="text-white">400.000</span></div>
-                    <div class="bg-white/5 p-2 rounded-xl border border-white/5">Moon (20%)<br><span id="s3" class="text-white">200.000</span></div>
+                <h2 id="balance" class="titan-font text-3xl text-yellow-500 font-black mb-4">Rp 1.000.000</h2>
+                <div class="grid grid-cols-3 gap-2 text-[7px] font-black opacity-50 uppercase">
+                    <div class="bg-white/5 p-2 rounded-xl">Scalp (40%)</div>
+                    <div class="bg-white/5 p-2 rounded-xl">Smart (40%)</div>
+                    <div class="bg-white/5 p-2 rounded-xl">Moon (20%)</div>
                 </div>
             </div>
 
             <div class="card-main">
                 <div class="flex justify-between items-center mb-4">
-                    <span class="text-[11px] font-black uppercase text-emerald-400 tracking-widest">Mata Dewa Analysis</span>
-                    <i class="fa-brands fa-bitcoin text-yellow-500 text-2xl"></i>
+                    <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest">Mata Dewa Engine</span>
+                    <i class="fa-brands fa-bitcoin text-yellow-500 text-xl"></i>
                 </div>
-                
                 <div class="graph-container">
                     <svg class="graph-svg" viewBox="0 0 100 40">
-                        <line x1="0" y1="28" x2="100" y2="28" class="trailing-line" />
-                        <path d="M0,35 Q10,10 25,30 T50,15 T75,32 T100,5" class="price-line" />
+                        <line x1="0" y1="25" x2="100" y2="25" class="trailing-line" />
+                        <path d="M0,35 Q15,5 30,28 T60,15 T100,25" class="price-line" />
                     </svg>
-                    <span class="absolute right-0 top-6 text-[6px] text-rose-500 font-black uppercase bg-black/50 px-1">Trailing Line 2%</span>
+                    <span class="absolute right-3 bottom-2 text-[6px] text-rose-500 font-black uppercase">Trailing Guard 2%</span>
                 </div>
-
-                <div class="flex justify-between text-[7px] font-black uppercase opacity-50 mb-4 border-t border-white/5 pt-3">
-                    <span class="flex items-center gap-1"><i class="fa-solid fa-check-circle text-emerald-500"></i> RSI Filter Active</span>
-                    <span class="flex items-center gap-1"><i class="fa-solid fa-check-circle text-emerald-500"></i> MA Filter Active</span>
+                <div class="flex justify-between text-[6px] font-black uppercase opacity-40 mb-4 pt-2 border-t border-white/5">
+                    <span>RSI ACTIVE</span>
+                    <span>MA ACTIVE</span>
                 </div>
-                
-                <p class="text-xs text-rose-500 font-black mb-4">THRESHOLD: 2.00% REQUIRED</p>
                 <button id="main-action" onclick="execute()" class="btn-supreme">Secure Profit (+5%)</button>
             </div>
         </main>
-    </div>
 
-    <div id="tutor-trigger" class="hidden btn-tutor" onclick="openBook()">
-        <i class="fa-solid fa-book-open text-xl"></i>
+        <nav class="nav-bottom">
+            <div id="nav-wallet" class="nav-item nav-locked"><i class="fa-solid fa-wallet text-lg"></i><span class="text-[6px] font-bold">WALLET</span></div>
+            <div id="nav-group" class="nav-item text-yellow-500"><i class="fa-solid fa-paper-plane text-lg"></i><span class="text-[6px] font-bold">GROUP</span></div>
+            <div class="nav-center"><i class="fa-solid fa-bolt"></i></div>
+            <div id="nav-jupiter" class="nav-item nav-locked"><i class="fa-solid fa-rocket text-lg"></i><span class="text-[6px] font-bold">JUPITER</span></div>
+            <div id="nav-gate" class="nav-item nav-locked"><i class="fa-solid fa-globe text-lg"></i><span class="text-[6px] font-bold">GATE.IO</span></div>
+        </nav>
     </div>
 
     <script>
-        let db = JSON.parse(localStorage.getItem('titan_v13_db')) || { lv: 1, cap: 1000000, xp: 0, api: false, targetMet: false };
-        const save = () => localStorage.setItem('titan_v13_db', JSON.stringify(db));
+        let db = JSON.parse(localStorage.getItem('titan_master_db')) || { lv: 1, cap: 1000000, xp: 0, api: false };
+        const save = () => localStorage.setItem('titan_master_db', JSON.stringify(db));
 
         function startAudit() {
-            const key = document.getElementById('key-access').value.toUpperCase();
-            if(key === "MAHADHAREV13MASTER") db.lv = 3;
-            else if(key === "ADMINAUDITV13") db.lv = 1;
-            else if(key === "MEMBER") db.lv = 1;
-            else return alert("ACCESS DENIED");
+            const k = document.getElementById('key-access').value.toUpperCase();
+            if(k === "MAHADHAREV13MASTER") db.lv = 3;
+            else if(k === "ADMINAUDITV13" || k === "MEMBER") db.lv = 1;
+            else return alert("KEY SALAH");
             save(); initApp();
         }
 
         function initApp() {
             document.getElementById('login-gate').classList.add('hidden');
             document.getElementById('app-ui').classList.remove('hidden');
-            document.getElementById('tutor-trigger').classList.remove('hidden');
-            renderData();
+            render();
         }
 
-        function renderData() {
+        function render() {
             const now = new Date();
             document.getElementById('date-wib').innerText = now.toLocaleString("id-ID", {timeZone: "Asia/Jakarta", weekday: 'long', day: 'numeric', month: 'short', year: 'numeric'});
             document.getElementById('time-wib').innerText = now.toLocaleString("id-ID", {timeZone: "Asia/Jakarta", hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit'}) + " WIB";
-            
             document.getElementById('balance').innerText = `Rp ${db.cap.toLocaleString('id-ID')}`;
-            document.getElementById('lv-label').innerText = `LEVEL ${db.lv}`;
             document.getElementById('xp-text').innerText = `${db.xp} / 150 XP`;
             document.getElementById('xp-bar').style.width = `${(db.xp/150)*100}%`;
-            
-            const btn = document.getElementById('main-action');
-            if(db.lv === 3) {
-                btn.innerText = db.api ? "AUTOPILOT ENGINE ACTIVE" : "CONNECT API BINDING";
-                btn.onclick = db.api ? null : () => { db.api = true; save(); renderData(); };
-                btn.style.background = db.api ? "#10b981" : "#3b82f6";
-                btn.style.color = "white";
-                if(db.api && !db.targetMet) autoTrade();
-            }
+            if(db.lv > 1) document.querySelectorAll('.nav-locked').forEach(e => e.classList.remove('nav-locked'));
         }
 
         function execute() {
-            if(db.lv < 3) {
-                db.cap += (db.cap * 0.05);
-                db.xp += 15;
-                if(db.xp >= 150) alert("CONGRATS! 150 XP REACHED. ELIGIBLE FOR LEVEL 2.");
-                save(); renderData();
-            }
+            db.cap += (db.cap * 0.05); db.xp += 15;
+            if(db.xp >= 150) alert("150 XP SELESAI!");
+            save(); render();
         }
 
-        function autoTrade() {
-            db.cap += (db.cap * 0.05);
-            db.targetMet = true;
-            save(); renderData();
-        }
+        function showModal() { document.getElementById('custom-modal').style.display = 'flex'; }
+        function closeModal() { document.getElementById('custom-modal').style.display = 'none'; }
+        function confirmLogout() { localStorage.clear(); location.reload(); }
 
-        function openBook() {
-            alert("MATA DEWA GUIDE:\n1. XP 150 for Level 2\n2. RSI & MA Back-end Validation\n3. Red Dashed Line: Trailing Guard 2%");
-        }
-
-        function doLogout() {
-            if(confirm("LOGOUT? Session will be saved unless cleared manual.")) {
-                localStorage.clear(); location.reload();
-            }
-        }
-
-        setInterval(() => {
-            if(document.getElementById('app-ui').offsetParent !== null) {
-                renderData();
-                document.getElementById('l1-val').innerText = (8000 + Math.floor(Math.random()*2000)).toLocaleString();
-            }
-        }, 3000);
-
-        if(localStorage.getItem('titan_v13_db')) initApp();
+        setInterval(() => { if(document.getElementById('app-ui').offsetParent) render(); }, 3000);
+        if(localStorage.getItem('titan_master_db')) initApp();
     </script>
 </body>
 </html>
