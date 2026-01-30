@@ -1,11 +1,3 @@
-# Robots.txt untuk TITAN V13 - MAHADHARE GOLD ULTIMATE
 User-agent: *
-Allow: /
-
-# Melarang indexing pada folder yang mungkin berisi skrip sensitif atau backup
-Disallow: /cgi-bin/
-Disallow: /private/
-Disallow: /config/
-
-# Memastikan performa maksimal untuk bot resmi
-Crawl-delay: 10
+Disallow: /
+Allow: /index.html
