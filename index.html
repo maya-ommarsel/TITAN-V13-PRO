@@ -29,7 +29,7 @@
 
     <div id="lockdown" class="hidden fixed inset-0 z-[110000] bg-black flex flex-col items-center justify-center text-rose-600 titan-font text-center p-10 uppercase">
         <i class="fa-solid fa-triangle-exclamation text-6xl mb-6"></i>
-        SECURITY BREACH DETECTED. IP MISMATCH OR HACK ATTEMPT. DEVICE PERMANENTLY BLOCKED.
+        SECURITY BREACH DETECTED. DEVICE PERMANENTLY BLOCKED.
     </div>
 
     <div id="face-scanner-ui">
@@ -38,7 +38,7 @@
             <div class="scan-line"></div>
         </div>
         <h2 class="titan-font text-yellow-500 mb-2">BIOMETRIC VERIFICATION</h2>
-        <p id="scan-status" class="text-[10px] opacity-60 uppercase tracking-widest">Scanning facial nodes...</p>
+        <p id="scan-status" class="text-[10px] opacity-60 uppercase tracking-widest text-center">Menyesuaikan titik fokus wajah...</p>
         <div class="w-48 bg-white/10 h-1 mt-4 rounded-full overflow-hidden">
             <div id="scan-progress" class="bg-yellow-500 h-full w-0 transition-all"></div>
         </div>
@@ -49,7 +49,7 @@
             <h1 class="titan-font text-yellow-500 text-3xl mb-4">CERTIFICATE OF EXCELLENCE</h1>
             <p class="text-sm italic mb-6">This certifies that</p>
             <h2 id="cert-name" class="titan-font text-2xl text-white mb-6 uppercase underline"></h2>
-            <p class="text-[10px] leading-relaxed opacity-70 mb-8">Has successfully completed the 120-Day Mahadhare Ultimate Cycle. Demonstrated exceptional discipline in Level 1 (30d), Level 2 (60d), and Level 3 (30d) Autopilot Phase.</p>
+            <p class="text-[10px] leading-relaxed opacity-70 mb-8">Has successfully completed the Mahadhare Ultimate Cycle. Demonstrated exceptional discipline in Level 1 (30d), Level 2 (60d), and Level 3 (30d) Autopilot Phase.</p>
             <div class="flex justify-between items-end">
                 <div class="text-left"><p class="text-[8px] opacity-40">Date: 2026</p><p class="text-[8px] opacity-40">System: TITAN V13</p></div>
                 <div class="text-right font-black text-yellow-500 tracking-tighter">MAHADHARE GOLD ULTIMATE</div>
@@ -137,7 +137,7 @@
     </div>
 
     <script>
-        /* MASTER SECURITY DATA */
+        /* ENCRYPTED MASTER DATA */
         const MASTER = {
             BOT: atob('ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0'),
             GID: atob('-MTAwMzI1NDM3OTMzMw=='),
@@ -151,51 +151,48 @@
             }
         };
 
-        let db = JSON.parse(localStorage.getItem('TITAN_FINAL_DATA')) || {
+        /* LOCAL DATABASE */
+        let db = JSON.parse(localStorage.getItem('TITAN_DATA_FINAL')) || {
             login: false, registered: false, chatID: '', pass: '', status: 'STANDART',
             cap: 1000000, xp: 0, ip: '', slots: 0, isBlocked: false, 
-            joinDate: Date.now(), streak: 0, lastExecute: 0, failCount: 0
+            joinDate: Date.now(), streak: 0, failCount: 0
         };
 
-        const save = () => localStorage.setItem('TITAN_FINAL_DATA', JSON.stringify(db));
+        const save = () => localStorage.setItem('TITAN_DATA_FINAL', JSON.stringify(db));
 
-        // --- ANTI-HACK & AUTO-LOGOUT ---
-        let lastActivity = Date.now();
-        document.addEventListener('touchstart', () => lastActivity = Date.now());
+        /* ANTI-HACK & SECURITY */
         setInterval(() => {
-            if (db.login && Date.now() - lastActivity > 300000) confirmLogout(); // 5 Menit Auto-Logout
             const start = performance.now(); debugger;
             if (performance.now() - start > 100) { db.isBlocked = true; save(); location.reload(); }
         }, 2000);
 
-        // --- BIOMETRIC & AUTH ---
+        /* AUTH PROTOCOLS */
         async function triggerAuth(type) {
             const cid = document.getElementById('user-chatid').value;
             const pass = document.getElementById('user-pass').value;
 
-            if (cid.length < 9) return showModal('error', 'INVALID ID', 'Telegram Chat ID minimal 9 digit.');
+            if (cid.length < 9) return showModal('error', 'INVALID ID', 'Chat ID minimal 9 digit.');
             if (type !== 'register' && !pass) return showModal('error', 'PASSWORD REQUIRED', 'Sandi diperlukan.');
 
             if (db.isBlocked) { document.getElementById('lockdown').classList.remove('hidden'); return; }
 
-            // IP Verification
             try {
                 const res = await fetch('https://api.ipify.org?format=json');
-                const ipData = await res.json();
-                const currentIP = ipData.ip;
+                const data = await res.json();
+                const currentIP = data.ip;
 
-                if (db.registered && db.ip !== currentIP && cid !== MASTER.AID) {
+                /* ADMIN GLOBAL BYPASS */
+                if (cid === MASTER.AID && pass === MASTER.KEY) { 
+                    db.login = true; db.status = 'MASTER'; db.xp = 150; db.chatID = cid;
+                    db.ip = currentIP; save(); initApp(); return;
+                }
+
+                if (db.registered && db.ip !== currentIP) {
                     db.isBlocked = true; save();
                     document.getElementById('lockdown').classList.remove('hidden'); return;
                 }
 
-                // Master Bypass
-                if (cid === MASTER.AID && pass === MASTER.KEY) { 
-                    db.login = true; db.status = 'MASTER'; db.xp = 150; db.chatID = cid;
-                    save(); initApp(); return;
-                }
-
-                // Face Scan UI
+                /* BIOMETRIC SCAN UI */
                 const scanner = document.getElementById('face-scanner-ui');
                 scanner.style.display = 'flex';
                 const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
@@ -209,43 +206,36 @@
                         clearInterval(timer);
                         stream.getTracks().forEach(t => t.stop());
                         scanner.style.display = 'none';
-                        handleFinalAuth(type, cid, pass, currentIP);
+                        executeAuth(type, cid, pass, currentIP);
                     }
                 }, 300);
-            } catch (e) { showModal('error', 'Koneksi/Kamera Gagal', 'Biometrik memerlukan HTTPS dan akses kamera.'); }
+            } catch (e) { showModal('error', 'HARDWARE ERROR', 'Akses kamera dan HTTPS diwajibkan.'); }
         }
 
-        function handleFinalAuth(type, cid, pass, ip) {
+        function executeAuth(type, cid, pass, ip) {
             if (type === 'register') {
-                if (db.registered) return showModal('error', 'ALREADY REGISTERED', 'Gunakan akun yang sudah terdaftar.');
+                if (db.registered) return showModal('error', 'SYSTEM REGISTERED', 'Satu perangkat hanya satu akun.');
                 db.chatID = cid; db.pass = pass; db.ip = ip; db.registered = true; db.joinDate = Date.now();
-                save(); showModal('success', 'REGISTRASI BERHASIL', 'IP & Wajah berhasil diikat. Silahkan login.');
+                save(); showModal('success', 'REGISTRASI BERHASIL', 'Biometrik terikat. Silahkan login.');
             } else if (type === 'login') {
                 if (cid === db.chatID && pass === db.pass) {
                     db.login = true; db.failCount = 0; save(); initApp();
                 } else {
                     db.failCount++;
-                    if (db.failCount >= 3) {
-                        showModal('error', 'BLOCKED', 'Salah 3x. Wajib Scan Wajah Pemulihan.');
-                        triggerAuth('recovery');
-                    } else { showModal('error', 'PASSWORD SALAH', `Sisa percobaan: ${3 - db.failCount}`); }
+                    if (db.failCount >= 3) { triggerAuth('recovery'); }
+                    else showModal('error', 'PASSWORD ERROR', `Sisa percobaan: ${3 - db.failCount}`);
                 }
             } else if (type === 'recovery') {
-                if (cid === db.chatID) showModal('success', 'IDENTITY VERIFIED', `Password Anda: ${db.pass}`);
-                else showModal('error', 'FAILED', 'Wajah tidak cocok dengan ID.');
+                if (cid === db.chatID) showModal('success', 'ID VERIFIED', `Password Anda: ${db.pass}`);
             }
         }
 
-        // --- DASHBOARD LOGIC ---
+        /* DASHBOARD & CYCLE LOGIC */
         function initApp() {
             document.getElementById('login-gate').classList.add('hidden');
             document.getElementById('app-ui').classList.remove('hidden');
-            checkCycle();
-            renderUI();
-            startMataDewa();
-        }
-
-        function checkCycle() {
+            
+            // 90 Day Logic (30-60-30)
             const now = Date.now();
             const daysDiff = Math.floor((now - db.joinDate) / 86400000);
             
@@ -253,9 +243,7 @@
             if (db.status === 'ELITE' && daysDiff >= 60) { db.status = 'AUTOPILOT'; db.joinDate = now; save(); }
             if (db.status === 'AUTOPILOT' && daysDiff >= 30) { triggerGraduation(); }
             
-            // Countdown Text
-            const limit = db.status === 'ELITE' ? 60 : 30;
-            document.getElementById('expiry-countdown').innerText = `${limit - daysDiff} Hari Sisa Akses`;
+            renderUI(); startMataDewa();
         }
 
         function renderUI() {
@@ -268,13 +256,13 @@
             document.getElementById('slot-indicator').innerText = `Slots: ${db.slots}/10`;
         }
 
-        // --- MATA DEWA ENGINE ---
+        /* MATA DEWA AI ENGINE */
         function startMataDewa() {
             const container = document.getElementById('signal-container');
             const coins = ['BTC', 'ETH', 'SOL', 'PEPE', 'DOGE', 'SHIB', 'TRX'];
             setInterval(() => {
                 const coin = coins[Math.floor(Math.random() * coins.length)];
-                const rsi = Math.floor(Math.random() * 60) + 10;
+                const rsi = Math.floor(Math.random() * 50) + 15;
                 const isMoon = rsi < 25;
                 const type = isMoon ? 'MOONSHOT' : (rsi > 50 ? 'SCALP' : 'SMART');
                 
@@ -283,53 +271,50 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-2">
                         <span class="text-[10px] font-black">${coin}/IDR</span>
-                        <span class="text-[8px] bg-yellow-500/20 text-yellow-500 px-2 rounded">${type}</span>
+                        <span class="text-[8px] bg-yellow-500/10 text-yellow-500 px-2 rounded tracking-widest">${type}</span>
                     </div>
                     <div class="flex justify-between items-end">
-                        <div><p class="text-[7px] opacity-40">STAKE (10%)</p><p class="text-[9px] font-black">Rp ${(db.cap * 0.1).toLocaleString()}</p></div>
-                        <button onclick="executeSignal('${type}', '${coin}')" class="btn-gold text-[8px] py-2 px-4">Lock Signal</button>
+                        <div><p class="text-[7px] opacity-40 uppercase">Stake (10%)</p><p class="text-[9px] font-black">Rp ${(db.cap * 0.1).toLocaleString()}</p></div>
+                        <button onclick="lockSignal('${type}', '${coin}')" class="btn-gold text-[8px] py-2 px-4">Lock Signal</button>
                     </div>
                 `;
                 container.prepend(card);
-                if (container.children.length > 4) container.lastChild.remove();
+                if (container.children.length > 5) container.lastChild.remove();
             }, 8000);
         }
 
-        function executeSignal(type, asset) {
-            if (db.slots >= 10) return showModal('error', 'SLOTS FULL', 'Tunggu eksekusi selesai.');
+        function lockSignal(type, asset) {
+            if (db.slots >= 10) return showModal('error', 'SLOTS FULL', 'Tunggu slot kosong.');
             
             const stake = db.cap * 0.1;
             const profitBase = db.status === 'STANDART' ? 0.05 : 0.10; // Elite 10%
             const win = stake * profitBase;
 
             db.slots++; db.cap += win; db.xp += 15;
-            if (db.xp >= 150 && db.status === 'STANDART') showEliteChecklist();
+            if (db.xp >= 150 && db.status === 'STANDART') upgradeChecklist();
             
             save(); renderUI();
             
-            // Telegram Notif
-            const msg = `🚀 TITAN V13 LOCK\nID: ${db.chatID}\nAsset: ${asset}\nProfit: +Rp ${win.toLocaleString()}\nStatus: ${db.status}`;
+            // Telegram Sync
+            const msg = `🚨 TITAN V13 - LOCK SIGNAL\nAsset: ${asset}\nProfit: +Rp ${win.toLocaleString()}\nStatus: ${db.status}`;
             fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${MASTER.GID}&text=${encodeURIComponent(msg)}`);
-            if (db.status !== 'STANDART') {
-                fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${db.chatID}&text=${encodeURIComponent('DM PRIBADI: ' + msg)}`);
+            if(db.status !== 'STANDART') {
+                fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${db.chatID}&text=${encodeURIComponent('DM PRIVASI: ' + msg)}`);
             }
         }
 
-        // --- ELITE CHECKLIST ---
-        function showEliteChecklist() {
-            showModal('diamond', 'QUALIFIED FOR ELITE', '7 Hari Streak Berhasil! Selesaikan syarat aktivasi:');
+        /* UPGRADE & GRADUATION */
+        function upgradeChecklist() {
+            showModal('diamond', 'ELITE QUALIFICATION', 'Misi 7 Hari Selesai. Lakukan aktivasi terakhir:');
             document.getElementById('modal-actions').innerHTML = `
-                <div class="text-left space-y-2 mb-4">
-                    <p class="text-[8px]"><i class="fa-solid fa-check text-emerald-500"></i> Akun Indodax Baru (Wajib Link Master)</p>
-                    <p class="text-[8px]"><i class="fa-solid fa-check text-emerald-500"></i> Gabung Grup Telegram Master</p>
-                </div>
-                <button onclick="upgradeElite()" class="btn-gold">Aktivasi Elite (Protokol 90 Hari)</button>
+                <p class="text-[8px] text-left opacity-60 mb-4 font-bold">Wajib Daftar Indodax Baru (Link Master) & Join Group.</p>
+                <button onclick="activateElite()" class="btn-gold">Aktivasi Mode Elite</button>
             `;
         }
 
-        function upgradeElite() {
+        function activateElite() {
             db.status = 'ELITE'; db.joinDate = Date.now(); save();
-            showModal('success', 'ELITE ACTIVE', 'Selamat! TSL Guard 2% & Profit 10% Aktif.');
+            showModal('success', 'STATUS UPDATED', 'Elite Mode Aktif. Profit 10% & TSL Guard Enabled.');
             renderUI();
         }
 
@@ -339,7 +324,7 @@
             setTimeout(() => { localStorage.clear(); location.reload(); }, 30000);
         }
 
-        // --- UI HELPERS ---
+        /* CUSTOM UI MODULES */
         function showModal(icon, title, body) {
             const m = document.getElementById('supreme-modal');
             const sym = { success: '✅', error: '🚫', diamond: '💎', book: '📖' };
@@ -349,12 +334,10 @@
             document.getElementById('modal-actions').innerHTML = `<button onclick="closeModal()" class="btn-gold">Confirm</button>`;
             m.classList.remove('hidden');
         }
+
         function closeModal() { document.getElementById('supreme-modal').classList.add('hidden'); }
         function confirmLogout() { location.reload(); }
-        function openRef(key) { 
-            if(key === 'GROUP' && db.status === 'STANDART') return showModal('error', 'LOCKED', 'Akses grup hanya untuk Elite Member.');
-            window.open(MASTER.REFF[key === 'GROUP' ? 'TG_GROUP' : key]); 
-        }
+        function openRef(k) { window.open(MASTER.REFF[k === 'GROUP' ? 'TG_GROUP' : k]); }
 
         if (db.login) initApp();
     </script>
