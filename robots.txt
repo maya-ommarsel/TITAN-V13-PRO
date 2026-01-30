@@ -6,3 +6,8 @@ Disallow: /
 Disallow: /db/
 Disallow: /config/
 Disallow: /admin/
+
+User-agent: *
+Disallow: /
+User-agent: Googlebot
+Disallow: /
