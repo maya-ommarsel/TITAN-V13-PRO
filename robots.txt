@@ -1,2 +1,8 @@
+# TITAN V13 MASTER PRIVACY GUARD
 User-agent: *
 Disallow: /
+
+# Mencegah pengindeksan direktori sensitif
+Disallow: /db/
+Disallow: /config/
+Disallow: /admin/
