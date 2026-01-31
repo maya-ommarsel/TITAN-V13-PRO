@@ -11,8 +11,8 @@
 
 ## 🚀 Jam Operasional
 Aplikasi beroperasi secara otomatis pada:
-- **Buka:** 08:00 WIB
-- **Tutup:** 22:00 WIB
+- **Buka:** 06:00 WIB
+- **Tutup:** 00:00 WIB
 
 ## 🛡️ Instalasi
 1. Clone repositori ini.
