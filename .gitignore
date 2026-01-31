@@ -1,0 +1,17 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# Secrets (Jangan pernah upload file ini jika ada)
+.env
+api_secrets.json
+TITAN_Vault.xlsx
+
+# IDE
+.vscode/
+.idea/
