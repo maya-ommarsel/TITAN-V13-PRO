@@ -1,19 +1,14 @@
 {
   "name": "TITAN V13 MAHADHARE",
-  "short_name": "TITAN V13",
+  "short_name": "TitanV13",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#010205",
+  "background_color": "#020308",
   "theme_color": "#ffd700",
   "icons": [
     {
-      "src": "https://img.icons8.com/fluent/192/000000/eye.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/1175/1175277.png",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://img.icons8.com/fluent/512/000000/eye.png",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
