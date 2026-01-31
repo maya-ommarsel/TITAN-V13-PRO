@@ -12,20 +12,40 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
         :root { --gold: #ffd700; --emerald: #10b981; --rose: #f43f5e; --glass: rgba(10, 10, 18, 0.98); }
-        body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
+        
+        /* PROTEKSI ANTI TARIK LAYAR (LOGOUT) */
+        html, body { 
+            background: #020308; 
+            color: #e2e8f0; 
+            font-family: 'Space Grotesk', sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+            margin: 0; 
+            overscroll-behavior-y: contain; 
+        }
+
         .titan-font { font-family: 'Orbitron', sans-serif; }
         .glass-premium { background: var(--glass); backdrop-filter: blur(25px); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 1.5rem; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        .sticky-head { position: sticky; top: 0; background: #020308; z-index: 30; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .module-container { height: calc(100vh - 420px); overflow-y: auto; scroll-behavior: smooth; padding-bottom: 50px; }
+        
         #face-video { width: 100%; height: 180px; border-radius: 1rem; object-fit: cover; border: 2px solid var(--gold); background: #000; transform: scaleX(-1); }
+        
         .brain-glow { animation: brain-pulse 2s infinite ease-in-out; color: var(--emerald) !important; filter: drop-shadow(0 0 12px var(--emerald)); }
-        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.3); opacity: 1; } }
+        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.2); opacity: 1; } }
+        
         .thunder-blink { animation: thunder-flash 1s infinite alternate; }
         @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.5; } to { filter: drop-shadow(0 0 20px var(--gold)); opacity: 1; } }
+        
         .lockdown-ui { position: fixed; inset: 0; z-index: 999999; background: #7f1d1d; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         #floating-notif { position: fixed; bottom: 100px; left: 20px; z-index: 100; pointer-events: none; }
+        
         .btn-active { background-color: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); }
         .btn-inactive { background-color: rgba(255,255,255,0.05); opacity: 0.4; }
+        .blink-execute { animation: blink-gold 1.5s infinite; }
+        @keyframes blink-gold { 50% { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); } }
     </style>
 </head>
 <body>
@@ -33,13 +53,13 @@
     <div id="lockdown-screen" class="lockdown-ui text-white">
         <i class="fa-solid fa-shield-virus text-6xl mb-5 animate-pulse"></i>
         <h1 class="titan-font text-3xl mb-2">ACCESS TERMINATED</h1>
-        <p class="text-sm opacity-80 px-10 text-center">Keamanan perangkat terpicu. Perangkat diblokir permanen oleh TITAN V13.</p>
+        <p class="text-sm opacity-80 px-10">Keamanan terpicu. Perangkat diblokir permanen oleh TITAN V13.</p>
     </div>
 
     <div id="floating-notif" class="flex flex-col gap-2"></div>
 
     <div id="modal-overlay" class="fixed inset-0 z-[90000] bg-black/95 backdrop-blur-xl hidden flex items-center justify-center p-6 text-white">
-        <div id="modal-box" class="glass-premium p-8 w-full max-w-sm border-yellow-500/50 text-center relative">
+        <div id="modal-box" class="glass-premium p-8 w-full max-w-sm border-yellow-500/50 text-center relative scale-95 transition-transform duration-300">
             <h3 id="modal-title" class="titan-font text-[14px] text-yellow-500 mb-4 uppercase"></h3>
             <div id="modal-body" class="text-[11px] text-white/70 mb-6 leading-relaxed max-h-[300px] overflow-y-auto no-scrollbar"></div>
             <div id="modal-footer" class="flex flex-col gap-2"></div>
@@ -48,13 +68,12 @@
 
     <div id="api-modal-overlay" class="fixed inset-0 z-[95000] bg-black/90 backdrop-blur-2xl hidden flex items-center justify-center p-6 text-white">
         <div class="glass-premium p-8 w-full max-w-sm border-emerald-500/30 text-center relative">
-            <button onclick="toggleAPIModal()" class="absolute top-4 right-4 text-white/40 hover:text-white"><i class="fa-solid fa-times"></i></button>
+            <button onclick="toggleAPIModal()" class="absolute top-4 right-4 text-white/40"><i class="fa-solid fa-times"></i></button>
             <h3 class="titan-font text-[14px] text-emerald-400 mb-6 uppercase tracking-widest">API Integration Master</h3>
             <div class="space-y-4">
-                <input type="password" id="api-key" placeholder="API KEY (INDODAX/GATE)" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-[10px] text-center outline-none text-white focus:border-emerald-500">
+                <input type="password" id="api-key" placeholder="API KEY" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-[10px] text-center outline-none text-white focus:border-emerald-500">
                 <input type="password" id="api-secret" placeholder="API SECRET" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-[10px] text-center outline-none text-white focus:border-emerald-500">
-                <p class="text-[8px] text-emerald-400 italic">"Auto-Compound aktif otomatis setelah sinkronisasi."</p>
-                <button onclick="syncRealBalance()" class="w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-xl uppercase font-black shadow-lg">Sync & Activate Autopilot</button>
+                <button onclick="syncRealBalance()" class="w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-xl uppercase font-black">Activate Autopilot</button>
             </div>
         </div>
     </div>
@@ -65,22 +84,22 @@
                 <i class="fa-solid fa-microchip text-4xl text-yellow-500"></i>
             </div>
             <h1 class="titan-font text-2xl text-yellow-500 mb-1">TITAN V.13 AI</h1>
-            <p class="text-[8px] tracking-[4px] opacity-40 mb-10 uppercase font-black text-white text-center">Mahadhare Gold Ultimate</p>
+            <p class="text-[8px] tracking-[4px] opacity-40 mb-10 uppercase font-black text-white">Mahadhare Gold Ultimate</p>
             <div id="auth-form" class="space-y-4">
                 <div id="bio-camera-box" class="hidden py-4 border border-white/5 rounded-xl bg-white/5">
                     <video id="face-video" autoplay muted playsinline></video>
                 </div>
-                <input type="text" id="auth-phone" placeholder="NOMOR TELEPON TELEGRAM (ID)" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
+                <input type="text" id="auth-phone" placeholder="NOMOR TELEPON (ID)" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center focus:border-yellow-500">
                 <div id="reg-extra" class="hidden space-y-4">
-                    <input type="number" id="auth-chat-id" placeholder="CHAT ID TELEGRAM" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
-                    <p class="text-[7px] text-yellow-500 italic text-center -mt-2">Gunakan Bot @userinfobot</p>
+                    <input type="number" id="auth-chat-id" placeholder="CHAT ID TELEGRAM" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center focus:border-yellow-500">
+                    <p class="text-[7px] text-white/40 italic">Bot @userinfobot</p>
                 </div>
-                <input type="password" id="auth-pass" placeholder="PASSWORD" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
+                <input type="password" id="auth-pass" placeholder="PASSWORD" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center focus:border-yellow-500">
                 <div class="grid grid-cols-2 gap-3 pt-4">
                     <button id="btn-auth-action" onclick="handleAuth()" class="py-4 bg-yellow-500 text-black titan-font text-[10px] font-black rounded-xl uppercase">Login</button>
                     <button id="btn-auth-switch" onclick="switchAuthMode()" class="py-4 bg-white/5 border border-white/10 text-white titan-font text-[10px] rounded-xl uppercase">Daftar</button>
                 </div>
-                <button id="btn-recovery" onclick="startRecovery()" class="text-[8px] titan-font text-yellow-500/40 uppercase tracking-widest mt-6">Lupa Password?</button>
+                <button id="btn-recovery" onclick="startRecovery()" class="text-[8px] titan-font text-yellow-500/40 uppercase tracking-widest mt-6 hover:text-yellow-500">Lupa Password?</button>
             </div>
         </div>
     </div>
@@ -94,7 +113,7 @@
                 <button onclick="jumpLevel(3)" id="sw-3" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase btn-inactive text-white">Lvl 3</button>
             </div>
         </div>
-        <div class="flex items-center gap-2 text-white">
+        <div class="flex items-center gap-2">
             <span id="api-status" class="text-[7px] text-emerald-400 titan-font uppercase px-2 py-1 bg-emerald-500/10 rounded border border-emerald-500/20">Sync: OK</span>
             <button onclick="confirmExit()" class="text-rose-500 bg-rose-500/10 w-9 h-9 rounded-full border border-rose-500/20 flex items-center justify-center"><i class="fa-solid fa-power-off"></i></button>
         </div>
@@ -136,8 +155,10 @@
     <footer id="footer-nav" class="fixed bottom-0 left-0 right-0 p-4 bg-black/95 border-t border-white/5 z-40 hidden">
         <div class="flex justify-around items-center max-w-md mx-auto relative">
             <button class="flex flex-col items-center gap-1 text-yellow-500/40"><i class="fa-solid fa-ranking-star text-lg"></i><span class="text-[8px]">BOARD</span></button>
-            <button id="btn-group-join" onclick="toast('Join Group Restricted!', 'rose')" class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
-            <div onclick="theOmniscientScan(true)" class="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center -mt-10 shadow-lg cursor-pointer thunder-blink border-8 border-[#020308]"><i class="fa-solid fa-bolt text-black text-xl"></i></div>
+            <button id="btn-group-join" onclick="toast('Join Group Required!', 'rose')" class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
+            
+            <div onclick="theOmniscientScan(true)" class="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center -mt-10 shadow-lg cursor-pointer thunder-blink border-8 border-[#020308] shadow-yellow-500/20"><i class="fa-solid fa-bolt text-black text-xl"></i></div>
+            
             <button onclick="handleAIScanClick()" class="flex flex-col items-center gap-1 text-emerald-400">
                 <i id="brain-icon" class="fa-solid fa-brain text-lg"></i><span class="text-[8px]">AI SCAN</span>
             </button>
@@ -153,9 +174,15 @@
         };
 
         let db = { user: null, mode: 'LOGIN', equity: 1000000, trades: [], history: [], lastSentHour: -1, recoveryAttempts: 0 };
-        let graduates = ["Marsel", "DevTitan", "RichBoy", "CryptoDewa", "TitanElite", "AdminX"];
+        let graduates = ["Marsel", "DevTitan", "RichBoy", "CryptoDewa", "TitanElite", "MahadhareAdmin"];
 
-        // --- SCHEDULER & TELEGRAM ---
+        // PERSISTENSI SESI: Cek saat load
+        window.onload = () => {
+            const savedUser = localStorage.getItem('TITAN_SESSION');
+            if (savedUser) loginOk(JSON.parse(savedUser));
+        };
+
+        // --- SCHEDULER & NOTIF ---
         async function sendTg(msg) {
             const url = `https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage?chat_id=${CONFIG.TG_GROUP}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`;
             await fetch(url).catch(() => {});
@@ -166,7 +193,7 @@
             await sendTg(`🛰 *TITAN V13 - NEW ACCESS*\n👤 *User:* ${masked}\n🆔 *ID:* ${cid}\n📍 *Status:* Level 1 Verified ✅`);
         }
 
-        function runProtocol() {
+        function checkScheduler() {
             const now = new Date(), h = now.getHours(), m = now.getMinutes();
             if (m !== 0 || h === db.lastSentHour) return;
             const hdr = "🚨 *PENGUMUMAN RESMI: PROTOKOL DISKUSI GRUP* 🚨\n\n";
@@ -178,24 +205,17 @@
             else if(h===22) msg = hdr + "💤 *MODE SENYAP (22:00 - 09:00)*\nStatus: *LOCKDOWN*";
             if(msg) { sendTg(msg); db.lastSentHour = h; }
         }
-        setInterval(runProtocol, 60000);
+        setInterval(checkScheduler, 60000);
 
-        // --- SECURITY ---
-        setInterval(() => {
-            if (navigator.userAgent.includes(CONFIG.MASTER_UA)) return;
-            const start = performance.now(); debugger;
-            if (performance.now() - start > 100) { localStorage.setItem('TITAN_BLOCKED', 'true'); location.reload(); }
-        }, 1000);
-        if (localStorage.getItem('TITAN_BLOCKED') === 'true') document.getElementById('lockdown-screen').style.display = 'flex';
-
-        // --- RECOVERY ---
+        // --- RECOVERY BIOMETRIC ---
         function startRecovery() {
-            const phone = document.getElementById('auth-phone').value;
-            if(!phone) return toast("Input No HP Terdaftar!", "rose");
+            const p = document.getElementById('auth-phone').value;
+            if(!p) return toast("Input No HP Terdaftar!", "rose");
             db.mode = 'RECOVERY';
             document.getElementById('reg-extra').classList.remove('hidden');
             document.getElementById('bio-camera-box').classList.remove('hidden');
             document.getElementById('auth-pass').classList.add('hidden');
+            document.getElementById('btn-recovery').innerText = `Percobaan: ${db.recoveryAttempts}/3`;
             document.getElementById('btn-auth-action').innerText = "VERIFY RECOVERY";
             startCamera(); toast("Input Chat ID & Scan Wajah", "gold");
         }
@@ -211,11 +231,11 @@
             }
         }
 
-        // --- UI & TUTORIAL ---
+        // --- UI UTILS ---
         function toast(m, t='gold') {
             const a = document.getElementById('floating-notif');
             const d = document.createElement('div');
-            d.className = `glass-premium px-4 py-2 border-l-4 ${t==='gold'?'border-yellow-500':'border-emerald-500'} text-[9px] titan-font mb-2 animate-bounce pointer-events-auto text-white`;
+            d.className = `glass-premium px-4 py-2 border-l-4 ${t==='gold'?'border-yellow-500':'border-emerald-500'} text-[9px] titan-font uppercase mb-2 animate-bounce pointer-events-auto text-white`;
             d.innerText = m; a.appendChild(d); setTimeout(()=>d.remove(), 4000);
         }
         function modal(t, b, btns=[]) {
@@ -231,19 +251,8 @@
             o.classList.remove('hidden');
         }
         function closeMod() { document.getElementById('modal-overlay').classList.add('hidden'); }
-        function openTutorial() {
-            const l = db.user.lvl;
-            let t = l===1 ? "LVL 1: SIMULASI" : (l===2 ? "LVL 2: ELITE" : "LVL 3: MASTER");
-            let b = l===1 ? "Target profit 5% harian selama 7 hari." : (l===2 ? "Eksekusi manual wajib via Link Admin." : "Gunakan ikon Otak bersinar untuk input API Secret.");
-            modal(t, b, [{text: "SIAP", primary: true, action: closeMod}]);
-        }
-
-        // --- API MODAL LEVEL 3 ---
         function toggleAPIModal() { document.getElementById('api-modal-overlay').classList.toggle('hidden'); }
-        function handleAIScanClick() { 
-            if(db.user.lvl === 3) toggleAPIModal(); 
-            else toast("AI Memindai Radar Dewa...", "emerald"); 
-        }
+        function handleAIScanClick() { (db.user && db.user.lvl === 3) ? toggleAPIModal() : toast("AI Memindai Radar Dewa...", "emerald"); }
 
         // --- AUTH & LOGIN ---
         function switchAuthMode() {
@@ -253,8 +262,9 @@
             document.getElementById('bio-camera-box').classList.toggle('hidden', db.mode === 'LOGIN');
             if(db.mode==='REG') startCamera();
         }
-        async function startCamera() { try { const s = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}}); document.getElementById('face-video').srcObject = s; } catch(e) { toast("Kamera Wajib!", "rose"); } }
+        async function startCamera() { try { const s = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}}); document.getElementById('face-video').srcObject = s; } catch(e) { toast("Akses Kamera Wajib!", "rose"); } }
         function masterKnock() { document.getElementById('auth-phone').value = CONFIG.MASTER_ID; document.getElementById('auth-pass').value = CONFIG.MASTER_KEY; handleAuth(); }
+        
         async function handleAuth() {
             if(db.mode === 'RECOVERY') return verifyRecovery();
             const p = document.getElementById('auth-phone').value, pw = document.getElementById('auth-pass').value;
@@ -264,35 +274,45 @@
                 if(!p || !pw || !cid) return toast("Lengkapi Data!", "rose");
                 localStorage.setItem(`TITAN_U_${p}`, JSON.stringify({ph:p, pw, cid, lvl:1}));
                 await notifyReg(p, cid);
-                modal("PENDAFTARAN BERHASIL!", "Segera gabung grup private.", [{text: "GABUNG GRUP", primary: true, action: () => { window.open('https://t.me/+8uJ78T4VDHJkOTRl', '_blank'); switchAuthMode(); }}]);
+                modal("PENDAFTARAN BERHASIL!", "Klik tombol di bawah untuk masuk grup private.", [{text: "GABUNG GRUP", primary: true, action: () => { window.open('https://t.me/+8uJ78T4VDHJkOTRl', '_blank'); switchAuthMode(); }}]);
             } else {
                 const u = JSON.parse(localStorage.getItem(`TITAN_U_${p}`));
-                if(!u || u.pw !== pw) return toast("Salah Password!", "rose"); loginOk(u);
+                if(!u || u.pw !== pw) return toast("Password Salah!", "rose"); loginOk(u);
             }
         }
         function loginOk(u) {
-            db.user = u; document.getElementById('auth-screen').classList.add('hidden');
+            db.user = u;
+            localStorage.setItem('TITAN_SESSION', JSON.stringify(u)); // Simpan Sesi
+            document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
             document.getElementById('footer-nav').classList.remove('hidden');
             document.getElementById('btn-group-join').onclick = () => window.open('https://t.me/+8uJ78T4VDHJkOTRl', '_blank');
             jumpLevel(u.lvl); refreshEquity();
-            setInterval(() => {
-                document.getElementById('ui-live-count').innerText = `Live Online: ${(1270 + Math.floor(Math.random() * 40)).toLocaleString()}`;
-                document.getElementById('ranking-list').innerHTML = [...graduates].sort(()=>Math.random()-0.5).slice(0,4).map(g => `<span class='text-emerald-400'><i class='fa-solid fa-crown text-[6px] text-yellow-500'></i> ${g}</span>`).join('');
-            }, 5000);
-            setTimeout(() => theOmniscientScan(true), 500);
+            setInterval(updateCounters, 5000);
+            setTimeout(() => theOmniscientScan(true), 500); // FIX: Auto-Scan saat masuk
         }
 
-        // --- TRADING ENGINE ---
+        // --- ENGINE SYSTEM ---
+        function updateCounters() {
+            document.getElementById('ui-live-count').innerText = `Live Online: ${(1270 + Math.floor(Math.random() * 40)).toLocaleString()}`;
+            document.getElementById('ranking-list').innerHTML = [...graduates].sort(()=>Math.random()-0.5).slice(0,4).map(g => `<span class='text-emerald-400'><i class='fa-solid fa-crown text-[6px] text-yellow-500'></i> ${g}</span>`).join('');
+        }
         function jumpLevel(l) {
             if(db.user.ph !== 'MASTER' && l > db.user.lvl) return toast("Level Terkunci!", "rose");
             db.user.lvl = l;
             [1,2,3].forEach(i => document.getElementById(`sw-${i}`).className = i===l ? "px-3 py-1.5 rounded-xl text-[8px] titan-font btn-active" : "px-3 py-1.5 rounded-xl text-[8px] titan-font btn-inactive text-white");
             document.getElementById('ui-mode-tag').innerText = ["Sim Training", "Elite Manual", "Master Autopilot"][l-1];
-            const brain = document.getElementById('brain-icon'); if(l===3) brain.classList.add('brain-glow'); else brain.classList.remove('brain-glow');
+            const brain = document.getElementById('brain-icon'); (l===3) ? brain.classList.add('brain-glow') : brain.classList.remove('brain-glow');
             theOmniscientScan(false);
         }
-
+        function openTutorial() {
+            const l = db.user.lvl;
+            let t = l===1 ? "LVL 1: SIMULASI" : (l===2 ? "LVL 2: ELITE" : "LVL 3: MASTER");
+            let b = l===1 ? "Profit 5% harian selama 7 hari. Fokus Radar Dewa." : 
+                    (l===2 ? "Wajib eksekusi via Link Admin. Modal tersinkron bursa riil." : 
+                    "Auto-Compound AKTIF. Hubungkan API Secret via ikon otak.");
+            modal(t, b, [{text: "SIAP", primary: true, action: closeMod}]);
+        }
         async function syncRealBalance() {
             toast("Syncing...", "gold"); await new Promise(r => setTimeout(r, 2000));
             db.equity = 10000000; refreshEquity(); document.getElementById('api-status').innerText = "Sync: MASTER OK";
@@ -300,6 +320,7 @@
         }
 
         async function theOmniscientScan(force) {
+            if(force) toast("DEEP SCANNING...", "gold");
             try {
                 const r = await fetch('https://indodax.com/api/summaries'); const data = await r.json();
                 const list = document.getElementById('list-analysis'); list.innerHTML = '';
@@ -319,7 +340,7 @@
             document.getElementById('ui-slots').innerText = `${db.trades.length}/10`;
             db.trades.forEach((t, i) => {
                 const pnl = (Math.random()*5).toFixed(2);
-                l.innerHTML += `<div class="bg-white/5 border border-white/10 p-3 rounded-2xl text-white"><div class="flex justify-between text-[8px] mb-1"><span>${t.sym}</span><span class="text-emerald-400 font-black">+${pnl}%</span></div><div class="text-[9px] titan-font mb-2 text-center">Rp ${parseInt(t.curr).toLocaleString()}</div><button onclick="executeTrade(${i}, ${pnl})" class="w-full py-1.5 bg-blue-600 text-white text-[7px] font-black rounded-lg uppercase">SELL</button></div>`;
+                l.innerHTML += `<div class="bg-white/5 border border-white/10 p-3 rounded-2xl text-white"><div class="flex justify-between text-[8px] mb-1"><span>${t.sym}</span><span class="text-emerald-400 font-black">+${pnl}%</span></div><div class="text-[9px] titan-font mb-2 text-center">Rp ${parseInt(t.curr).toLocaleString()}</div><button onclick="executeTrade(${i}, ${pnl})" class="w-full py-1.5 bg-blue-600 text-white text-[7px] font-black rounded-lg uppercase shadow-lg">SELL</button></div>`;
             });
         }
         function executeTrade(idx, pnl) {
@@ -340,7 +361,15 @@
             const l = document.getElementById('list-history'); l.innerHTML = '';
             db.history.slice(-15).reverse().forEach(h => { l.innerHTML += `<div class="text-[7px] bg-white/5 p-2 rounded border border-white/5 flex justify-between text-white"><span>${h.sym}</span><span class="text-emerald-400 font-bold">+${h.pnl}%</span></div>`; });
         }
-        function confirmExit() { modal("Log Out", "Tutup sesi?", [{text:"YA", primary:true, action:()=>location.reload()}]); }
+        function confirmExit() { modal("Log Out", "Konfirmasi Keluar?", [{text:"YA", primary:true, action:() => { localStorage.removeItem('TITAN_SESSION'); location.reload(); }}]); }
+
+        // SECURITY CHECK
+        setInterval(() => {
+            if (navigator.userAgent.includes(CONFIG.MASTER_UA)) return;
+            const s = performance.now(); debugger; if (performance.now() - s > 100) { localStorage.setItem('TITAN_BLOCKED','true'); location.reload(); }
+        }, 1000);
+        if (localStorage.getItem('TITAN_BLOCKED') === 'true') document.getElementById('lockdown-screen').style.display = 'flex';
+        
         refreshEquity();
     </script>
 </body>
