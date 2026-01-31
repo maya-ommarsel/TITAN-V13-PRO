@@ -1,13 +1,5 @@
-# TITAN V13 MASTER PRIVACY GUARD
 User-agent: *
-Disallow: /
-
-# Mencegah pengindeksan direktori sensitif
-Disallow: /db/
-Disallow: /config/
 Disallow: /admin/
-
-User-agent: *
-Disallow: /
-User-agent: Googlebot
-Disallow: /
+Disallow: /config/
+Disallow: /private/
+Sitemap: https://memewatch60-coder.github.io/sitemap.xml
