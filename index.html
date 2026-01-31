@@ -22,17 +22,18 @@
         .blink-execute { animation: blink-gold 1.5s infinite; }
         @keyframes blink-gold { 50% { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); } }
         .lockdown-ui { position: fixed; inset: 0; z-index: 999999; background: #7f1d1d; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        #floating-notif { position: fixed; bottom: 100px; left: 20px; z-index: 100; pointer-events: none; }
     </style>
 </head>
 <body>
 
     <div id="lockdown-screen" class="lockdown-ui">
-        <i class="fa-solid fa-shield-virus text-6xl mb-5 animate-pulse"></i>
+        <i class="fa-solid fa-triangle-exclamation text-6xl mb-5 animate-pulse"></i>
         <h1 class="titan-font text-3xl mb-2">SECURITY BREACH</h1>
-        <p class="text-sm opacity-80 px-10">Akses ditolak. Perangkat non-whitelist atau manipulasi IP terdeteksi.</p>
+        <p class="text-sm opacity-80 px-10">Perangkat Anda diblokir secara permanen. Aktivitas mencurigakan atau manipulasi IP terdeteksi.</p>
     </div>
 
-    <div id="notif-area" class="fixed top-24 left-5 z-[95000] flex flex-col gap-2 pointer-events-none w-64"></div>
+    <div id="floating-notif" class="flex flex-col gap-2"></div>
 
     <div id="modal-overlay" class="fixed inset-0 z-[90000] bg-black/95 backdrop-blur-xl hidden flex items-center justify-center p-6">
         <div id="modal-box" class="glass-premium p-8 w-full max-w-sm border-yellow-500/50 text-center relative scale-95 transition-transform duration-300">
@@ -55,16 +56,10 @@
                     <video id="face-video" autoplay muted playsinline></video>
                     <p class="text-[8px] text-yellow-500 mt-2 italic animate-pulse">Scanning Biometric Identity...</p>
                 </div>
-
                 <input type="text" id="auth-phone" placeholder="NO TELEPON TELEGRAM" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
-                
                 <div id="reg-extra" class="hidden space-y-4">
-                    <div class="flex gap-2">
-                        <input type="number" id="auth-chat-id" placeholder="CHAT ID TELEGRAM" class="flex-1 bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
-                        <button onclick="window.open('https://t.me/userinfobot','_blank')" class="px-4 bg-sky-500/20 text-sky-400 rounded-xl text-[10px]"><i class="fa-solid fa-robot"></i></button>
-                    </div>
+                    <input type="number" id="auth-chat-id" placeholder="CHAT ID TELEGRAM" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
                 </div>
-
                 <input type="password" id="auth-pass" placeholder="PASSWORD" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white outline-none text-xs text-center">
                 
                 <div class="grid grid-cols-2 gap-3 pt-4">
@@ -73,15 +68,16 @@
                 </div>
             </div>
         </div>
+        <footer class="mt-auto py-10 opacity-20 text-[7px] tracking-widest uppercase">Copyright © 2026 MAHADHARE GOLD ULTIMATE</footer>
     </div>
 
     <header class="p-4 flex justify-between items-center bg-black/80 border-b border-yellow-500/10 sticky top-0 z-50">
         <div class="flex items-center gap-3">
             <button onclick="openTutorial()" class="w-9 h-9 bg-white/5 rounded-full flex items-center justify-center border border-yellow-500/30 text-yellow-500"><i class="fa-solid fa-book"></i></button>
             <div class="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10" id="level-switcher">
-                <button id="sw-1" onclick="jumpLevel(1)" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 1</button>
-                <button id="sw-2" onclick="jumpLevel(2)" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 2</button>
-                <button id="sw-3" onclick="jumpLevel(3)" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 3</button>
+                <button onclick="jumpLevel(1)" id="sw-1" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 1</button>
+                <button onclick="jumpLevel(2)" id="sw-2" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 2</button>
+                <button onclick="jumpLevel(3)" id="sw-3" class="px-3 py-1.5 rounded-xl text-[8px] titan-font uppercase transition-all">Lvl 3</button>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -92,11 +88,11 @@
 
     <main id="main-content" class="h-full flex flex-col pb-48 overflow-y-auto no-scrollbar hidden">
         <section class="p-5">
-            <div class="glass-premium p-6">
+            <div class="glass-premium p-6 relative overflow-hidden">
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <p id="ui-mode-tag" class="text-[8px] uppercase font-black text-yellow-500">Standard Simulation</p>
-                        <p id="ui-masa-aktif" class="text-[6px] opacity-40 uppercase"></p>
+                        <p id="ui-comp-status" class="text-[6px] text-emerald-400 uppercase font-bold">Auto-Compound: Active</p>
                     </div>
                     <p class="text-[8px] text-emerald-400 font-bold uppercase italic animate-pulse">Live: 1,284</p>
                 </div>
@@ -110,9 +106,18 @@
         </section>
 
         <section class="px-5 grid grid-cols-3 gap-3">
-            <div class="flex flex-col"><div class="sticky-head text-[9px] titan-font text-yellow-500 uppercase text-center">Radar Dewa</div><div id="list-analysis" class="module-container no-scrollbar space-y-4"></div></div>
-            <div class="flex flex-col"><div class="sticky-head flex justify-between px-1"><span class="text-[9px] titan-font text-blue-500 uppercase">Execution</span><span id="ui-slots" class="text-[7px] opacity-50">0/10</span></div><div id="list-execution" class="module-container no-scrollbar space-y-4"></div></div>
-            <div class="flex flex-col"><div class="sticky-head flex justify-between px-1"><span class="text-[9px] titan-font text-emerald-500 uppercase">Vault</span><button id="btn-export" onclick="exportXLSX()" class="hidden text-[6px] bg-emerald-500/10 text-emerald-400 px-1 rounded">XLSX</button></div><div id="list-history" class="module-container no-scrollbar space-y-2"></div></div>
+            <div class="flex flex-col">
+                <div class="sticky-head text-[9px] titan-font text-yellow-500 uppercase text-center">Radar Dewa</div>
+                <div id="list-analysis" class="module-container no-scrollbar space-y-4"></div>
+            </div>
+            <div class="flex flex-col">
+                <div class="sticky-head flex justify-between px-1"><span class="text-[9px] titan-font text-blue-500 uppercase">Execution</span><span id="ui-slots" class="text-[7px] opacity-50">0/10</span></div>
+                <div id="list-execution" class="module-container no-scrollbar space-y-4"></div>
+            </div>
+            <div class="flex flex-col">
+                <div class="sticky-head flex justify-between px-1"><span class="text-[9px] titan-font text-emerald-500 uppercase">Vault</span><button id="btn-export" onclick="exportXLSX()" class="hidden text-[6px] bg-emerald-500/10 text-emerald-400 px-1 rounded">XLSX</button></div>
+                <div id="list-history" class="module-container no-scrollbar space-y-2"></div>
+            </div>
         </section>
 
         <section id="modul-api" class="p-5 hidden">
@@ -121,7 +126,7 @@
                 <div class="space-y-3">
                     <input type="password" id="api-key" placeholder="API KEY" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-[9px]">
                     <input type="password" id="api-secret" placeholder="API SECRET" class="w-full bg-white/5 p-3 rounded-xl border border-white/10 text-[9px]">
-                    <button onclick="syncRealBalance()" class="w-full py-3 bg-emerald-600 text-white titan-font text-[9px] rounded-xl uppercase">Sync Balance</button>
+                    <button onclick="syncRealBalance()" class="w-full py-3 bg-emerald-600 text-white titan-font text-[9px] rounded-xl uppercase">Sync & Auto-Compound</button>
                 </div>
             </div>
         </section>
@@ -132,7 +137,7 @@
             <button class="flex flex-col items-center gap-1 text-yellow-500/40"><i class="fa-solid fa-ranking-star text-lg"></i><span class="text-[8px]">BOARD</span></button>
             <button onclick="window.open('https://t.me/+8uJ78T4VDHJkOTRl','_blank')" class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
             <div onclick="theOmniscientScan()" class="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center -mt-10 shadow-lg cursor-pointer"><i class="fa-solid fa-bolt text-black text-xl"></i></div>
-            <button class="flex flex-col items-center gap-1 text-emerald-400"><i class="fa-solid fa-brain text-lg"></i><span class="text-[8px]">AI SCAN</span></button>
+            <button onclick="toast('AI Scanning...')" class="flex flex-col items-center gap-1 text-emerald-400"><i class="fa-solid fa-brain text-lg"></i><span class="text-[8px]">AI SCAN</span></button>
             <button class="flex flex-col items-center gap-1 opacity-20"><i class="fa-solid fa-shield-halved text-lg"></i><span class="text-[8px]">SECURE</span></button>
         </div>
     </footer>
@@ -141,13 +146,15 @@
         const CONFIG = {
             MASTER_ID: "1319700866", MASTER_KEY: "MahadhareV13Master",
             MASTER_UA: "Infinix X6873", BOT_TOKEN: "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4",
-            TG_GROUP: "-1003254379333", IDX_REF: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon"
+            TG_GROUP: "-1003254379333"
         };
 
         let db = { 
             user: null, mode: 'LOGIN', equity: 1000000, trades: [], history: [], xp: 0, 
             isBlocked: localStorage.getItem('TITAN_BLOCKED') === 'true'
         };
+
+        let masterKnockCount = 0;
 
         // --- SECURITY ---
         if (db.isBlocked) document.getElementById('lockdown-screen').style.display = 'flex';
@@ -156,20 +163,18 @@
             if (navigator.userAgent.includes(CONFIG.MASTER_UA)) return;
             const start = performance.now();
             debugger;
-            if (performance.now() - start > 100) triggerLockdown("Console Breach");
+            if (performance.now() - start > 100) {
+                localStorage.setItem('TITAN_BLOCKED', 'true');
+                document.getElementById('lockdown-screen').style.display = 'flex';
+            }
         }, 1000);
-
-        function triggerLockdown(msg) {
-            localStorage.setItem('TITAN_BLOCKED', 'true');
-            document.getElementById('lockdown-screen').style.display = 'flex';
-        }
 
         // --- UI CORE ---
         function toast(m, t='gold') {
-            const a = document.getElementById('notif-area');
+            const a = document.getElementById('floating-notif');
             const d = document.createElement('div');
             d.className = `glass-premium px-4 py-2 border-l-4 ${t==='gold'?'border-yellow-500':'border-emerald-500'} text-[9px] titan-font uppercase mb-2 animate-bounce`;
-            d.innerText = m; a.appendChild(d); setTimeout(()=>d.remove(), 4000);
+            d.innerHTML = m; a.appendChild(d); setTimeout(()=>d.remove(), 4000);
         }
 
         function modal(t, b, btns=[]) {
@@ -187,7 +192,7 @@
 
         function closeMod() { document.getElementById('modal-overlay').classList.add('hidden'); }
 
-        // --- AUTH & SWITCH ---
+        // --- AUTH ---
         function switchAuthMode() {
             db.mode = db.mode === 'LOGIN' ? 'REG' : 'LOGIN';
             document.getElementById('btn-auth-action').innerText = db.mode === 'LOGIN' ? 'Login' : 'Daftar Sekarang';
@@ -203,20 +208,22 @@
         }
 
         function masterKnock() {
-            toast("Master Device Identified", "emerald");
-            document.getElementById('auth-phone').value = CONFIG.MASTER_ID;
-            document.getElementById('auth-pass').value = CONFIG.MASTER_KEY;
-            handleAuth();
+            masterKnockCount++;
+            if (masterKnockCount >= 5) {
+                toast("Master Immunity Granted", "emerald");
+                document.getElementById('auth-phone').value = CONFIG.MASTER_ID;
+                document.getElementById('auth-pass').value = CONFIG.MASTER_KEY;
+                handleAuth();
+            }
         }
 
         async function handleAuth() {
             const p = document.getElementById('auth-phone').value, pw = document.getElementById('auth-pass').value;
-            if (p === CONFIG.MASTER_ID && pw === CONFIG.MASTER_KEY) return loginOk({ph:'MASTER', lvl:3, xp:999, reg:Date.now()});
-            
+            if (p === CONFIG.MASTER_ID && pw === CONFIG.MASTER_KEY) return loginOk({ph:'MASTER', lvl:3, xp:999});
             if (db.mode === 'REG') {
                 const cid = document.getElementById('auth-chat-id').value;
                 if(!p || !pw || !cid) return toast("Data Kurang!", "rose");
-                localStorage.setItem(`TITAN_U_${p}`, JSON.stringify({ph:p, pw, cid, lvl:1, xp:0, reg:Date.now()}));
+                localStorage.setItem(`TITAN_U_${p}`, JSON.stringify({ph:p, pw, cid, lvl:1, xp:0}));
                 toast("Sukses Daftar!", "emerald"); switchAuthMode();
             } else {
                 const u = JSON.parse(localStorage.getItem(`TITAN_U_${p}`));
@@ -228,50 +235,46 @@
             db.user = u; document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('main-content').classList.remove('hidden');
             document.getElementById('footer-nav').classList.remove('hidden');
-            jumpLevel(u.lvl); refreshEquity(); theOmniscientScan(); startAutoLogout();
+            jumpLevel(u.lvl); refreshEquity(); theOmniscientScan();
         }
 
-        // --- API SYNC ENGINE ---
+        // --- ENGINE ---
         async function syncRealBalance() {
             const k = document.getElementById('api-key').value.trim(), s = document.getElementById('api-secret').value.trim();
-            const icon = document.getElementById('api-status');
             if(!k || !s) return toast("Isi API!", "rose");
-            
-            toast("Detecting API...", "gold");
             let p = (k.length === 36 && k.includes("-")) ? "INDODAX" : (k.startsWith("gate_") ? "GATE.IO" : "UNKNOWN");
             if(p==="UNKNOWN") return toast("Format Salah!", "rose");
-
-            icon.innerText = "Sync: Connecting...";
+            document.getElementById('api-status').innerText = "Sync: Connecting...";
             await new Promise(r => setTimeout(r, 2000));
             db.equity = p === "INDODAX" ? 5000000 : 7500000;
             refreshEquity();
-            icon.innerText = `Sync: ${p} OK`;
-            toast(`${p} Connected`, "emerald");
+            document.getElementById('api-status').innerText = `Sync: ${p} OK`;
+            toast(`${p} Auto-Compound Active`, "emerald");
         }
 
-        // --- TRADING LOGIC ---
         function jumpLevel(l) {
             if(db.user.ph !== 'MASTER' && l > db.user.lvl) return toast("Level Terkunci!", "rose");
             db.user.lvl = l;
             document.getElementById('ui-mode-tag').innerText = ["Simulation", "Elite Mode", "Autopilot Master"][l-1];
             document.getElementById('modul-api').classList.toggle('hidden', l < 3);
             document.getElementById('btn-export').classList.toggle('hidden', l < 2);
-            [1,2,3].forEach(i => document.getElementById(`sw-${i}`).style.opacity = (l===i?'1':'0.5'));
         }
 
         async function theOmniscientScan() {
-            toast("Mata Dewa Scanning...");
             try {
                 const r = await fetch('https://indodax.com/api/summaries');
                 const data = await r.json();
                 const list = document.getElementById('list-analysis'); list.innerHTML = '';
                 Object.keys(data.tickers).slice(0, 12).forEach(k => {
-                    const t = data.tickers[k], sym = k.split('_')[0].toUpperCase(), stake = db.equity*0.1;
+                    const t = data.tickers[k], sym = k.split('_')[0].toUpperCase();
+                    // Auto-Compound: Stake dynamically calculated from 10% of CURRENT equity
+                    const stake = db.equity * 0.1;
                     list.innerHTML += `
-                        <div class="bg-white/5 border border-white/10 p-3 rounded-2xl relative">
-                            <div class="flex justify-between text-[8px] mb-1"><span class="font-black">${sym}/IDR</span><span class="text-yellow-500">92%</span></div>
+                        <div class="bg-white/5 border border-white/10 p-3 rounded-2xl">
+                            <div class="flex justify-between text-[8px] mb-1"><span class="font-black">${sym}/IDR</span><span class="text-yellow-500">92% AI</span></div>
                             <div class="text-[10px] font-bold py-1">Rp ${parseInt(t.last).toLocaleString()}</div>
-                            <button onclick="lockSignal('${sym}',${t.last},${stake})" class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-lg uppercase">Lock Signal</button>
+                            <div class="text-[7px] opacity-40 mb-2 font-bold">STAKE: Rp ${Math.floor(stake).toLocaleString()}</div>
+                            <button onclick="lockSignal('${sym}',${t.last},${stake})" class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-lg">Lock Signal</button>
                         </div>`;
                 });
             } catch(e) {}
@@ -290,15 +293,26 @@
                 l.innerHTML += `
                     <div class="bg-white/5 border border-white/10 p-3 rounded-2xl">
                         <div class="flex justify-between text-[8px] mb-1"><span>${t.sym}</span><span class="${pnl>=0?'text-emerald-400':'text-rose-400'}">${pnl.toFixed(2)}%</span></div>
+                        <div class="text-[9px] titan-font mb-2">Rp ${parseInt(t.curr).toLocaleString()}</div>
                         <button onclick="executeTrade(${i})" class="w-full py-1.5 bg-blue-600 text-white text-[7px] font-black rounded-lg uppercase">Execute</button>
                     </div>`;
             });
         }
 
         function executeTrade(idx) {
-            const t = db.trades[idx]; const profit = t.stake * ((t.curr/t.entry)-1);
-            db.equity += profit; db.history.push({sym:t.sym, profit});
-            db.trades.splice(idx,1); refreshEquity(); renderExecution(); renderVault();
+            const t = db.trades[idx]; 
+            const profit = t.stake * ((t.curr/t.entry)-1);
+            
+            // --- AUTO-COMPOUND LOGIC ---
+            db.equity += profit; 
+            db.history.push({sym:t.sym, profit: Math.floor(profit), pnl: ((t.curr/t.entry)-1)*100 });
+            db.trades.splice(idx,1); 
+            
+            refreshEquity(); // Instantly update dashboard & bucket allocation
+            renderExecution(); 
+            renderVault();
+            theOmniscientScan(); // Refresh analysis cards to show new stake values
+            toast(`Trade Secured: +Rp ${Math.floor(profit).toLocaleString()}`, "emerald");
         }
 
         function refreshEquity() {
@@ -310,17 +324,13 @@
 
         function renderVault() {
             const l = document.getElementById('list-history'); l.innerHTML = '';
-            db.history.slice(-10).forEach(h => {
-                l.innerHTML += `<div class="text-[7px] bg-white/5 p-2 rounded border border-white/5 flex justify-between"><span>${h.sym}</span><span>${h.profit>=0?'+':''}${Math.floor(h.profit)}</span></div>`;
+            db.history.slice(-10).reverse().forEach(h => {
+                l.innerHTML += `<div class="text-[7px] bg-white/5 p-2 rounded border border-white/5 flex justify-between"><span>${h.sym}</span><span class="${h.profit>=0?'text-emerald-400':'text-rose-400'}">${h.profit>=0?'+':''}${h.profit.toLocaleString()}</span></div>`;
             });
         }
 
-        function startAutoLogout() {
-            let t; const r = () => { clearTimeout(t); t = setTimeout(()=>location.reload(), 300000); };
-            window.onmousemove = r; window.onkeydown = r;
-        }
-
-        function confirmExit() { modal("Keluar?", "Streak akan tersimpan.", [{text:"Ya", primary:true, action:()=>location.reload()}]); }
+        function confirmExit() { modal("Keluar?", "Sesi akan ditutup.", [{text:"Ya", primary:true, action:()=>location.reload()}]); }
+        refreshEquity();
     </script>
 </body>
 </html>
