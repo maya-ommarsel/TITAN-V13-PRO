@@ -1,19 +1,14 @@
 {
-  "name": "TITAN V13 ULTIMATE",
+  "name": "TITAN V13 - MAHADHARE GOLD ULTIMATE",
   "short_name": "TITAN V13",
-  "description": "Mahadhare Gold Ultimate Trading System",
+  "description": "Supreme AI Trading Signal Robot",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#020308",
   "theme_color": "#ffd700",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/8943/8943377.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/8943/8943377.png",
+      "src": "https://cdn-icons-png.flaticon.com/512/3665/3665923.png",
       "sizes": "512x512",
       "type": "image/png"
     }
