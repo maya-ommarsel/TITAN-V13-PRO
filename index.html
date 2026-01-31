@@ -12,13 +12,14 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Space+Grotesk:wght@500;700&display=swap');
         body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; user-select: none; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(18, 18, 24, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,215,0,0.15); border-radius: 25px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .glass { background: rgba(18, 18, 24, 0.95); backdrop-filter: blur(15px); border: 1px solid rgba(255,215,0,0.15); border-radius: 25px; }
         .btn-gold { background: linear-gradient(135deg, #ffd700, #b8860b); color: #000; font-weight: 900; border-radius: 12px; cursor: pointer; text-transform: uppercase; transition: 0.3s; font-size: 10px; }
         
         /* Triple-View Scrollable Modules */
         .module-container { height: calc(28vh); overflow-y: auto; padding-right: 5px; }
         .module-container::-webkit-scrollbar { width: 3px; }
-        .module-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.3); border-radius: 10px; }
+        .module-container::-webkit-scrollbar-thumb { background: rgba(255,215,0,0.2); border-radius: 10px; }
         
         .nav-bottom { position: fixed; bottom: 0; width: 100%; background: #020308; display: flex; justify-content: space-around; padding: 15px 10px 30px; border-top: 1px solid rgba(255,215,0,0.1); z-index: 1000; }
         #face-scanner-ui { position: fixed; inset: 0; background: #000; z-index: 99999; display: none; flex-direction: column; align-items: center; justify-content: center; }
@@ -26,9 +27,9 @@
         .scan-line { position: absolute; width: 100%; height: 3px; background: #ffd700; top: 0; animation: scanMove 2s linear infinite; box-shadow: 0 0 15px #ffd700; }
         @keyframes scanMove { 0% { top: 0; } 100% { top: 100%; } }
         
+        /* Grafik Konsep Kode Pertama */
         .trailing-line { stroke: #f43f5e; stroke-width: 1.5; stroke-dasharray: 4; }
         .price-line { stroke: #ffd700; stroke-width: 2.5; fill: none; filter: drop-shadow(0 0 8px #ffd700); }
-        .cert-card { background: linear-gradient(135deg, #1a1a1a, #000); border: 4px double #ffd700; padding: 40px; text-align: center; max-width: 400px; border-radius: 20px; box-shadow: 0 0 50px rgba(255,215,0,0.2); }
     </style>
 </head>
 <body class="no-scrollbar">
@@ -39,23 +40,13 @@
     </div>
 
     <div id="face-scanner-ui">
-        <div class="scanner-circle mb-6"><video id="webcam" class="w-full h-full object-cover" autoplay muted playsinline></video><div class="scan-line"></div></div>
-        <h2 class="titan-font text-yellow-500 mb-2 uppercase">Biometric Verification</h2>
-        <p class="text-[8px] text-white/50 mb-6 uppercase">Silahkan berkedip atau menoleh perlahan</p>
-        <div class="w-48 bg-white/10 h-1 rounded-full overflow-hidden"><div id="scan-progress" class="bg-yellow-500 h-full w-0 transition-all"></div></div>
-    </div>
-
-    <div id="cert-ui" class="hidden fixed inset-0 bg-black/95 z-[100000] flex items-center justify-center p-6 backdrop-blur-md">
-        <div class="cert-card">
-            <h1 class="titan-font text-yellow-500 text-xl mb-2">MAHADHARE ULTIMATE</h1>
-            <p class="text-[8px] italic text-gray-400 mb-8 uppercase tracking-widest">Sertifikat Keunggulan Digital</p>
-            <p class="text-xs mb-2">Diberikan Kepada Node:</p>
-            <h2 id="cert-user" class="titan-font text-lg text-white underline mb-6"></h2>
-            <p class="text-[9px] leading-relaxed text-gray-400">"Berhasil menyelesaikan siklus 120 hari TITAN V13 dengan disiplin tinggi."</p>
-            <div class="mt-10 pt-6 border-t border-yellow-500/20 text-[7px] opacity-50 uppercase flex justify-between">
-                <span>V13-MASTER-2026</span>
-                <span>Titan Elite Engine</span>
-            </div>
+        <div class="scanner-circle mb-6">
+            <video id="webcam" class="w-full h-full object-cover" autoplay muted playsinline></video>
+            <div class="scan-line"></div>
+        </div>
+        <h2 class="titan-font text-yellow-500 mb-2 tracking-widest uppercase">Biometric Auth</h2>
+        <div class="w-48 bg-white/10 h-1 rounded-full overflow-hidden">
+            <div id="scan-progress" class="bg-yellow-500 h-full w-0 transition-all"></div>
         </div>
     </div>
 
@@ -68,7 +59,7 @@
         <div class="w-full space-y-4 max-w-xs">
             <input type="text" id="user-chatid" inputmode="numeric" placeholder="TELEGRAM CHAT ID" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white text-center outline-none font-bold">
             <input type="password" id="user-pass" placeholder="SECURITY PASSWORD" class="w-full bg-white/5 p-4 rounded-xl border border-white/10 text-white text-center outline-none font-black tracking-widest uppercase">
-            <button onclick="triggerAuth()" class="btn-gold w-full py-4 titan-font">Authorize Access</button>
+            <button onclick="triggerAuth()" class="btn-gold w-full py-4 titan-font text-sm">Authorize Access</button>
             <div class="flex justify-between pt-6 border-t border-white/5">
                 <a href="https://t.me/userinfobot" target="_blank" class="text-[9px] text-blue-400 font-bold uppercase underline">Get Chat ID</a>
                 <span class="text-[8px] opacity-30 uppercase">Copyright © 2026</span>
@@ -81,12 +72,12 @@
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-full border border-yellow-500/30 flex items-center justify-center bg-yellow-500/10"><i class="fa-solid fa-crown text-yellow-500 text-sm"></i></div>
                 <div>
-                    <p id="status-label" class="text-[8px] font-black uppercase text-yellow-500 tracking-widest">Level 1: Standart</p>
+                    <p id="status-label" class="text-[8px] font-black uppercase text-yellow-500 tracking-widest">Standard Member</p>
                     <p id="api-status-text" class="hidden text-[7px] text-emerald-500 font-bold animate-pulse uppercase">API Sync Active</p>
                 </div>
             </div>
             <div class="flex gap-4 items-center">
-                <i onclick="exportExcel()" class="fa-solid fa-file-excel text-lg text-emerald-500 cursor-pointer"></i>
+                <i onclick="exportToExcel()" class="fa-solid fa-file-excel text-lg text-emerald-500 cursor-pointer"></i>
                 <i onclick="showBook()" class="fa-solid fa-book-open text-xl text-yellow-500 cursor-pointer"></i>
                 <i onclick="showLogoutModal()" class="fa-solid fa-power-off text-lg text-rose-500 cursor-pointer"></i>
             </div>
@@ -94,7 +85,7 @@
 
         <div class="px-6 mb-4">
             <div class="glass p-4 text-center border-l-4 border-yellow-500">
-                <p class="text-[7px] opacity-40 uppercase tracking-[0.3em] mb-1">Equity (Auto-Compound)</p>
+                <p class="text-[8px] opacity-40 uppercase tracking-[0.3em] mb-1">Equity (Auto-Compound)</p>
                 <h1 id="main-balance" class="titan-font text-2xl text-yellow-500">Rp 1.000.000</h1>
             </div>
         </div>
@@ -111,9 +102,9 @@
             <section class="glass p-4 rounded-2xl flex-1 flex flex-col border-t-2 border-emerald-500/20">
                 <h3 class="titan-font text-[9px] text-emerald-400 mb-3 uppercase flex justify-between">
                     <span><i class="fa-solid fa-shield-halved mr-1"></i> Guard Room</span>
-                    <span class="text-[7px] opacity-40 uppercase">TSL Guard 2% Active</span>
+                    <span class="text-[7px] opacity-40 uppercase">TSL Guard 2%</span>
                 </h3>
-                <div id="execution-container" class="module-container no-scrollbar space-y-3"></div>
+                <div id="execution-container" class="module-container no-scrollbar space-y-3 text-[10px]"></div>
             </section>
 
             <section class="glass p-4 rounded-2xl flex-1 flex flex-col border-t-2 border-white/5">
@@ -125,7 +116,7 @@
         <nav class="nav-bottom">
             <div onclick="window.open('https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon')" class="text-center opacity-40"><i class="fa-solid fa-wallet text-xl"></i><p class="text-[7px] mt-1">WALLET</p></div>
             <div onclick="window.open('https://t.me/+8uJ78T4VDHJkOTRl')" class="text-center text-yellow-500"><i class="fa-solid fa-paper-plane text-xl"></i><p class="text-[7px] mt-1 font-bold">GROUP</p></div>
-            <div onclick="openLevelSwitcher()" class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center -mt-8 shadow-[0_0_20px_#ffd700] text-black text-xl"><i class="fa-solid fa-bolt"></i></div>
+            <div onclick="openAPIConfig()" class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center -mt-8 shadow-[0_0_20px_#ffd700] text-black text-xl"><i class="fa-solid fa-bolt"></i></div>
             <div onclick="window.open('https://jup.ag/?refId=yuf0dh4il1xs')" class="text-center opacity-40"><i class="fa-solid fa-rocket text-xl"></i><p class="text-[7px] mt-1">JUPITER</p></div>
             <div onclick="window.open('https://www.gate.com/referral/cashback?ref=VQUQVVWJUG')" class="text-center opacity-40"><i class="fa-solid fa-globe text-xl"></i><p class="text-[7px] mt-1 uppercase">Gate.io</p></div>
         </nav>
@@ -141,7 +132,6 @@
     </div>
 
     <script>
-        /* MASTER SECURITY & DATA */
         const MASTER = {
             BOT: atob('ODI5NTYwNzcwNDpBQUZkeV9VOGJGTC14Mk9sOTBuOGYyS0RPSHp0eWJjdWo0'),
             GID: atob('-MTAwMzI1NDM3OTMzMw=='),
@@ -151,8 +141,7 @@
 
         let db = JSON.parse(localStorage.getItem('TITAN_ULTIMATE_V13')) || {
             login: false, chatID: '', level: 1, equity: 1000000, 
-            xp: 0, slots: 0, isBlocked: false, history: [], execution: [],
-            ip: '', joinDate: Date.now()
+            xp: 0, slots: 0, isBlocked: false, history: [], execution: [], joinDate: Date.now()
         };
 
         const save = () => localStorage.setItem('TITAN_ULTIMATE_V13', JSON.stringify(db));
@@ -163,7 +152,7 @@
             taps++;
             if (taps >= 5) {
                 taps = 0;
-                db = { login: true, level: 3, chatID: MASTER.AID, xp: 160, equity: 100000000, slots: 0, history: [], execution: [], ip: 'MASTER-DEVICE' };
+                db = { login: true, level: 3, chatID: MASTER.AID, xp: 160, equity: 100000000, slots: 0, history: [], execution: [] };
                 save(); location.reload();
             }
         }
@@ -172,7 +161,6 @@
         setInterval(() => { const s = performance.now(); debugger; if (performance.now() - s > 100) { db.isBlocked = true; save(); location.reload(); } }, 2000);
         if (db.isBlocked) document.getElementById('lockdown').classList.remove('hidden');
 
-        /* Biometric Auth */
         async function triggerAuth() {
             const cid = document.getElementById('user-chatid').value;
             const p = document.getElementById('user-pass').value;
@@ -180,7 +168,7 @@
 
             const scanner = document.getElementById('face-scanner-ui');
             scanner.style.display = 'flex';
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
             document.getElementById('webcam').srcObject = stream;
             
             let prog = 0;
@@ -190,7 +178,7 @@
                     clearInterval(timer); stream.getTracks().forEach(t => t.stop());
                     scanner.style.display = 'none';
                     if (cid && p.length >= 8) { db.login = true; db.chatID = cid; save(); initApp(); }
-                    else showModal('ACCESS DENIED', 'Invalid credentials.');
+                    else showModal('ERROR', 'Invalid credentials.');
                 }
             }, 300);
         }
@@ -206,13 +194,11 @@
 
         function renderUI() {
             document.getElementById('main-balance').innerText = `Rp ${Math.floor(db.equity).toLocaleString('id-ID')}`;
-            document.getElementById('status-label').innerText = `Level ${db.level}: ${db.level === 1 ? 'Standart' : (db.level === 2 ? 'Elite' : 'Autopilot')}`;
+            document.getElementById('status-label').innerText = `Level ${db.level}: ${db.level === 1 ? 'Standart' : 'Elite'}`;
             document.getElementById('slot-info').innerText = `Slots: ${db.execution.length}/10`;
-            if(db.level === 3) document.getElementById('api-status-text').classList.remove('hidden');
             renderExecution(); renderHistory();
         }
 
-        /* Mata Dewa Scan Engine */
         function startRadar() {
             const coins = ['BTC', 'ETH', 'SOL', 'PEPE', 'DOGE'];
             setInterval(() => {
@@ -223,8 +209,11 @@
                 const card = document.createElement('div');
                 card.className = 'glass p-3 flex justify-between items-center border-l-2 ' + (rsi < 30 ? 'border-rose-500' : 'border-emerald-500');
                 card.innerHTML = `
-                    <div><h4 class="font-bold text-xs">$${coin}/IDR</h4><p class="text-[7px] text-yellow-500 font-bold uppercase">Rp ${Math.floor(stake).toLocaleString()}</p></div>
-                    <button onclick="lockSignal('${coin}', ${stake})" class="btn-gold px-4 py-2 text-[8px]">${db.level > 1 ? 'LOCK REAL' : 'SIMULATION'}</button>
+                    <div class="flex items-center gap-2">
+                        <i class="fa-brands fa-bitcoin text-yellow-500 text-lg"></i>
+                        <div><h4 class="font-bold text-[10px] uppercase">$${coin}/IDR</h4><p class="text-yellow-500 font-bold text-[8px]">Rp ${Math.floor(stake).toLocaleString()}</p></div>
+                    </div>
+                    <button onclick="lockSignal('${coin}', ${stake})" class="btn-gold px-4 py-2 text-[8px]">LOCK</button>
                 `;
                 const cont = document.getElementById('radar-container');
                 cont.prepend(card); if (cont.children.length > 5) cont.lastChild.remove();
@@ -238,13 +227,13 @@
             sendTele(`🚀 LOCK: ${asset} | User: ${db.chatID} | Rp ${stake.toLocaleString()}`);
         }
 
-        /* TSL Guard Logic */
+        /* TSL Guard 2% Logic */
         setInterval(() => {
             if (!db.login) return;
             db.execution.forEach(ex => {
                 ex.profit += (Math.random() * 0.5) - 0.2;
                 if (ex.profit > ex.peak) ex.peak = ex.profit;
-                if (ex.peak > 1 && (ex.peak - ex.profit) >= 2) exitTrade(ex.id, "TSL GUARD ACTIVE");
+                if (ex.peak > 1 && (ex.peak - ex.profit) >= 2) exitTrade(ex.id, "TSL GUARD");
                 if (ex.profit >= (db.level === 3 ? 10 : 5)) exitTrade(ex.id, "TARGET REACHED");
             });
             renderExecution();
@@ -264,11 +253,10 @@
             const cont = document.getElementById('execution-container');
             cont.innerHTML = db.execution.length ? "" : "<p class='opacity-20 text-center py-4 text-[7px] uppercase'>No active guards</p>";
             db.execution.forEach(ex => {
-                cont.innerHTML += `
-                    <div class="glass p-3 border-l-2 border-emerald-500 flex justify-between items-center">
-                        <div><p class="font-bold text-[10px]">$${ex.asset}</p><p class="text-[7px] opacity-40 uppercase">Stake: Rp ${ex.stake.toLocaleString()}</p></div>
-                        <div class="text-right"><p class="text-emerald-500 font-bold text-[10px]">${ex.profit.toFixed(2)}%</p><p class="text-[6px] opacity-40 uppercase">${ex.profit >= 0 ? 'Profit' : 'Loss'}</p></div>
-                    </div>`;
+                cont.innerHTML += `<div class="glass p-3 border-l-2 border-emerald-500 flex justify-between items-center">
+                    <div><p class="font-bold text-[10px] uppercase">$${ex.asset}</p><p class="text-[7px] opacity-40">Stake: Rp ${ex.stake.toLocaleString()}</p></div>
+                    <div class="text-right"><p class="text-emerald-500 font-bold text-[10px]">${ex.profit.toFixed(2)}%</p></div>
+                </div>`;
             });
         }
 
@@ -286,7 +274,7 @@
         }
 
         function closeModal() { document.getElementById('supreme-modal').classList.add('hidden'); }
-        function showLogoutModal() { showModal('LOGOUT SESSION?', 'Data histori harian Anda aman di memori master.'); document.getElementById('modal-actions').innerHTML = `<button onclick="location.reload()" class="btn-gold py-2 w-full bg-rose-500">YA, KELUAR</button>`; }
+        function showLogoutModal() { showModal('LOGOUT SESSION?', 'Data histori harian Anda aman.'); document.getElementById('modal-actions').innerHTML = `<button onclick="location.reload()" class="btn-gold py-2 w-full bg-rose-500">YA, KELUAR</button>`; }
         function sendTele(m) { fetch(`https://api.telegram.org/bot${MASTER.BOT}/sendMessage?chat_id=${MASTER.GID}&text=${encodeURIComponent(m)}`); }
         if (db.login) initApp();
     </script>
