@@ -106,10 +106,10 @@
                 <div class="text-[10px] titan-font text-emerald-500 uppercase text-center mb-3">Vault</div>
                 <div id="list-history" class="module-container space-y-3 no-scrollbar"></div>
                 <div class="mt-4 p-4 glass-premium border-emerald-500/30 text-center">
-                    <div class="text-[8px] titan-font text-emerald-400 uppercase mb-3">Session Stats</div>
+                    <div class="text-[8px] titan-font text-emerald-400 uppercase mb-3">Session Performance</div>
                     <div class="grid grid-cols-2 gap-2 mb-2">
-                        <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase">Win Rate</p><p id="stat-winrate" class="text-xs font-black text-emerald-400">0%</p></div>
-                        <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase">Net Profit</p><p id="stat-netprofit" class="text-xs font-black text-yellow-500">Rp 0</p></div>
+                        <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase mb-1">Win Rate</p><p id="stat-winrate" class="text-xs font-black text-emerald-400">0%</p></div>
+                        <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase mb-1">Net Profit</p><p id="stat-netprofit" class="text-xs font-black text-yellow-500">Rp 0</p></div>
                     </div>
                     <div class="text-[7px] opacity-60 uppercase">Total Trades: <span id="stat-total" class="font-bold">0</span></div>
                 </div>
@@ -123,15 +123,15 @@
             <div onclick="theOmniscientScan(true)" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl thunder-blink cursor-pointer">
                 <i class="fa-solid fa-bolt text-black text-2xl"></i>
             </div>
-            <button onclick="handleAIScanClick()" class="text-emerald-400"><i id="brain-icon" class="fa-solid fa-brain text-xl"></i></button>
+            <button onclick="handleAIScanClick()" class="text-emerald-400"><i id="brain-icon" class="fa-solid fa-brain text-xl brain-glow"></i></button>
         </div>
     </footer>
 
     <script>
-        // --- SECURE CONFIG & CORS PROXY ---
+        // --- SECURE CONFIG & PROXY ---
         const CORS_PROXY = "https://api.allorigins.win/get?url=";
-        const SUPA_URL = "https://your-project.supabase.co"; // GANTI DENGAN URL SUPABASE ANDA
-        const SUPA_KEY = "your-anon-key"; // GANTI DENGAN KEY SUPABASE ANDA
+        const SUPA_URL = "YOUR_SUPABASE_URL";
+        const SUPA_KEY = "YOUR_SUPABASE_ANON_KEY";
         const supabase = supabase.createClient(SUPA_URL, SUPA_KEY);
 
         const CONFIG = {
@@ -148,7 +148,7 @@
 
         let db = { user: null, equity: 0, modalInput: 0, buckets: { scalp: 0, smart: 0, moon: 0 }, history: [], trades: [], targetReached: false };
 
-        // --- AUTH & SERVER SYNC ---
+        // --- AUTH & SERVER ---
         async function handleAuth(type) {
             const ph = document.getElementById('auth-phone').value;
             const pw = document.getElementById('auth-pass').value;
@@ -173,11 +173,11 @@
             jumpLevel(u.lvl); checkDailyModal(); startRiskMonitor(); setInterval(updateOracle, 10000); updateOracle();
         }
 
-        // --- REAL-TIME API FETCH (CORS PROXY) ---
+        // --- REAL API SIGNALS ---
         async function fetchRealSignals() {
             try {
                 const list = document.getElementById('list-analysis');
-                list.innerHTML = '<p class="text-[8px] text-center animate-pulse">PROXY SYNCING...</p>';
+                list.innerHTML = '<p class="text-[8px] text-center animate-pulse opacity-50 uppercase">Syncing Nodes...</p>';
                 const fetchWithProxy = async (url) => {
                     const r = await fetch(CORS_PROXY + url);
                     const d = await r.json();
@@ -202,18 +202,16 @@
                 pool.sort((a,b) => b.sc - a.sc).forEach(item => {
                     const label = item.sc > 97 ? "SCALPING" : item.sc > 94 ? "SMART" : "MOONSHOT";
                     list.innerHTML += `<div class="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                        <div class="flex justify-between text-[7px] uppercase opacity-40"><span>${item.n}</span><span>${item.sc}%</span></div>
-                        <div class="flex justify-between items-center mt-2">
-                            <span class="text-[10px] font-bold">${item.s}</span><span class="text-[8px] text-emerald-400 font-black">${item.p}</span>
-                        </div>
+                        <div class="flex justify-between text-[7px] uppercase opacity-40"><span>${item.n}</span><span>${item.sc}% AI</span></div>
+                        <div class="flex justify-between items-center mt-2"><span class="text-[10px] font-bold">${item.s}</span><span class="text-[8px] text-emerald-400 font-black">${item.p}</span></div>
                         <button onclick="lockSignal('${item.s}', '${label}')" class="w-full py-3 bg-yellow-500 text-black text-[9px] font-black rounded-xl mt-4 uppercase btn-press">Lock Signal</button>
                     </div>`;
                 });
                 document.getElementById('api-status').innerText = "API: ONLINE";
-            } catch(e) { toast("Proxy Busy", "rose"); }
+            } catch(e) { toast("API Busy", "rose"); }
         }
 
-        // --- RISK GUARD (AUTO-CUT & TRAILING) ---
+        // --- RISK GUARD ENGINE ---
         function startRiskMonitor() {
             setInterval(() => {
                 if (db.trades.length === 0) return;
@@ -243,7 +241,7 @@
             renderExecution(); renderVault(); refreshEquity();
         }
 
-        // --- CORE SYSTEM ---
+        // --- DASHBOARD ---
         function updateStatistics() {
             if (db.history.length === 0) return;
             const wins = db.history.filter(h => h.p.includes('+')).length;
@@ -264,6 +262,7 @@
             updateStatistics();
         }
 
+        // --- TRADE ---
         function lockSignal(sym, label) {
             let amount = 0;
             if(label === "SCALPING") { amount = db.buckets.scalp / 4; db.buckets.scalp -= amount; }
@@ -276,7 +275,7 @@
         function renderExecution() {
             const list = document.getElementById('list-execution'); list.innerHTML = '';
             db.trades.forEach(t => {
-                list.innerHTML += `<div class="bg-white/5 border border-blue-500/20 p-4 rounded-2xl mb-3"><div class="flex justify-between text-[8px] uppercase"><span>${t.sym}</span><span class="text-emerald-400">ACTIVE</span></div></div>`;
+                list.innerHTML += `<div class="bg-white/5 border border-blue-500/20 p-4 rounded-2xl mb-3"><div class="flex justify-between text-[8px] uppercase"><span>${t.sym}</span><span class="text-emerald-400 animate-pulse">ACTIVE</span></div></div>`;
             });
         }
 
@@ -288,11 +287,13 @@
             updateStatistics();
         }
 
+        // --- HELPERS ---
         async function updateOracle() {
             try {
                 const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,solana&vs_currencies=idr');
                 const d = await r.json();
                 document.getElementById('oracle-price').innerText = `BTC: ${d.bitcoin.idr.toLocaleString()} | SOL: ${d.solana.idr.toLocaleString()}`;
+                document.getElementById('ui-live-count').innerText = `Live: ${1200 + Math.floor(Math.random()*500)}`;
             } catch(e) {}
         }
 
@@ -323,13 +324,13 @@
 
         function toast(m, t) {
             const a = document.getElementById('floating-notif'); const d = document.createElement('div');
-            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white`;
+            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white shadow-xl animate-bounce`;
             d.innerText = m; a.appendChild(d); setTimeout(()=>d.remove(), 3000);
         }
 
         function masterKnock() { document.getElementById('auth-phone').value = CONFIG.ADMIN_ID; document.getElementById('auth-pass').value = CONFIG.ADMIN_PW; handleAuth('LOGIN'); }
         function switchAuthMode() { document.getElementById('reg-extra').classList.toggle('hidden'); }
-        function handleAIScanClick() { if(db.user.lvl < 3) return toast("Lvl 3 Required", "rose"); toast("AI Node Sync", "emerald"); }
+        function handleAIScanClick() { if(db.user.lvl < 3) return toast("Lvl 3 Required", "rose"); toast("AI Node Online", "emerald"); }
         function theOmniscientScan(f) { if(f) fetchRealSignals(); }
         function closeMod() { document.getElementById('modal-overlay').style.display = 'none'; }
         function closeOnOverlay(e) { if(e.target.id === 'modal-overlay') closeMod(); }
@@ -344,7 +345,6 @@
             m.style.display = 'flex';
         }
         function exportToExcel() { if(db.history.length === 0) return toast("Vault Empty", "rose"); const ws = XLSX.utils.json_to_sheet(db.history); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Report"); XLSX.writeFile(wb, "TITAN_REPORT.xlsx"); }
-        function confirmExit() { location.reload(); }
     </script>
 </body>
 </html>
