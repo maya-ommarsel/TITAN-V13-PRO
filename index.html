@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -25,9 +24,6 @@
         @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
         .thunder-blink { animation: thunder-flash 0.8s infinite alternate; }
         @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.6; } to { filter: drop-shadow(0 0 20px var(--gold)); opacity: 1; } }
-        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--gold); box-shadow: 0 0 15px var(--gold); animation: moveScan 2s infinite linear; }
-        @keyframes moveScan { 0% { top: 0; } 100% { top: 100%; } }
-
         .btn-press:active { transform: scale(0.95); filter: brightness(1.2); }
         .tab-active { background-color: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px var(--gold); }
         .input-supreme { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.1); padding: 16px; border-radius: 1rem; color: white; font-size: 11px; transition: 0.3s; }
@@ -84,7 +80,7 @@
                     <p id="ui-live-count" class="text-[9px] text-emerald-400 font-bold animate-pulse">Live: 0</p>
                 </div>
                 <h2 id="ui-equity" class="titan-font text-4xl font-black mb-1">Rp 0</h2>
-                <div id="oracle-price" class="text-[7px] titan-font text-emerald-400 opacity-60 mb-6 uppercase">Oracle: Syncing...</div>
+                <div id="oracle-price" class="text-[7px] titan-font text-emerald-400 opacity-60 mb-6 uppercase tracking-[2px]">Oracle: Syncing...</div>
                 <div class="grid grid-cols-3 gap-3">
                     <div class="bg-white/5 p-4 rounded-2xl border border-emerald-500/20 text-center">
                         <p class="text-[7px] opacity-40 mb-1 uppercase">Scalp</p><p id="eq-scalp" class="text-[10px] font-bold text-emerald-400">0</p>
@@ -106,7 +102,7 @@
                 <div class="text-[10px] titan-font text-emerald-500 uppercase text-center mb-3">Vault</div>
                 <div id="list-history" class="module-container space-y-3 no-scrollbar"></div>
                 <div class="mt-4 p-4 glass-premium border-emerald-500/30 text-center">
-                    <div class="text-[8px] titan-font text-emerald-400 uppercase mb-3">Session Performance</div>
+                    <div class="text-[8px] titan-font text-emerald-400 uppercase mb-3">Session Stats</div>
                     <div class="grid grid-cols-2 gap-2 mb-2">
                         <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase mb-1">Win Rate</p><p id="stat-winrate" class="text-xs font-black text-emerald-400">0%</p></div>
                         <div class="bg-white/5 p-3 rounded-xl"><p class="text-[7px] opacity-40 uppercase mb-1">Net Profit</p><p id="stat-netprofit" class="text-xs font-black text-yellow-500">Rp 0</p></div>
@@ -128,11 +124,9 @@
     </footer>
 
     <script>
-        // --- SECURE CONFIG & PROXY ---
+        // --- SECURE CONFIG & PROXY (NO SUPABASE) ---
         const CORS_PROXY = "https://api.allorigins.win/get?url=";
-        const SUPA_URL = "YOUR_SUPABASE_URL";
-        const SUPA_KEY = "YOUR_SUPABASE_ANON_KEY";
-        const supabase = supabase.createClient(SUPA_URL, SUPA_KEY);
+        const SECRET_KEY = "TITAN-V13-SECURE-KEY";
 
         const CONFIG = {
             ADMIN_ID: "1319700866",
@@ -148,19 +142,24 @@
 
         let db = { user: null, equity: 0, modalInput: 0, buckets: { scalp: 0, smart: 0, moon: 0 }, history: [], trades: [], targetReached: false };
 
-        // --- AUTH & SERVER ---
-        async function handleAuth(type) {
+        // --- AUTH LOGIC (LOCALSTORAGE SYSTEM) ---
+        function handleAuth(type) {
             const ph = document.getElementById('auth-phone').value;
             const pw = document.getElementById('auth-pass').value;
             const cid = document.getElementById('auth-chat-id').value;
+
             if (ph === CONFIG.ADMIN_ID && pw === CONFIG.ADMIN_PW) return loginOk({ ph: 'MASTER', lvl: 3, isAdmin: true });
+
             if (type === 'REG') {
-                const { error } = await supabase.from('members').insert([{ ph, pw, cid, lvl: 1 }]);
-                if(error) return toast("ID Terdaftar!", "rose");
-                toast("Registrasi Sukses!", "emerald"); switchAuthMode();
+                if(!ph || !pw || !cid) return toast("Lengkapi Data!", "rose");
+                const userData = { ph, pw, cid, lvl: 1, equity: 0 };
+                localStorage.setItem(`TITAN_USER_${ph}`, encrypt(JSON.stringify(userData)));
+                toast("Registrasi Berhasil!", "emerald"); switchAuthMode();
             } else {
-                const { data, error } = await supabase.from('members').select('*').eq('ph', ph).single();
-                if(error || data.pw !== pw) return toast("ID/Password Salah!", "rose");
+                const raw = localStorage.getItem(`TITAN_USER_${ph}`);
+                if(!raw) return toast("ID Tidak Ditemukan!", "rose");
+                const data = JSON.parse(decrypt(raw));
+                if(data.pw !== pw) return toast("Password Salah!", "rose");
                 loginOk(data);
             }
         }
@@ -173,7 +172,7 @@
             jumpLevel(u.lvl); checkDailyModal(); startRiskMonitor(); setInterval(updateOracle, 10000); updateOracle();
         }
 
-        // --- REAL API SIGNALS ---
+        // --- REAL-TIME API FETCH (CORS PROXY) ---
         async function fetchRealSignals() {
             try {
                 const list = document.getElementById('list-analysis');
@@ -203,15 +202,17 @@
                     const label = item.sc > 97 ? "SCALPING" : item.sc > 94 ? "SMART" : "MOONSHOT";
                     list.innerHTML += `<div class="bg-white/5 border border-white/10 p-4 rounded-2xl">
                         <div class="flex justify-between text-[7px] uppercase opacity-40"><span>${item.n}</span><span>${item.sc}% AI</span></div>
-                        <div class="flex justify-between items-center mt-2"><span class="text-[10px] font-bold">${item.s}</span><span class="text-[8px] text-emerald-400 font-black">${item.p}</span></div>
+                        <div class="flex justify-between items-center mt-2">
+                            <span class="text-[10px] font-bold">${item.s}</span><span class="text-[8px] text-emerald-400 font-black">${item.p}</span>
+                        </div>
                         <button onclick="lockSignal('${item.s}', '${label}')" class="w-full py-3 bg-yellow-500 text-black text-[9px] font-black rounded-xl mt-4 uppercase btn-press">Lock Signal</button>
                     </div>`;
                 });
                 document.getElementById('api-status').innerText = "API: ONLINE";
-            } catch(e) { toast("API Busy", "rose"); }
+            } catch(e) { toast("Proxy Busy - Retrying", "rose"); }
         }
 
-        // --- RISK GUARD ENGINE ---
+        // --- RISK GUARD (AUTO-CUT & TRAILING) ---
         function startRiskMonitor() {
             setInterval(() => {
                 if (db.trades.length === 0) return;
@@ -230,18 +231,18 @@
             }, 3000);
         }
 
-        async function executeAutoCut(idx, finalPercent, reason) {
+        function executeAutoCut(idx, finalPercent, reason) {
             const t = db.trades[idx];
-            const multiplier = (100 + finalPercent) / 100;
-            db.equity += (t.amount * multiplier);
+            const result = t.amount * ((100 + finalPercent) / 100);
+            db.equity += result;
             db.history.push({ sym: t.sym, p: `${finalPercent > 0 ? '+' : ''}${finalPercent}% (${reason})`, date: new Date().toLocaleTimeString() });
-            if(db.user.ph !== 'MASTER') await supabase.from('members').update({ equity: db.equity }).eq('ph', db.user.ph);
+            
             sendTelegram(`${finalPercent > 0 ? '🛡️' : '🚨'} *TITAN ${reason}*\nAsset: ${t.sym}\nFinal: ${finalPercent}%`);
             db.trades.splice(idx, 1);
             renderExecution(); renderVault(); refreshEquity();
         }
 
-        // --- DASHBOARD ---
+        // --- SYSTEM UI ---
         function updateStatistics() {
             if (db.history.length === 0) return;
             const wins = db.history.filter(h => h.p.includes('+')).length;
@@ -262,7 +263,6 @@
             updateStatistics();
         }
 
-        // --- TRADE ---
         function lockSignal(sym, label) {
             let amount = 0;
             if(label === "SCALPING") { amount = db.buckets.scalp / 4; db.buckets.scalp -= amount; }
@@ -287,7 +287,7 @@
             updateStatistics();
         }
 
-        // --- HELPERS ---
+        // --- HELPERS & UTILS ---
         async function updateOracle() {
             try {
                 const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,solana&vs_currencies=idr');
@@ -316,22 +316,23 @@
             try { await fetch(`https://api.telegram.org/bot${CONFIG.BOT_TOKEN}/sendMessage`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({chat_id: CONFIG.CHAT_GROUP, text: msg, parse_mode: 'Markdown'}) }); } catch(e) {}
         }
 
-        function jumpLevel(l) {
-            db.user.lvl = l;
-            [1,2,3].forEach(i => document.getElementById(`sw-${i}`).className = i === l ? "px-3 py-2 rounded-xl text-[8px] titan-font tab-active" : "px-3 py-2 rounded-xl text-[8px] titan-font text-white/40");
-            document.getElementById('ui-mode-tag').innerText = l === 1 ? "Training" : l === 2 ? "Elite" : "Master Node";
+        const encrypt = (t) => CryptoJS.AES.encrypt(t, SECRET_KEY).toString();
+        const decrypt = (t) => CryptoJS.AES.decrypt(t, SECRET_KEY).toString(CryptoJS.enc.Utf8);
+        
+        function masterKnock() { document.getElementById('auth-phone').value = CONFIG.ADMIN_ID; document.getElementById('auth-pass').value = CONFIG.ADMIN_PW; handleAuth('LOGIN'); }
+        function switchAuthMode() { 
+            const reg = document.getElementById('reg-extra');
+            reg.classList.toggle('hidden');
+            toast(reg.classList.contains('hidden') ? "Mode Login" : "Mode Daftar", "emerald");
         }
-
+        function jumpLevel(l) { [1,2,3].forEach(i => document.getElementById(`sw-${i}`).className = i === l ? "px-3 py-2 rounded-xl text-[8px] titan-font tab-active" : "px-3 py-2 rounded-xl text-[8px] titan-font text-white/40"); }
         function toast(m, t) {
             const a = document.getElementById('floating-notif'); const d = document.createElement('div');
-            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white shadow-xl animate-bounce`;
+            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white shadow-xl`;
             d.innerText = m; a.appendChild(d); setTimeout(()=>d.remove(), 3000);
         }
-
-        function masterKnock() { document.getElementById('auth-phone').value = CONFIG.ADMIN_ID; document.getElementById('auth-pass').value = CONFIG.ADMIN_PW; handleAuth('LOGIN'); }
-        function switchAuthMode() { document.getElementById('reg-extra').classList.toggle('hidden'); }
-        function handleAIScanClick() { if(db.user.lvl < 3) return toast("Lvl 3 Required", "rose"); toast("AI Node Online", "emerald"); }
         function theOmniscientScan(f) { if(f) fetchRealSignals(); }
+        function handleAIScanClick() { toast("AI Node Sync", "emerald"); }
         function closeMod() { document.getElementById('modal-overlay').style.display = 'none'; }
         function closeOnOverlay(e) { if(e.target.id === 'modal-overlay') closeMod(); }
         function modal(t, b, btns=[]) {
