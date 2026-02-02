@@ -2,548 +2,266 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TITAN V.13 AI - SUPREME OMNIPOTENT</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TITAN V.13 AI - MASTER OMNIPOTENT</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
-        :root { --gold: #ffd700; --emerald: #10b981; --rose: #f43f5e; --glass: rgba(10, 10, 18, 0.98); }
+        :root { --gold: #ffd700; --emerald: #10b981; --rose: #f43f5e; --blue-opt: #3b82f6; --glass: rgba(10, 10, 18, 0.98); }
         
-        html, body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; overscroll-behavior-y: contain; user-select: none; }
+        html, body { background: #020308; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
         .glass-premium { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 1.5rem; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* Layout Modules */
-        .module-container { height: calc(100vh - 480px); overflow-y: auto; scroll-behavior: smooth; padding-bottom: 50px; }
-        .sticky-head { position: sticky; top: 0; background: #020308; z-index: 10; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-
-        /* Animations & Effects */
+        /* Layout khusus sesuai gambar */
+        .module-container { height: calc(100vh - 580px); overflow-y: auto; padding-bottom: 50px; }
+        
+        /* Animasi */
         .brain-glow { animation: brain-pulse 1.5s infinite ease-in-out; color: var(--emerald) !important; filter: drop-shadow(0 0 15px var(--emerald)); }
-        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.2); opacity: 1; } }
+        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
         .thunder-blink { animation: thunder-flash 0.8s infinite alternate; }
         @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.6; } to { filter: drop-shadow(0 0 20px var(--gold)); opacity: 1; } }
-
-        /* Biometric Scan */
-        #face-scan-box { width: 100%; height: 220px; border-radius: 2rem; overflow: hidden; border: 2px solid var(--gold); position: relative; background: #000; }
-        .scan-line { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--gold); box-shadow: 0 0 15px var(--gold); animation: moveScan 2s infinite linear; }
-        @keyframes moveScan { 0% { top: 0; } 100% { top: 100%; } }
-
-        /* UI States */
-        .tab-active { background: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px var(--gold); }
-        .btn-press:active { transform: scale(0.95); filter: brightness(1.2); }
-        .input-supreme { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.1); padding: 18px; border-radius: 1.2rem; color: white; font-size: 11px; }
         
-        /* Gembok Effect */
-        .locked-glow { position: relative; filter: grayscale(1); pointer-events: none; }
-        .locked-glow::after { content: '\f023'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; color: var(--gold); opacity: 0.8; text-shadow: 0 0 20px var(--gold); }
+        .tab-active { background-color: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px var(--gold); }
+        .btn-press:active { transform: scale(0.95); }
+        
+        /* Leaderboard styling */
+        .grad-item { font-size: 7px; font-weight: 800; color: #aaa; text-transform: uppercase; display: flex; align-items: center; gap: 3px; }
+        .grad-item i { color: var(--gold); font-size: 6px; }
+
+        /* API Input Area */
+        .api-input-box { background: rgba(255, 215, 0, 0.03); border: 1px dashed rgba(255, 215, 0, 0.2); border-radius: 1rem; }
     </style>
 </head>
 <body>
 
-    <div id="floating-notif" class="fixed bottom-[110px] left-5 right-5 z-[1000] pointer-events-none text-white"></div>
-
-    <div id="api-modal" class="fixed inset-0 z-[95000] bg-black/98 backdrop-blur-2xl hidden flex items-center justify-center p-6 text-white text-center">
-        <div class="glass-premium p-10 w-full max-w-sm relative border-emerald-500/30">
-            <button onclick="toggleAPIModal()" class="absolute top-6 right-6 text-white/40"><i class="fa-solid fa-times text-xl"></i></button>
-            <h3 class="titan-font text-[14px] text-emerald-400 mb-8 uppercase tracking-widest">Protocol Sync Master</h3>
-            <div id="api-form" class="space-y-4">
-                <select id="api-exchange" class="w-full input-supreme bg-zinc-900 border-white/10">
-                    <option value="INDODAX">INDODAX NODE</option>
-                    <option value="GATE">GATE.IO NODE</option>
-                    <option value="JUPITER">JUPITER DEX (SOL)</option>
-                </select>
-                <input type="password" id="api-key" placeholder="API KEY" class="w-full input-supreme text-center">
-                <input type="password" id="api-secret" placeholder="API SECRET" class="w-full input-supreme text-center">
-                <button onclick="saveAPI()" class="w-full py-5 bg-emerald-600 text-white titan-font text-[11px] rounded-2xl uppercase font-black btn-press shadow-xl">Authorize & Connect</button>
+    <div id="net-modal" class="fixed inset-0 z-[98000] bg-black/95 hidden flex items-center justify-center p-6 backdrop-blur-xl">
+        <div class="glass-premium p-8 w-full max-w-sm relative text-center">
+            <i class="fa-solid fa-tower-broadcast text-4xl text-blue-400 mb-4"></i>
+            <h3 class="titan-font text-blue-400 mb-6 uppercase tracking-widest text-[12px]">Network Optimizer</h3>
+            <div class="space-y-4">
+                <div class="bg-white/5 p-4 rounded-2xl border border-blue-500/20 text-left">
+                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-1">Pintas Lock Band 4G/5G</p>
+                    <a href="tel:*#*#4636#*#*" class="block w-full py-3 bg-blue-600 text-center rounded-xl titan-font text-[9px] text-white">DIAL: *#*#4636#*#*</a>
+                </div>
             </div>
+            <button onclick="toggleModal('net-modal')" class="w-full py-4 bg-white/5 text-white titan-font text-[10px] rounded-2xl mt-6">CLOSE</button>
         </div>
     </div>
 
-    <div id="modal-overlay" class="fixed inset-0 z-[90000] bg-black/95 hidden items-center justify-center p-6 text-center text-white">
-        <div class="glass-premium p-10 w-full max-w-sm border-white/5">
-            <h3 id="modal-title" class="titan-font text-yellow-500 mb-4 uppercase"></h3>
-            <div id="modal-body" class="text-[11px] text-white/60 mb-8 leading-relaxed text-left"></div>
-            <div id="modal-footer" class="flex flex-col gap-3"></div>
-        </div>
-    </div>
-
-    <div id="lockdown-screen" class="fixed inset-0 z-[100000] bg-red-950 hidden flex flex-col items-center justify-center p-10 text-center text-white">
-        <i class="fa-solid fa-shield-slash text-8xl mb-6 animate-pulse text-white"></i>
-        <h1 class="titan-font text-3xl">SYSTEM LOCKDOWN</h1>
-        <p id="lockdown-msg" class="text-white/60 text-sm mt-4 uppercase tracking-widest"></p>
-    </div>
-
-    <div id="auth-screen" class="fixed inset-0 z-[80000] bg-[#020308] overflow-y-auto p-6 flex flex-col items-center">
-        <div class="w-full max-w-sm text-center mt-12">
-            <div id="master-logo" class="w-24 h-24 mx-auto mb-8 bg-zinc-900 rounded-[2rem] border border-yellow-500/20 flex items-center justify-center shadow-2xl cursor-pointer" onclick="masterKnock()">
-                <i class="fa-solid fa-microchip text-4xl text-yellow-500"></i>
+    <header class="p-4 flex justify-between items-center bg-black/80 border-b border-white/5 sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <button class="w-9 h-9 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 text-yellow-500">
+                <i class="fa-solid fa-book-open text-xs"></i>
+            </button>
+            <div class="flex gap-1 p-1 bg-white/5 rounded-xl border border-white/10">
+                <button onclick="jumpLevel(1)" id="sw-1" class="px-3 py-1.5 rounded-lg text-[7px] titan-font">Lvl 1</button>
+                <button onclick="jumpLevel(2)" id="sw-2" class="px-3 py-1.5 rounded-lg text-[7px] titan-font">Lvl 2</button>
+                <button onclick="jumpLevel(3)" id="sw-3" class="px-3 py-1.5 rounded-lg text-[7px] titan-font tab-active">Lvl 3</button>
             </div>
-            <h1 class="titan-font text-2xl text-yellow-500 mb-12 tracking-widest">TITAN V.13 AI</h1>
-            
-            <div id="auth-form" class="space-y-4">
-                <div id="bio-container" class="hidden mb-6">
-                    <div id="face-scan-box">
-                        <video id="face-video" autoplay muted playsinline class="w-full h-full object-cover grayscale"></video>
-                        <div class="scan-line"></div>
-                    </div>
-                    <p class="text-[8px] text-yellow-500 uppercase mt-3 animate-pulse tracking-widest">Syncing Biometric identity...</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <button onclick="toggleModal('net-modal')" class="w-9 h-9 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/40 text-blue-400">
+                <i class="fa-solid fa-wifi text-xs"></i>
+            </button>
+            <div class="flex items-center gap-1.5 bg-black/40 px-2 py-1.5 rounded-lg border border-white/5">
+                <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
+                <span id="ping-val" class="text-[7px] titan-font text-emerald-400">404ms</span>
+            </div>
+            <button class="w-9 h-9 bg-rose-500/10 rounded-xl flex items-center justify-center border border-rose-500/20 text-rose-500">
+                <i class="fa-solid fa-power-off"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="flex justify-center gap-4 py-2 bg-black/20 border-b border-white/5">
+        <span class="text-[6px] titan-font opacity-30 mt-0.5">TOP GRADUATES</span>
+        <div class="grad-item"><i class="fa-solid fa-crown"></i> TitanElite</div>
+        <div class="grad-item"><i class="fa-solid fa-crown"></i> Marsel</div>
+        <div class="grad-item"><i class="fa-solid fa-crown"></i> DevTitan</div>
+        <div class="grad-item"><i class="fa-solid fa-crown"></i> RichBoy</div>
+    </div>
+
+    <main class="h-full flex flex-col pb-48 overflow-y-auto no-scrollbar">
+        <section class="p-5">
+            <div class="glass-premium p-6 text-center relative">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-[8px] titan-font text-emerald-400 opacity-60">LIVE: 1.553</span>
+                    <span class="px-2 py-0.5 bg-yellow-500/10 border border-yellow-500/20 rounded text-[6px] titan-font text-yellow-500">API: STANDBY</span>
                 </div>
 
-                <input type="text" id="auth-id" placeholder="ID TELEGRAM" class="w-full input-supreme text-center">
-                <div id="reg-fields" class="hidden space-y-4">
-                    <p class="text-[8px] text-blue-400 text-left px-2 uppercase font-black">Cek ID: Kirim /myid ke Bot @userinfobot</p>
+                <p class="text-[9px] titan-font text-yellow-500 uppercase tracking-[4px] mb-2">Master Node</p>
+                <div class="flex items-center justify-center gap-3 mb-1">
+                    <h2 id="ui-equity" class="titan-font text-5xl font-black">Rp 0</h2>
                 </div>
-                <input type="password" id="auth-pw" placeholder="PASSWORD" class="w-full input-supreme text-center">
+                <div id="oracle-sync" class="text-[7px] titan-font text-emerald-500/50 uppercase tracking-[2px] mb-6">Oracle: Syncing...</div>
                 
-                <div class="grid grid-cols-2 gap-4 pt-4">
-                    <button onclick="handleAuth('LOGIN')" id="btn-login" class="py-5 bg-yellow-500 text-black titan-font text-[11px] rounded-2xl uppercase font-black btn-press">Masuk</button>
-                    <button onclick="handleAuth('REG')" id="btn-reg" class="py-5 bg-white/5 text-white titan-font text-[11px] rounded-2xl border border-white/10 uppercase btn-press">Daftar</button>
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                        <p class="text-[6px] opacity-40 uppercase mb-1">SCALPING</p><p id="eq-scalp" class="text-[12px] font-bold text-emerald-400">0</p>
+                    </div>
+                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                        <p class="text-[6px] opacity-40 uppercase mb-1">SMART</p><p id="eq-smart" class="text-[12px] font-bold text-blue-400">0</p>
+                    </div>
+                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                        <p class="text-[6px] opacity-40 uppercase mb-1">MOON</p><p id="eq-moon" class="text-[12px] font-bold text-violet-400">0</p>
+                    </div>
+                </div>
+
+                <div id="api-config-area" class="mt-4 p-4 api-input-box text-left">
+                    <p class="text-[8px] titan-font text-yellow-500 uppercase mb-3">API Configuration</p>
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <input type="password" id="api-key" placeholder="API KEY" class="bg-black/60 border border-white/10 p-2 rounded-lg text-[8px] text-white">
+                        <input type="password" id="api-secret" placeholder="API SECRET" class="bg-black/60 border border-white/10 p-2 rounded-lg text-[8px] text-white">
+                    </div>
+                    <button onclick="saveApiConfig()" class="w-full py-2 bg-emerald-500/20 border border-emerald-500/40 rounded-lg text-[7px] titan-font text-emerald-400 uppercase">Authorize API</button>
                 </div>
             </div>
+        </section>
+
+        <section class="px-5 grid grid-cols-3 gap-4">
+            <div>
+                <h4 class="text-[9px] titan-font text-yellow-500 uppercase text-center mb-4">Radar API</h4>
+                <div id="radar-list" class="module-container space-y-4 no-scrollbar">
+                    <p class="text-[7px] text-center opacity-30 mt-10">SYNCING NODES...</p>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-[9px] titan-font text-blue-500 uppercase text-center mb-4">Execution</h4>
+                <div id="execution-list" class="module-container space-y-4 no-scrollbar"></div>
+            </div>
+
+            <div>
+                <h4 class="text-[9px] titan-font text-emerald-500 uppercase text-center mb-4">Vault</h4>
+                <div id="vault-list" class="module-container space-y-2 no-scrollbar"></div>
+                
+                <div class="mt-4 p-4 glass-premium border-emerald-500/30 text-center">
+                    <p class="text-[7px] titan-font text-emerald-400 uppercase mb-3 tracking-tighter">Session Performance</p>
+                    <div class="space-y-2">
+                        <div class="bg-white/5 p-2 rounded-lg border border-white/5">
+                            <p class="text-[6px] opacity-40 uppercase">Win Rate</p>
+                            <p id="stat-win" class="text-[12px] font-black text-emerald-400">0%</p>
+                        </div>
+                        <div class="bg-white/5 p-2 rounded-lg border border-white/5">
+                            <p class="text-[6px] opacity-40 uppercase">Net Profit</p>
+                            <p id="stat-profit" class="text-[9px] font-black text-yellow-500">Rp 0</p>
+                        </div>
+                        <p class="text-[5px] opacity-20 mt-1">TOTAL TRADES: 0</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="fixed bottom-0 left-0 right-0 p-5 bg-black/95 border-t border-white/5 z-50">
+        <div class="flex justify-around items-end max-w-md mx-auto">
+            <button class="flex flex-col items-center gap-1.5 text-emerald-500">
+                <i class="fa-solid fa-file-invoice text-xl"></i>
+                <span class="text-[7px] titan-font font-bold">REPORT</span>
+            </button>
+            <button class="flex flex-col items-center gap-1.5 text-sky-400">
+                <i class="fa-brands fa-telegram text-2xl"></i>
+                <span class="text-[7px] titan-font font-bold">GROUP</span>
+            </button>
+            
+            <div onclick="theOmniscientScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mb-8 shadow-2xl border-[6px] border-[#020308] thunder-blink cursor-pointer">
+                <i class="fa-solid fa-bolt text-black text-2xl"></i>
+            </div>
+
+            <button class="flex flex-col items-center gap-1.5 text-emerald-500">
+                <i class="fa-solid fa-brain text-xl brain-glow"></i>
+                <span class="text-[7px] titan-font font-bold">AI SCAN</span>
+            </button>
+            <button class="flex flex-col items-center gap-1.5 opacity-20">
+                <i class="fa-solid fa-shield-halved text-xl"></i>
+                <span class="text-[7px] titan-font font-bold">SECURE</span>
+            </button>
         </div>
-    </div>
-
-    <div id="app-ui" class="hidden h-full flex flex-col">
-        <header class="p-5 flex justify-between items-center bg-black/40 backdrop-blur-md border-b border-white/5 sticky top-0 z-50 text-white">
-            <div class="flex items-center gap-4">
-                <button onclick="showGuide()" class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-yellow-500/20 text-yellow-500 btn-press"><i class="fa-solid fa-book"></i></button>
-                <div id="level-nav" class="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10">
-                    <button id="sw-1" onclick="jumpLevel(1)" class="px-4 py-2 rounded-xl text-[9px] titan-font text-white transition-all">Lvl 1</button>
-                    <button id="sw-2" onclick="jumpLevel(2)" class="px-4 py-2 rounded-xl text-[9px] titan-font text-white transition-all">Lvl 2</button>
-                    <button id="sw-3" onclick="jumpLevel(3)" class="px-4 py-2 rounded-xl text-[9px] titan-font text-white transition-all">Lvl 3</button>
-                </div>
-            </div>
-            <div class="flex items-center gap-3">
-                <div id="api-indicator" class="text-[7px] text-yellow-400 titan-font uppercase px-3 py-1.5 bg-yellow-500/10 rounded-lg border border-yellow-500/20">Sync: Standby</div>
-                <button onclick="confirmLogout()" class="text-rose-500 bg-rose-500/10 w-10 h-10 rounded-full flex items-center justify-center border border-rose-500/10 active:bg-rose-600 active:text-white"><i class="fa-solid fa-power-off"></i></button>
-            </div>
-        </header>
-
-        <main id="main-content" class="flex-1 overflow-y-auto p-4 no-scrollbar">
-            <section class="mb-6">
-                <div class="glass-premium p-6 text-center relative overflow-hidden">
-                    <div class="flex justify-between items-start mb-4">
-                        <p id="ui-label" class="text-[9px] uppercase font-black text-yellow-500 tracking-[3px]">Simulation Node</p>
-                        <p id="ui-live" class="text-[9px] text-emerald-400 font-bold uppercase animate-pulse">Live: 0</p>
-                    </div>
-                    <h2 id="ui-equity" class="titan-font text-4xl font-black mb-1">Rp 0</h2>
-                    <div id="oracle-status" class="text-[7px] titan-font text-emerald-400 opacity-60 mb-6 uppercase tracking-[2px]">Oracle: Syncing...</div>
-                    
-                    <div class="grid grid-cols-3 gap-3">
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <p class="text-[7px] opacity-40 uppercase mb-1">SCALPING</p>
-                            <p id="eq-scalp" class="text-[10px] font-bold text-emerald-400">0</p>
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <p class="text-[7px] opacity-40 uppercase mb-1">SMART</p>
-                            <p id="eq-smart" class="text-[10px] font-bold text-blue-400">0</p>
-                        </div>
-                        <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-                            <p class="text-[7px] opacity-40 uppercase mb-1">MOON</p>
-                            <p id="eq-moon" class="text-[10px] font-bold text-violet-400">0</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="mb-6 bg-white/5 p-3 rounded-2xl border border-white/5 flex justify-center gap-4">
-                <div id="leader-list" class="flex gap-4 text-[8px] font-bold italic overflow-hidden"></div>
-            </section>
-
-            <section class="grid grid-cols-3 gap-4 h-[500px]">
-                <div class="flex flex-col">
-                    <div class="sticky-head text-center"><h4 class="text-[9px] titan-font text-yellow-500">RADAR DEWA</h4></div>
-                    <div id="radar-list" class="module-container space-y-4 no-scrollbar"></div>
-                </div>
-                <div class="flex flex-col border-x border-white/5 px-2">
-                    <div class="sticky-head text-center">
-                        <h4 class="text-[9px] titan-font text-blue-400">EXECUTION</h4>
-                        <p id="slot-indicator" class="text-[7px] text-white/40">Slots: 0/10</p>
-                    </div>
-                    <div id="exec-list" class="module-container space-y-4 no-scrollbar"></div>
-                </div>
-                <div class="flex flex-col">
-                    <div class="sticky-head text-center"><h4 class="text-[9px] titan-font text-emerald-500">VAULT</h4></div>
-                    <div id="vault-list" class="module-container space-y-2 no-scrollbar text-[7px]"></div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="fixed bottom-0 left-0 right-0 p-5 bg-black/90 backdrop-blur-lg border-t border-white/5 z-40 text-white">
-            <div class="flex justify-around items-center max-w-md mx-auto">
-                <button onclick="exportToExcel()" class="flex flex-col items-center gap-1 text-emerald-400"><i class="fa-solid fa-file-excel text-xl"></i><span class="text-[8px]">REPORT</span></button>
-                <button onclick="window.open('https://t.me/+8uJ78T4VDHJkOTRl','_blank')" class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
-                <div onclick="deepScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl border-8 border-[#020308] thunder-blink cursor-pointer">
-                    <i class="fa-solid fa-bolt text-black text-2xl"></i>
-                </div>
-                <button onclick="handleBrainClick()" class="flex flex-col items-center gap-1 text-emerald-400">
-                    <i id="brain-icon" class="fa-solid fa-brain text-xl"></i><span class="text-[8px]">AI SCAN</span>
-                </button>
-                <button class="flex flex-col items-center gap-1 opacity-20"><i class="fa-solid fa-shield-halved text-xl"></i><span class="text-[8px]">SECURE</span></button>
-            </div>
-        </footer>
-    </div>
+    </footer>
 
     <script>
-        /* CONFIGURATION */
-        const SEC = {
-            ID: "1319700866",
-            PW: "MahadhareV13Master",
-            BOT: "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4",
-            GRP: "-1003254379333"
+        // Data Dummy & State
+        let state = {
+            equity: 0,
+            scalp: 0,
+            smart: 0,
+            moon: 0,
+            level: 3
         };
 
-        let db = {
-            user: null, lvl: 1, equity: 0, 
-            bucket: { scalp: 0, smart: 0, moon: 0 },
-            trades: [], vault: [], xp: 0, streak: 0,
-            lastLogin: null, api: null, isAdm: false
-        };
+        // Network Modal Toggle
+        function toggleModal(id) {
+            document.getElementById(id).classList.toggle('hidden');
+        }
 
-        let graduates = ["TitanElite", "Marsel", "DevTitan", "RichBoy", "DewaTrading"];
-        let logoutTimer;
-
-        /* INITIALIZATION & SECURITY */
-        (function initSecurity() {
-            const block = localStorage.getItem('TITAN_LOCK');
-            if(block) showLockdown("Permanent Block: Violation Detected");
-            
-            // Check Operating Hours (Non-Admin)
-            setInterval(() => {
-                if(db.user && !db.isAdm) {
-                    const hr = new Date().getHours();
-                    if(hr < 6 || hr >= 0) { // 00:00 - 06:00 Close
-                        // showLockdown("System Rest Mode (Closed 00:00 - 06:00 WIB)");
-                    }
-                }
-            }, 60000);
-        })();
-
-        /* AUTH LOGIC */
-        async function handleAuth(mode) {
-            const id = document.getElementById('auth-id').value;
-            const pw = document.getElementById('auth-pw').value;
-
-            if(!id || !pw) return toast("Lengkapi Form!", "rose");
-
-            if(mode === 'REG') {
-                document.getElementById('reg-fields').classList.remove('hidden');
-                document.getElementById('bio-container').classList.remove('hidden');
-                await startCamera();
-                
-                // Simulasikan pendaftaran
-                const userObj = { id, pw, lvl: 1, xp: 0, equity: 0, regTime: Date.now() };
-                localStorage.setItem(`TITAN_U_${id}`, JSON.stringify(userObj));
-                
-                sendTele(`👤 *REGISTRASI BARU*\nID: ${id}\nTime: ${new Date().toLocaleString()}\nStatus: Standart`);
-                toast("Registrasi Berhasil! Silakan Login", "emerald");
-                toggleAuthMode('LOGIN');
+        // Simpan API Config
+        function saveApiConfig() {
+            const key = document.getElementById('api-key').value;
+            const secret = document.getElementById('api-secret').value;
+            if(key && secret) {
+                alert("API AUTHORIZED: MASTER NODE CONNECTED");
+                document.getElementById('ping-val').innerText = "42ms";
+                document.getElementById('ping-val').style.color = "#10b981";
             } else {
-                if(id === SEC.ID && pw === SEC.PW) {
-                    db.isAdm = true; db.lvl = 3; db.user = id; db.equity = 1000000000;
-                    return loginSuccess();
-                }
-                const saved = JSON.parse(localStorage.getItem(`TITAN_U_${id}`));
-                if(!saved || saved.pw !== pw) return toast("Auth Error!", "rose");
-                
-                db = {...db, ...saved};
-                loginSuccess();
+                alert("PLEASE ENTER VALID CREDENTIALS");
             }
         }
 
-        async function startCamera() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'user'}});
-                document.getElementById('face-video').srcObject = stream;
-            } catch(e) { toast("Akses Kamera Ditolak!", "rose"); }
-        }
-
-        function loginSuccess() {
-            document.getElementById('auth-screen').classList.add('hidden');
-            document.getElementById('app-ui').classList.remove('hidden');
-            
-            checkDailyEquity();
-            jumpLevel(db.lvl);
-            startLeaderboard();
-            resetActivity();
-            
-            toast(`Welcome Master ${db.user}`, "emerald");
-            setInterval(smartScan, 10000);
-            smartScan();
-        }
-
-        /* SALDO & BUCKET LOGIC (40:40:20) */
-        function checkDailyEquity() {
-            const today = new Date().toDateString();
-            if(db.lastEquityDate !== today) {
-                if(db.lvl === 1) {
-                    modal("INITIAL CAPITAL", "Input modal simulasi (Min 1.000.000)", 
-                    [{ text: "START SIMULATION", action: () => {
-                        const val = 1000000; // Fixed Min
-                        distributeModal(val);
-                        db.lastEquityDate = today;
-                        saveDB();
-                    }}]);
-                } else if(db.lvl === 2) {
-                    modal("ELITE CAPITAL", "Sinkronisasi Saldo Dompet Indodax?", 
-                    [{ text: "SYNC WALLET", action: () => {
-                        distributeModal(5000000); // Simulasi Dompet
-                        db.lastEquityDate = today;
-                        saveDB();
-                    }}]);
-                }
-            }
-        }
-
-        function distributeModal(total) {
-            db.equity = 0; 
-            db.bucket.scalp = total * 0.4;
-            db.bucket.smart = total * 0.4;
-            db.bucket.moon = total * 0.2;
-            updateUI();
-            toast("Capital Distributed 40:40:20", "emerald");
-        }
-
-        /* RADAR DEWA (MULTI-NODE SCAN) */
-        async function smartScan() {
+        // Scan Engine
+        async function theOmniscientScan() {
             const radar = document.getElementById('radar-list');
-            radar.innerHTML = '<p class="text-[7px] animate-pulse text-center">Scanning Multi-Node Node...</p>';
+            radar.innerHTML = '<p class="text-[7px] text-center animate-pulse opacity-50 mt-10">ANALYZING LIQUIDITY...</p>';
             
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1');
-                const data = await res.json();
+            setTimeout(() => {
+                const coins = [
+                    {s:'BTC', p:'98.420', ai:'99.2'},
+                    {s:'ETH', p:'3.421', ai:'98.5'},
+                    {s:'SOL', p:'145.2', ai:'97.1'}
+                ];
                 
                 radar.innerHTML = '';
-                data.sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
-                
-                data.forEach(coin => {
-                    const score = Math.floor(Math.random() * 15) + 85;
-                    const label = score > 95 ? "MOONSHOT" : (score > 90 ? "SMART" : "SCALP");
-                    
+                coins.forEach(c => {
                     radar.innerHTML += `
-                        <div class="bg-white/5 p-4 rounded-2xl border border-white/10 relative overflow-hidden btn-press">
-                            <div class="flex justify-between items-start mb-2">
-                                <span class="text-[6px] titan-font opacity-40 uppercase">${db.lvl === 1 ? 'GECKO' : 'INDODAX'}</span>
-                                <span class="text-[8px] font-black text-emerald-400">${score}% AI</span>
+                        <div class="bg-white/5 border border-white/10 p-3 rounded-2xl relative">
+                            <div class="flex justify-between text-[6px] opacity-40 uppercase"><span>SPOT</span><span>AI: ${c.ai}%</span></div>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-[9px] font-bold">${c.s}</span>
+                                <span class="text-[8px] text-emerald-400 font-black">${c.p}</span>
                             </div>
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-2">
-                                    <img src="${coin.image}" class="w-4 h-4 rounded-full">
-                                    <span class="text-[9px] font-bold">${coin.symbol.toUpperCase()}</span>
-                                </div>
-                                <span class="text-[8px] titan-font">Rp ${coin.current_price.toLocaleString()}</span>
-                            </div>
-                            <button onclick="lockSignal('${coin.symbol.toUpperCase()}', ${coin.current_price}, '${label}')" 
-                                    class="w-full mt-3 py-2 bg-yellow-500 text-black titan-font text-[8px] font-black rounded-lg uppercase">
-                                Lock ${label}
-                            </button>
+                            <button class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-lg mt-2 uppercase">LOCK</button>
                         </div>
                     `;
                 });
-                document.getElementById('oracle-status').innerText = `Oracle: ${data[0].symbol.toUpperCase()} Synced OK`;
-            } catch(e) { radar.innerHTML = 'Sync Error'; }
+                
+                // Update Balance Sim
+                state.equity = 12500000;
+                document.getElementById('ui-equity').innerText = `Rp ${state.equity.toLocaleString()}`;
+                document.getElementById('oracle-sync').innerText = "Oracle: Synced Successfully";
+            }, 1500);
         }
 
-        /* EXECUTION LOGIC */
-        function lockSignal(sym, price, type) {
-            if(db.trades.length >= 10) return toast("Slot Penuh!", "rose");
+        // Jump Level
+        function jumpLevel(lv) {
+            for(let i=1; i<=3; i++) document.getElementById(`sw-${i}`).classList.remove('tab-active');
+            document.getElementById(`sw-${lv}`).classList.add('tab-active');
+            state.level = lv;
             
-            // Check Daily Target
-            const target = db.lvl === 1 ? 0.05 : (db.lvl === 2 ? 0.1 : 0.2);
-            if(db.dailyProfit >= target) return toast("Daily Target Reached!", "gold");
-
-            const bucketKey = type.toLowerCase();
-            const stake = db.bucket[bucketKey] / (bucketKey === 'moon' ? 2 : 4);
-            
-            if(stake <= 0) return toast("Saldo Bucket Habis!", "rose");
-
-            const trade = {
-                id: Date.now(), sym, price, type, stake, 
-                high: 0, pnl: 0, status: 'OPEN'
-            };
-            
-            db.bucket[bucketKey] -= stake;
-            db.trades.push(trade);
-            
-            updateUI();
-            sendTele(`🔒 *LOCK SIGNAL*\nUser: ${db.user}\nAsset: ${sym}\nStake: Rp ${stake.toLocaleString()}`);
-            toast(`${sym} Locked into ${type}`, "emerald");
+            const apiArea = document.getElementById('api-config-area');
+            if(lv < 3) apiArea.style.display = 'none';
+            else apiArea.style.display = 'block';
         }
 
-        function marketEngine() {
-            db.trades.forEach((t, i) => {
-                // Simulasi pergerakan harga
-                const move = (Math.random() * 0.4) - 0.15;
-                t.pnl += move;
-                if(t.pnl > t.high) t.high = t.pnl;
-
-                // TSL Logic (Drop 2% dari High)
-                if(t.high - t.pnl >= 2 && t.pnl > 1) {
-                    secureProfit(i, "TSL PROTECT");
-                }
-            });
-            renderExec();
-        }
-        setInterval(marketEngine, 4000);
-
-        function secureProfit(idx, reason = "MANUAL") {
-            const t = db.trades[idx];
-            const profit = (t.stake * t.pnl) / 100;
-            const net = t.stake + profit;
-            
-            db.equity += net;
-            db.vault.unshift({
-                sym: t.sym, pnl: t.pnl.toFixed(2), 
-                nom: profit.toLocaleString(), time: new Date().toLocaleTimeString()
-            });
-            
-            db.trades.splice(idx, 1);
-            updateUI();
-            
-            if(profit > 0) toast(`Profit Secured: +${t.pnl.toFixed(2)}%`, "emerald");
-            sendTele(`💰 *PROFIT SECURED*\nUser: ${db.user}\nAsset: ${t.sym}\nGain: +${t.pnl.toFixed(2)}%\nReason: ${reason}`);
-        }
-
-        /* UI CONTROLS */
-        function updateUI() {
-            document.getElementById('ui-equity').innerText = `Rp ${Math.floor(db.equity).toLocaleString()}`;
-            document.getElementById('eq-scalp').innerText = Math.floor(db.bucket.scalp).toLocaleString();
-            document.getElementById('eq-smart').innerText = Math.floor(db.bucket.smart).toLocaleString();
-            document.getElementById('eq-moon').innerText = Math.floor(db.bucket.moon).toLocaleString();
-            document.getElementById('slot-indicator').innerText = `Slots: ${db.trades.length}/10`;
-            
-            renderExec();
-            renderVault();
-            saveDB();
-        }
-
-        function renderExec() {
-            const el = document.getElementById('exec-list');
-            el.innerHTML = db.trades.map((t, i) => `
-                <div class="bg-white/5 border-l-4 ${t.pnl >= 0 ? 'border-emerald-500' : 'border-rose-500'} p-3 rounded-xl">
-                    <div class="flex justify-between text-[7px] titan-font mb-1">
-                        <span>${t.sym} (${t.type})</span>
-                        <span class="${t.pnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}">${t.pnl.toFixed(2)}%</span>
-                    </div>
-                    <p class="text-[9px] font-black">Rp ${t.stake.toLocaleString()}</p>
-                    <button onclick="secureProfit(${i})" class="w-full mt-2 py-1.5 bg-emerald-600 text-[8px] font-black rounded-lg">SECURE</button>
-                </div>
-            `).join('');
-        }
-
-        function renderVault() {
-            document.getElementById('vault-list').innerHTML = db.vault.slice(0,15).map(v => `
-                <div class="flex justify-between border-b border-white/5 pb-1 opacity-60">
-                    <span>${v.sym}</span>
-                    <span class="${v.pnl >= 0 ? 'text-emerald-400' : 'text-rose-500'}">${v.pnl}%</span>
-                    <span>${v.time}</span>
-                </div>
-            `).join('');
-        }
-
-        function jumpLevel(l) {
-            if(!db.isAdm && l > db.lvl) return toast(`Locked: Need XP Qualification`, "rose");
-            db.lvl = l;
-            [1,2,3].forEach(i => {
-                const btn = document.getElementById(`sw-${i}`);
-                btn.className = (i === l) ? "px-4 py-2 rounded-xl text-[9px] titan-font tab-active" : "px-4 py-2 rounded-xl text-[9px] titan-font text-white transition-all";
-            });
-            const uiLabel = document.getElementById('ui-label');
-            const main = document.getElementById('main-content');
-            
-            if(l === 1) { uiLabel.innerText = "Simulation Node"; main.classList.remove('locked-glow'); }
-            else if(l === 2) { uiLabel.innerText = "Elite Manual Node"; }
-            else { uiLabel.innerText = "Master Autopilot Node"; document.getElementById('brain-icon').classList.add('brain-glow'); }
-            
-            updateAPIUI(db.api ? true : false);
-            smartScan();
-        }
-
-        /* MASTER FEATURES */
-        function masterKnock() {
-            const id = document.getElementById('auth-id');
-            const pw = document.getElementById('auth-pw');
-            id.value = SEC.ID; pw.value = SEC.PW;
-            handleAuth('LOGIN');
-        }
-
-        function showGuide() {
-            const lvl = db.lvl;
-            const content = lvl === 1 ? 
-                "🔱 TRAINING: Target 5% per hari selama 7 hari atau 100% dalam 30 hari untuk naik level." : 
-                (lvl === 2 ? "💎 ELITE: Target 10% per hari. Sinyal riil bursa via Link Reff Admin." : 
-                "🔥 MASTER: Autopilot 30 hari penuh. Koneksi API Secret Required.");
-            
-            modal(`PANDUAN LVL ${lvl}`, content, [{text: "SIAP MASTER", primary: true, action: closeMod}]);
-        }
-
-        /* HELPER FUNCTIONS */
-        function modal(t, b, btns=[]) {
-            const o = document.getElementById('modal-overlay');
-            document.getElementById('modal-title').innerText = t;
-            document.getElementById('modal-body').innerText = b;
-            const footer = document.getElementById('modal-footer');
-            footer.innerHTML = '';
-            btns.forEach(btn => {
-                const el = document.createElement('button');
-                el.className = `py-4 rounded-xl titan-font text-[10px] ${btn.primary ? 'bg-yellow-500 text-black font-black' : 'bg-white/5 text-white'}`;
-                el.innerText = btn.text;
-                el.onclick = btn.action;
-                footer.appendChild(el);
-            });
-            o.classList.replace('hidden', 'flex');
-        }
-
-        function closeMod() { document.getElementById('modal-overlay').classList.replace('flex', 'hidden'); }
-
-        function toast(m, t) {
-            const c = document.getElementById('floating-notif');
-            const d = document.createElement('div');
-            d.className = `glass-premium px-5 py-3 border-l-4 ${t === 'rose' ? 'border-rose-500' : 'border-yellow-500'} text-[10px] titan-font uppercase mb-3 animate-bounce shadow-2xl`;
-            d.innerText = m;
-            c.appendChild(d);
-            setTimeout(() => d.remove(), 4000);
-        }
-
-        function deepScan() {
-            if(navigator.vibrate) navigator.vibrate([100, 30, 100]);
-            toast("DEEP SCANNING PROTOCOLS...", "gold");
-            smartScan();
-        }
-
-        function toggleAPIModal() { document.getElementById('api-modal').classList.toggle('hidden'); }
-
-        function updateAPIUI(ok) {
-            const ind = document.getElementById('api-indicator');
-            if(ok) {
-                ind.innerText = "Sync: MASTER OK";
-                ind.className = "text-[7px] text-emerald-400 titan-font uppercase px-3 py-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/40 animate-pulse";
-            } else {
-                ind.innerText = "Sync: Standby";
-                ind.className = "text-[7px] text-yellow-400 titan-font uppercase px-3 py-1.5 bg-yellow-500/10 rounded-lg border border-yellow-500/20";
-            }
-        }
-
-        function saveAPI() {
-            db.api = { key: document.getElementById('api-key').value, ex: document.getElementById('api-exchange').value };
-            updateAPIUI(true); toggleAPIModal(); toast("Autopilot Node Activated", "emerald");
-        }
-
-        function saveDB() { localStorage.setItem(`TITAN_U_${db.user}`, JSON.stringify(db)); }
-        function resetActivity() { db.lastActivity = Date.now(); clearTimeout(logoutTimer); logoutTimer = setTimeout(confirmLogout, 300000); }
-        function confirmLogout() { modal("LOGOUT", "Tutup sesi trading?", [{text: "YA, KELUAR", primary: true, action: () => location.reload()}, {text: "BATAL", action: closeMod}]); }
-        function exportToExcel() { const ws = XLSX.utils.json_to_sheet(db.vault); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Vault"); XLSX.writeFile(wb, "TITAN_REPORT.xlsx"); }
-        function showLockdown(m) { const s = document.getElementById('lockdown-screen'); s.classList.remove('hidden'); document.getElementById('lockdown-msg').innerText = m; }
-        function sendTele(m) { fetch(`https://api.telegram.org/bot${SEC.BOT}/sendMessage?chat_id=${SEC.GRP}&text=${encodeURIComponent(m)}&parse_mode=Markdown`); }
-        function startLeaderboard() { const el = document.getElementById('leader-list'); setInterval(() => { const s = graduates.shift(); graduates.push(s); el.innerHTML = graduates.map(g => `<span class="text-emerald-400">👑 ${g}</span>`).join(''); }, 3000); }
-
-        window.onclick = resetActivity;
+        // Ping Randomizer (Visual)
+        setInterval(() => {
+            const p = Math.floor(Math.random() * 50) + 30;
+            document.getElementById('ping-val').innerText = p + "ms";
+        }, 3000);
     </script>
 </body>
 </html>
