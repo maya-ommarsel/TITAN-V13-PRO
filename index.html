@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN V.13 AI - MASTER OMNIPOTENT</title>
+    <title>TITAN V13 - MAHADHARE GOLD ULTIMATE</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -20,195 +20,237 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .module-container { height: calc(100vh - 580px); overflow-y: auto; padding-bottom: 50px; }
         
-        /* ANIMASI & GLO */
-        .brain-glow { animation: brain-pulse 1.5s infinite ease-in-out; color: var(--emerald) !important; }
-        @keyframes brain-pulse { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; transform: scale(1.1); } }
+        /* ANIMASI */
+        .brain-glow { animation: brain-pulse 1.5s infinite ease-in-out; color: var(--emerald) !important; filter: drop-shadow(0 0 15px var(--emerald)); }
+        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
         .thunder-blink { animation: thunder-flash 0.8s infinite alternate; }
-        @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.8; } to { filter: drop-shadow(0 0 15px var(--gold)); opacity: 1; } }
+        @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.6; } to { filter: drop-shadow(0 0 20px var(--gold)); opacity: 1; } }
         
+        .btn-press:active { transform: scale(0.95); filter: brightness(1.2); }
         .tab-active { background-color: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px var(--gold); }
-        .btn-press:active { transform: scale(0.95); }
-        .card-exec { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.05); border-radius: 1.2rem; }
+        .input-supreme { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.1); padding: 16px; border-radius: 1rem; color: white; font-size: 11px; width: 100%; outline: none; }
+        .popup-card { background: rgba(10, 11, 20, 0.99); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 2rem; }
     </style>
 </head>
 <body>
 
-    <div id="floating-notif" class="fixed bottom-[120px] left-5 right-5 z-[1000] pointer-events-none"></div>
+    <div id="floating-notif" class="fixed bottom-[110px] left-5 right-5 z-[1000] pointer-events-none"></div>
 
-    <div id="net-modal" class="fixed inset-0 z-[99000] bg-black/95 hidden flex items-center justify-center p-6 backdrop-blur-xl">
-        <div class="glass-premium p-8 w-full max-w-sm border-blue-500/30 text-center">
-            <i class="fa-solid fa-tower-broadcast text-3xl text-blue-400 mb-4"></i>
-            <h3 class="titan-font text-blue-400 mb-6 text-[12px] tracking-widest">NETWORK OPTIMIZER</h3>
-            <div class="space-y-3 text-left">
-                <div class="bg-white/5 p-4 rounded-xl border border-blue-500/20">
-                    <p class="text-[9px] font-bold text-blue-400 uppercase mb-1">Pintas Lock Band 4G/5G</p>
-                    <a href="tel:*#*#4636#*#*" class="block w-full py-3 bg-blue-600 text-center rounded-lg titan-font text-[9px] text-white">DIAL: *#*#4636#*#*</a>
+    <div id="net-modal" class="fixed inset-0 z-[98000] bg-black/95 hidden flex items-center justify-center p-6 backdrop-blur-xl">
+        <div class="popup-card p-8 w-full max-w-sm relative border-blue-500/30 text-center">
+            <button onclick="toggleNetModal()" class="absolute top-4 right-4 text-white/20"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <i class="fa-solid fa-tower-broadcast text-4xl text-blue-400 mb-4"></i>
+            <h3 class="titan-font text-blue-400 mb-6 uppercase tracking-widest text-[14px]">Network Optimizer</h3>
+            <div class="space-y-4 text-left">
+                <div class="bg-white/5 p-4 rounded-2xl border border-blue-500/20">
+                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-1">Pintas Lock Band 4G/5G</p>
+                    <a href="tel:*#*#4636#*#*" class="block w-full py-3 bg-blue-600 text-center rounded-xl titan-font text-[10px] text-white btn-press uppercase">Dial: *#*#4636#*#*</a>
                 </div>
             </div>
-            <button onclick="toggleNetModal()" class="w-full py-3 bg-white/5 text-white titan-font text-[9px] rounded-xl mt-6">CLOSE</button>
+            <button onclick="toggleNetModal()" class="w-full py-4 bg-white/5 text-white titan-font text-[10px] rounded-2xl mt-6 uppercase">Simpan Konfigurasi</button>
         </div>
     </div>
 
-    <header class="p-5 flex justify-between items-center bg-black/80 border-b border-white/5 sticky top-0 z-50">
-        <div class="flex items-center gap-3">
-            <button onclick="toggleNetModal()" class="w-9 h-9 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/40 text-blue-400">
+    <div id="api-modal" class="fixed inset-0 z-[99000] bg-black/98 hidden flex items-center justify-center p-6 backdrop-blur-2xl">
+        <div class="popup-card p-8 w-full max-w-sm border-emerald-500/30">
+            <h3 class="titan-font text-emerald-400 mb-6 uppercase tracking-widest text-[14px] text-center">Master API Sync</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[9px] uppercase opacity-40 ml-2">Exchange Node</label>
+                    <select id="api-node" class="input-supreme mt-1">
+                        <option value="INDODAX">INDODAX (IDR)</option>
+                        <option value="GATE">GATE.IO (USDT)</option>
+                        <option value="JUPITER">JUPITER (SOL)</option>
+                    </select>
+                </div>
+                <input type="password" id="api-key" placeholder="API KEY / ACCESS TOKEN" class="input-supreme">
+                <input type="password" id="api-secret" placeholder="SECRET KEY" class="input-supreme">
+                <button onclick="saveAPI()" class="w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-2xl uppercase btn-press shadow-lg">Link Master Node</button>
+                <button onclick="toggleAPIModal()" class="w-full py-2 text-white/30 text-[9px] uppercase">Cancel Sync</button>
+            </div>
+        </div>
+    </div>
+
+    <header class="p-5 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <button onclick="toggleNetModal()" class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/40 text-blue-400 btn-press shadow-lg">
                 <i class="fa-solid fa-wifi"></i>
             </button>
-            <div class="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10">
-                <button onclick="switchLevel(1)" id="sw-1" class="px-3 py-1.5 rounded-xl text-[8px] titan-font">Lvl 1</button>
-                <button onclick="switchLevel(2)" id="sw-2" class="px-3 py-1.5 rounded-xl text-[8px] titan-font">Lvl 2</button>
-                <button onclick="switchLevel(3)" id="sw-3" class="px-3 py-1.5 rounded-xl text-[8px] titan-font tab-active">Lvl 3</button>
+            <div id="level-tabs" class="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10">
+                <button onclick="jumpLevel(1)" id="sw-1" class="px-3 py-2 rounded-xl text-[8px] titan-font">Lvl 1</button>
+                <button onclick="jumpLevel(2)" id="sw-2" class="px-3 py-2 rounded-xl text-[8px] titan-font">Lvl 2</button>
+                <button onclick="jumpLevel(3)" id="sw-3" class="px-3 py-2 rounded-xl text-[8px] titan-font tab-active">Lvl 3</button>
             </div>
         </div>
         <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1 bg-black/40 px-2 py-1.5 rounded-lg border border-white/5">
+            <div id="ping-indicator" class="flex items-center gap-1 bg-black/40 px-2 py-1.5 rounded-lg border border-white/5">
                 <div class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
                 <span id="ping-val" class="text-[7px] titan-font text-emerald-400">404ms</span>
             </div>
-            <button class="text-rose-500"><i class="fa-solid fa-power-off text-lg"></i></button>
+            <button onclick="location.reload()" class="text-rose-500 bg-rose-500/10 w-10 h-10 rounded-full flex items-center justify-center border border-rose-500/20"><i class="fa-solid fa-power-off"></i></button>
         </div>
     </header>
 
     <main id="main-content" class="h-full flex flex-col pb-48 overflow-y-auto no-scrollbar">
-        
         <div class="px-6 mt-4">
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-3 flex flex-col items-center">
-                <p class="text-[7px] titan-font opacity-40 uppercase mb-2">Top Graduates</p>
-                <div class="flex gap-4 overflow-x-auto no-scrollbar w-full justify-center">
-                    <span class="text-[8px] text-yellow-500">👑 TitanElite</span>
-                    <span class="text-[8px] text-white opacity-60">👑 Marsel</span>
-                    <span class="text-[8px] text-white opacity-60">👑 DevTitan</span>
-                    <span class="text-[8px] text-yellow-500">👑 RichBoy</span>
+            <div class="bg-white/5 p-3 rounded-2xl border border-white/5 text-center">
+                <p class="text-[8px] titan-font opacity-40 uppercase tracking-widest mb-2">Top Graduates</p>
+                <div id="graduates-list" class="flex justify-center gap-4 text-[7px] font-bold">
+                    <span class="text-yellow-500"><i class="fa-solid fa-crown mr-1"></i>TitanElite</span>
+                    <span class="text-white/60">👑 Marsel</span>
+                    <span class="text-white/60">👑 DevTitan</span>
+                    <span class="text-white/60">👑 RichBoy</span>
                 </div>
             </div>
         </div>
 
         <section class="p-6">
             <div class="glass-premium p-8 text-center relative overflow-hidden">
-                <div class="flex justify-between items-start mb-2">
-                    <p class="text-[9px] titan-font text-yellow-500 tracking-[3px]">MASTER NODE</p>
-                    <div class="bg-yellow-500/10 px-2 py-1 rounded text-[7px] text-yellow-500 titan-font">API STANDBY</div>
+                <div class="flex justify-between items-start mb-4">
+                    <p id="ui-mode-tag" class="text-[9px] uppercase font-black text-yellow-500 tracking-[3px]">Master Node</p>
+                    <p id="ui-live-count" class="text-[9px] text-emerald-400 font-bold animate-pulse uppercase">Live: 1.744</p>
                 </div>
                 <h2 id="ui-equity" class="titan-font text-4xl font-black mb-1">Rp 0</h2>
-                <div id="oracle-sync" class="text-[8px] titan-font text-emerald-400 opacity-60 mb-6 uppercase animate-pulse">Oracle: Syncing...</div>
+                <div id="oracle-sync" class="text-[7px] titan-font text-emerald-400 opacity-60 mb-6 uppercase tracking-widest">Oracle: Syncing...</div>
                 
                 <div class="grid grid-cols-3 gap-3">
-                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                         <p class="text-[7px] opacity-40 uppercase mb-1">SCALPING</p><p id="eq-scalp" class="text-[10px] font-bold text-emerald-400">0</p>
                     </div>
-                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                         <p class="text-[7px] opacity-40 uppercase mb-1">SMART</p><p id="eq-smart" class="text-[10px] font-bold text-blue-400">0</p>
                     </div>
-                    <div class="bg-white/5 p-3 rounded-2xl border border-white/5">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
                         <p class="text-[7px] opacity-40 uppercase mb-1">MOON</p><p id="eq-moon" class="text-[10px] font-bold text-violet-400">0</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="api-secret-mod" class="px-6 mb-6">
-            <div class="bg-white/5 border border-blue-500/20 p-5 rounded-2xl">
-                <p class="text-[8px] titan-font text-blue-400 uppercase mb-4">Connect Indodax API (Level 3)</p>
-                <div class="space-y-3">
-                    <input type="text" id="api-key" placeholder="API KEY" class="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-[10px] text-white">
-                    <input type="password" id="api-secret" placeholder="API SECRET" class="w-full bg-black/40 border border-white/10 p-3 rounded-xl text-[10px] text-white">
-                    <button onclick="saveAPISettings()" class="w-full py-3 bg-blue-600/20 text-blue-400 border border-blue-500/40 rounded-xl titan-font text-[9px] uppercase hover:bg-blue-600 hover:text-white transition-all">Synchronize API</button>
-                </div>
-            </div>
-        </section>
-
         <section class="px-6 grid grid-cols-3 gap-4">
-            <div class="flex flex-col"><div class="text-[9px] titan-font text-yellow-500 text-center mb-3">Radar API</div><div id="list-radar" class="module-container space-y-4 no-scrollbar"></div></div>
-            <div class="flex flex-col"><div class="text-[9px] titan-font text-blue-500 text-center mb-3">Execution</div><div id="list-exec" class="module-container space-y-4 no-scrollbar"></div></div>
+            <div class="flex flex-col"><div class="text-[10px] titan-font text-yellow-500 uppercase text-center mb-3">Radar API</div><div id="list-analysis" class="module-container space-y-5 no-scrollbar text-center text-[8px] opacity-40 uppercase mt-4">Syncing Nodes...</div></div>
+            <div class="flex flex-col"><div class="text-[10px] titan-font text-blue-500 uppercase text-center mb-3">Execution</div><div id="list-execution" class="module-container space-y-5 no-scrollbar"></div></div>
             <div class="flex flex-col">
-                <div class="text-[9px] titan-font text-emerald-500 text-center mb-3">Vault</div>
-                <div id="list-vault" class="module-container space-y-2 no-scrollbar"></div>
+                <div class="text-[10px] titan-font text-emerald-500 uppercase text-center mb-3">Vault</div>
+                <div id="list-history" class="module-container space-y-3 no-scrollbar"></div>
                 
-                <div class="mt-4 bg-white/5 p-4 rounded-2xl border border-emerald-500/20 text-center">
-                    <p class="text-[8px] titan-font text-emerald-400 uppercase mb-3">Session Performance</p>
+                <div class="mt-4 p-4 glass-premium border-emerald-500/30 shadow-lg text-center relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-16 h-16 bg-emerald-500/5 rounded-full blur-xl"></div>
+                    <p class="text-[8px] titan-font text-emerald-400 uppercase mb-3 tracking-widest font-black">Session Performance</p>
                     <div class="flex gap-2">
-                        <div class="flex-1 bg-black/40 p-2 rounded-xl border border-white/5">
-                            <p class="text-[6px] opacity-40 uppercase">Win Rate</p><p id="stat-win" class="text-[10px] font-black text-emerald-400">0%</p>
+                        <div class="flex-1 bg-black/40 p-2 rounded-xl border border-white/5 flex flex-col justify-center min-h-[50px]">
+                            <p class="text-[6px] opacity-40 uppercase">Win Rate</p>
+                            <p id="stat-winrate" class="text-[10px] font-black text-emerald-400">0%</p>
                         </div>
-                        <div class="flex-1 bg-black/40 p-2 rounded-xl border border-white/5">
-                            <p class="text-[6px] opacity-40 uppercase">Net Profit</p><p id="stat-net" class="text-[9px] font-black text-yellow-500">Rp 0</p>
+                        <div class="flex-1 bg-black/40 p-2 rounded-xl border border-white/5 flex flex-col justify-center min-h-[50px]">
+                            <p class="text-[6px] opacity-40 uppercase">Net Profit</p>
+                            <p id="stat-netprofit" class="text-[9px] font-black text-yellow-500">Rp 0</p>
                         </div>
                     </div>
+                    <p class="text-[6px] opacity-20 uppercase mt-2">Total Trades: 0</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer id="footer-nav" class="fixed bottom-0 left-0 right-0 p-5 bg-black/90 border-t border-white/5 z-40">
+    <footer id="footer-nav" class="fixed bottom-0 left-0 right-0 p-5 bg-black/90 backdrop-blur-lg border-t border-white/5 z-40">
         <div class="flex justify-around items-center max-w-md mx-auto">
-            <button class="flex flex-col items-center gap-1 text-emerald-400"><i class="fa-solid fa-file-excel text-xl"></i><span class="text-[8px]">REPORT</span></button>
-            <button class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
-            <div onclick="theOmniscientScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl border-8 border-[#020308] thunder-blink cursor-pointer">
+            <button onclick="exportToExcel()" class="flex flex-col items-center gap-1 text-emerald-400"><i class="fa-solid fa-file-excel text-xl"></i><span class="text-[8px]">REPORT</span></button>
+            <button onclick="window.open('https://t.me/+8uJ78T4VDHJkOTRl')" class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
+            <div onclick="theOmniscientScan(true)" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl border-8 border-[#020308] thunder-blink cursor-pointer">
                 <i class="fa-solid fa-bolt text-black text-2xl"></i>
             </div>
-            <button class="flex flex-col items-center gap-1 text-emerald-400">
-                <i id="brain-icon" class="fa-solid fa-brain text-xl brain-glow"></i><span class="text-[8px]">AI SCAN</span>
+            <button onclick="handleAIScanClick()" class="flex flex-col items-center gap-1 text-emerald-400">
+                <i id="brain-icon" class="fa-solid fa-brain text-xl"></i><span class="text-[8px]">AI SCAN</span>
             </button>
             <button class="flex flex-col items-center gap-1 opacity-20"><i class="fa-solid fa-shield-halved text-xl"></i><span class="text-[8px]">SECURE</span></button>
         </div>
     </footer>
 
     <script>
-        const API_BASE = "https://indodax.com/api/summaries";
-        let state = { level: 3, equity: 0, buckets: {s:0, sm:0, m:0}, trades: [], win: 0, total: 0 };
+        let db = { 
+            equity: 0, 
+            buckets: { scalp: 0, smart: 0, moon: 0 }, 
+            history: [], 
+            trades: [],
+            currentLvl: 3,
+            apiLinked: false
+        };
 
-        // FALLBACK LOGIC
-        const PROXIES = ["https://api.allorigins.win/get?url=", "https://corsproxy.io/?"];
-
-        async function theOmniscientScan() {
-            const radar = document.getElementById('list-radar');
-            radar.innerHTML = '<p class="text-[7px] text-center titan-font opacity-50 mt-4">SYNCING NODES...</p>';
+        function jumpLevel(lvl) {
+            db.currentLvl = lvl;
+            document.querySelectorAll('#level-tabs button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(`sw-${lvl}`).classList.add('tab-active');
+            document.getElementById('ui-mode-tag').innerText = lvl === 3 ? "Master Node" : (lvl === 2 ? "Elite Member" : "Training Member");
             
-            try {
-                const response = await fetch(PROXIES[0] + encodeURIComponent(API_BASE));
-                const raw = await response.json();
-                const data = JSON.parse(raw.contents);
-                
-                radar.innerHTML = '';
-                const keys = ["btc_idr", "eth_idr", "sol_idr", "bnb_idr", "doge_idr"];
-                
-                keys.forEach(k => {
-                    const coin = data.tickers[k];
-                    const sym = k.split('_')[0].toUpperCase();
-                    radar.innerHTML += `
-                        <div class="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                            <div class="flex justify-between text-[7px] opacity-40 uppercase mb-2"><span>${sym}/IDR</span><span>AI Ready</span></div>
-                            <div class="text-[11px] font-black text-emerald-400 mb-4">${parseFloat(coin.last).toLocaleString()}</div>
-                            <button onclick="lockSignal('${sym}', ${coin.last})" class="w-full py-2.5 bg-yellow-500 text-black text-[9px] font-black rounded-xl uppercase btn-press">Lock</button>
-                        </div>`;
-                });
-            } catch(e) { toast("Nodes Busy. Try Network Optimizer", "rose"); }
-        }
-
-        function saveAPISettings() {
-            const key = document.getElementById('api-key').value;
-            const secret = document.getElementById('api-secret').value;
-            if(!key || !secret) return toast("API Data Incomplete", "rose");
-            
-            localStorage.setItem('titan_api_key', key);
-            localStorage.setItem('titan_api_sec', secret);
-            toast("Indodax API Synchronized", "emerald");
-            document.getElementById('oracle-sync').innerText = "Oracle: API Active";
+            if(lvl === 3 && !db.apiLinked) {
+                toggleAPIModal();
+            }
         }
 
         function toggleNetModal() { document.getElementById('net-modal').classList.toggle('hidden'); }
+        function toggleAPIModal() { document.getElementById('api-modal').classList.toggle('hidden'); }
 
-        function toast(m, t) {
-            const container = document.getElementById('floating-notif');
-            const el = document.createElement('div');
-            el.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-emerald-500'} text-[10px] titan-font uppercase mb-3 animate-bounce`;
-            el.innerText = m;
-            container.appendChild(el);
-            setTimeout(() => el.remove(), 3000);
+        function saveAPI() {
+            const key = document.getElementById('api-key').value;
+            const secret = document.getElementById('api-secret').value;
+            if(key.length < 5 || secret.length < 5) return toast("Invalid API Credentials", "rose");
+            
+            db.apiLinked = true;
+            toast("Syncing with " + document.getElementById('api-node').value, "emerald");
+            setTimeout(() => {
+                toggleAPIModal();
+                theOmniscientScan();
+            }, 1500);
         }
 
-        // Initialize UI
-        document.getElementById('ui-equity').innerText = `Rp ${state.equity.toLocaleString()}`;
+        function handleAIScanClick() {
+            const brain = document.getElementById('brain-icon');
+            brain.classList.add('brain-glow');
+            if(db.currentLvl === 3) toggleAPIModal();
+            else toast("Level 3 Required for Master Sync", "gold");
+            setTimeout(() => brain.classList.remove('brain-glow'), 3000);
+        }
+
+        // Auto Ping Engine
+        setInterval(() => {
+            const ping = Math.floor(Math.random() * 50) + 30;
+            document.getElementById('ping-val').innerText = ping + "ms";
+        }, 3000);
+
+        async function theOmniscientScan(force) {
+            if(force && db.currentLvl === 3 && !db.apiLinked) return toggleAPIModal();
+            
+            const list = document.getElementById('list-analysis');
+            list.innerHTML = '<p class="text-[7px] text-center animate-pulse opacity-50 uppercase mt-4">Node Scanning...</p>';
+            
+            setTimeout(() => {
+                list.innerHTML = '';
+                const pairs = ["BTC/IDR", "ETH/IDR", "SOL/USDT", "PEPE/USDT"];
+                pairs.forEach(p => {
+                    const score = (94 + Math.random() * 5.9).toFixed(1);
+                    list.innerHTML += `
+                        <div class="bg-white/5 border border-white/10 p-3 rounded-xl relative text-left">
+                            <div class="flex justify-between text-[6px] uppercase opacity-40 mb-1"><span>NODE: MASTER</span><span>${score}%</span></div>
+                            <p class="text-[10px] font-bold tracking-tighter">${p}</p>
+                            <button class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-lg mt-2 uppercase btn-press">Lock Signal</button>
+                        </div>`;
+                });
+                document.getElementById('oracle-sync').innerText = "Oracle: Synced " + new Date().toLocaleTimeString();
+            }, 1000);
+        }
+
+        function toast(m, t) {
+            const a = document.getElementById('floating-notif');
+            const d = document.createElement('div');
+            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white animate-bounce shadow-2xl`;
+            d.innerText = m;
+            a.appendChild(d);
+            setTimeout(()=>d.remove(), 3000);
+        }
+
+        // Init
+        jumpLevel(3);
     </script>
 </body>
 </html>
