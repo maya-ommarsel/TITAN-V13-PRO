@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN V.13 AI - SUPREME OMNIPOTENT</title>
+    <title>TITAN V.13 AI - MASTER OMNIPOTENT</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,274 +17,211 @@
         .titan-font { font-family: 'Orbitron', sans-serif; }
         .glass-premium { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 1.5rem; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .module-container { height: calc(100vh - 580px); overflow-y: auto; padding-bottom: 50px; }
+        .module-container { height: calc(100vh - 580px); overflow-y: auto; }
         
-        /* ANIMASI */
-        .brain-glow { animation: brain-pulse 1.5s infinite ease-in-out; color: var(--emerald) !important; filter: drop-shadow(0 0 15px var(--emerald)); }
-        @keyframes brain-pulse { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.1); opacity: 1; } }
-        .thunder-blink { animation: thunder-flash 0.8s infinite alternate; }
-        @keyframes thunder-flash { from { filter: drop-shadow(0 0 2px var(--gold)); opacity: 0.6; } to { filter: drop-shadow(0 0 20px var(--gold)); opacity: 1; } }
-        
-        .btn-press:active { transform: scale(0.95); filter: brightness(1.2); }
         .tab-active { background-color: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 15px var(--gold); }
-        .input-supreme { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,215,0,0.1); padding: 16px; border-radius: 1rem; color: white; font-size: 11px; outline: none; transition: 0.3s; }
-        .input-supreme:focus { border-color: var(--gold); background: rgba(255,215,0,0.05); }
-        .popup-card { background: rgba(10, 11, 20, 0.99); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 2rem; }
+        .thunder-blink { animation: thunder-flash 0.8s infinite alternate; }
+        @keyframes thunder-flash { from { opacity: 0.6; } to { opacity: 1; } }
+        
+        .btn-press:active { transform: scale(0.95); }
+        .input-dark { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.1); border-radius: 12px; padding: 12px; color: white; outline: none; font-size: 10px; }
     </style>
 </head>
-<body>
-
-    <div id="floating-notif" class="fixed bottom-[110px] left-5 right-5 z-[1000] pointer-events-none"></div>
+<body class="no-scrollbar">
 
     <div id="api-modal" class="fixed inset-0 z-[99000] bg-black/95 hidden flex items-center justify-center p-6 backdrop-blur-xl">
-        <div class="popup-card p-8 w-full max-w-sm relative text-center">
-            <button onclick="toggleApiModal()" class="absolute top-4 right-4 text-white/20"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <i class="fa-solid fa-microchip text-4xl text-emerald-400 mb-4 animate-pulse"></i>
-            <h3 class="titan-font text-emerald-400 mb-6 uppercase tracking-widest text-[14px]">Master Node Protocol</h3>
-            
+        <div class="glass-premium p-8 w-full max-w-sm border-gold/30">
+            <h3 class="titan-font text-gold mb-6 text-center text-sm">MASTER API CONFIG</h3>
             <div class="space-y-4">
-                <select id="api-exchange" class="w-full input-supreme text-white">
-                    <option value="INDODAX">INDODAX (IDR)</option>
-                    <option value="GATE">GATE.IO (USDT)</option>
-                    <option value="JUPITER">JUPITER (SOL)</option>
-                </select>
-                <input type="password" id="api-key" placeholder="API KEY / WALLET ADDRESS" class="w-full input-supreme text-center">
-                <input type="password" id="api-secret" placeholder="API SECRET / PRIVATE KEY" class="w-full input-supreme text-center">
-                
-                <div id="api-status-text" class="text-[8px] titan-font text-yellow-500 uppercase opacity-60">Status: Waiting Authentication...</div>
-                
-                <button onclick="saveMasterNode()" class="w-full py-5 bg-emerald-600 text-white titan-font text-[11px] rounded-2xl uppercase font-black shadow-lg shadow-emerald-900/20 btn-press">Sync Master Node</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="net-modal" class="fixed inset-0 z-[98000] bg-black/95 hidden flex items-center justify-center p-6 backdrop-blur-xl">
-        <div class="popup-card p-8 w-full max-w-sm relative border-blue-500/30 text-center">
-            <button onclick="toggleNetModal()" class="absolute top-4 right-4 text-white/20"><i class="fa-solid fa-xmark text-xl"></i></button>
-            <i class="fa-solid fa-tower-broadcast text-4xl text-blue-400 mb-4"></i>
-            <h3 class="titan-font text-blue-400 mb-6 uppercase tracking-widest text-[14px]">Network Optimizer</h3>
-            
-            <div class="space-y-4 text-left">
-                <div class="bg-white/5 p-4 rounded-2xl border border-blue-500/20">
-                    <p class="text-[10px] font-bold text-blue-400 uppercase mb-1">Lock Band 4G/5G</p>
-                    <a href="tel:*#*#4636#*#*" class="block w-full py-3 bg-blue-600 text-center rounded-xl titan-font text-[10px] text-white btn-press">DIAL: *#*#4636#*#*</a>
+                <div>
+                    <label class="text-[8px] uppercase opacity-40 ml-1">Exchange Provider</label>
+                    <select id="api-provider" class="w-full input-dark mt-1">
+                        <option value="INDODAX">INDODAX (IDR)</option>
+                        <option value="GATEIO">GATE.IO (USDT)</option>
+                    </select>
                 </div>
-                <div class="bg-white/5 p-4 rounded-2xl border border-emerald-500/20">
-                    <p class="text-[10px] font-bold text-emerald-400 uppercase mb-1">DNS Resolver</p>
-                    <p class="text-[9px] font-mono text-emerald-400 text-center">Cloudflare: 1.1.1.1</p>
+                <div>
+                    <label class="text-[8px] uppercase opacity-40 ml-1">API Key</label>
+                    <input type="text" id="api-key" placeholder="Enter API Key" class="w-full input-dark mt-1">
                 </div>
+                <div>
+                    <label class="text-[8px] uppercase opacity-40 ml-1">Secret Key</label>
+                    <input type="password" id="api-secret" placeholder="Enter Secret Key" class="w-full input-dark mt-1">
+                </div>
+                <button onclick="saveApiConfig()" class="w-full py-4 bg-gold text-black titan-font text-[10px] rounded-2xl mt-4 uppercase font-black btn-press">Deploy Keys</button>
             </div>
-            <button onclick="toggleNetModal()" class="w-full py-4 bg-white/5 text-white titan-font text-[10px] rounded-2xl mt-6 uppercase">Save Config</button>
+            <button onclick="toggleApiModal()" class="w-full text-[8px] text-white/30 mt-4 uppercase">Cancel</button>
         </div>
     </div>
 
     <header class="p-5 flex justify-between items-center bg-black/80 backdrop-blur-md border-b border-white/5 sticky top-0 z-50">
         <div class="flex items-center gap-4">
-            <button onclick="toggleNetModal()" class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/40 text-blue-400 btn-press">
-                <i class="fa-solid fa-wifi"></i>
-            </button>
+            <div class="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center border border-white/10 text-gold">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
             <div id="level-tabs" class="flex gap-1 p-1 bg-white/5 rounded-2xl border border-white/10">
                 <button onclick="jumpLevel(1)" id="sw-1" class="px-3 py-2 rounded-xl text-[8px] titan-font">Lvl 1</button>
                 <button onclick="jumpLevel(2)" id="sw-2" class="px-3 py-2 rounded-xl text-[8px] titan-font">Lvl 2</button>
                 <button onclick="jumpLevel(3)" id="sw-3" class="px-3 py-2 rounded-xl text-[8px] titan-font tab-active">Lvl 3</button>
             </div>
         </div>
-        <div class="flex items-center gap-3">
-            <div id="ping-indicator" class="flex items-center gap-1 bg-black/40 px-2 py-1.5 rounded-lg border border-white/5">
-                <div id="ping-dot" class="w-1.5 h-1.5 rounded-full bg-emerald-400"></div>
-                <span id="ping-val" class="text-[7px] titan-font text-emerald-400">0ms</span>
+        <div class="flex items-center gap-4">
+            <div class="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center text-blue-400">
+                <i class="fa-solid fa-wifi"></i>
             </div>
-            <button class="text-rose-500 active:scale-90 transition-all"><i class="fa-solid fa-power-off text-xl"></i></button>
+            <div class="bg-black/40 px-3 py-1.5 rounded-lg border border-white/5 flex items-center gap-2">
+                <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                <span class="text-[7px] titan-font text-yellow-500">404ms</span>
+            </div>
+            <button class="text-rose-500"><i class="fa-solid fa-power-off text-xl"></i></button>
         </div>
     </header>
 
-    <div class="w-full py-2 bg-black/40 text-center">
-        <p class="text-[7px] titan-font opacity-40 uppercase tracking-[4px] mb-2">Top Graduates</p>
-        <div class="flex justify-center gap-4 text-[7px] titan-font text-yellow-500 italic">
-            <span><i class="fa-solid fa-crown"></i> TitanElite</span>
-            <span><i class="fa-solid fa-crown"></i> Marsel</span>
-            <span><i class="fa-solid fa-crown"></i> DevTitan</span>
-            <span><i class="fa-solid fa-crown"></i> RichBoy</span>
+    <main class="h-full flex flex-col no-scrollbar overflow-y-auto pb-48">
+        <div class="px-6 mt-4">
+            <div class="bg-white/5 p-3 rounded-2xl border border-white/5 flex justify-center items-center gap-6">
+                <span class="text-[7px] titan-font opacity-40 uppercase">Top Graduates:</span>
+                <span class="text-[7px] text-gold"><i class="fa-solid fa-crown mr-1"></i> TitanElite</span>
+                <span class="text-[7px] text-gold"><i class="fa-solid fa-crown mr-1"></i> Marsel</span>
+                <span class="text-[7px] text-gold"><i class="fa-solid fa-crown mr-1"></i> DevTitan</span>
+            </div>
         </div>
-    </div>
 
-    <main id="main-content" class="h-full flex flex-col pb-48 overflow-y-auto no-scrollbar">
         <section class="p-6">
-            <div class="glass-premium p-8 text-center relative overflow-hidden">
-                <div class="flex justify-between items-start mb-4">
-                    <p id="ui-mode-tag" class="text-[9px] uppercase font-black text-yellow-500 tracking-[3px]">Master Node</p>
-                    <p id="ui-live-count" class="text-[9px] text-emerald-400 font-bold animate-pulse uppercase">Live: 0</p>
-                </div>
-                <h2 id="ui-equity" class="titan-font text-4xl font-black mb-1">Rp 0</h2>
-                <div id="oracle-price" class="text-[7px] titan-font text-emerald-400 opacity-60 mb-6 uppercase">Oracle: Syncing...</div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[7px] opacity-40 uppercase mb-1">SCALPING</p><p id="eq-scalp" class="text-[10px] font-bold text-emerald-400">0</p>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[7px] opacity-40 uppercase mb-1">SMART</p><p id="eq-smart" class="text-[10px] font-bold text-blue-400">0</p>
-                    </div>
-                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
-                        <p class="text-[7px] opacity-40 uppercase mb-1">MOON</p><p id="eq-moon" class="text-[10px] font-bold text-violet-400">0</p>
+            <div class="glass-premium p-8 relative overflow-hidden flex justify-between items-center">
+                <div class="text-left">
+                    <p class="text-[9px] uppercase font-black text-yellow-500 tracking-[3px] mb-4">Master Node</p>
+                    <h2 id="ui-equity" class="titan-font text-4xl font-black mb-1">Rp 0</h2>
+                    <p class="text-[8px] titan-font text-emerald-400 animate-pulse uppercase">Oracle: Syncing...</p>
+                    
+                    <div class="flex gap-2 mt-6">
+                        <div class="bg-white/5 p-3 px-6 rounded-2xl border border-white/5 text-center">
+                            <p class="text-[6px] opacity-40 uppercase mb-1">Scalping</p><p class="text-[10px] text-emerald-400 font-bold">0</p>
+                        </div>
+                        <div class="bg-white/5 p-3 px-6 rounded-2xl border border-white/5 text-center">
+                            <p class="text-[6px] opacity-40 uppercase mb-1">Smart</p><p class="text-[10px] text-blue-400 font-bold">0</p>
+                        </div>
+                        <div class="bg-white/5 p-3 px-6 rounded-2xl border border-white/5 text-center">
+                            <p class="text-[6px] opacity-40 uppercase mb-1">Moon</p><p class="text-[10px] text-violet-400 font-bold">0</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="mt-6 p-4 bg-white/5 rounded-2xl border border-white/5">
-                    <p class="text-[8px] titan-font text-emerald-400 uppercase mb-3 tracking-[2px]">Session Performance</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="bg-black/40 p-2 rounded-xl border border-white/5">
-                            <p class="text-[6px] opacity-40 uppercase">Win Rate</p>
-                            <p id="stat-winrate" class="text-[10px] font-black text-emerald-400">0%</p>
+                <div class="bg-black/40 p-5 rounded-3xl border border-emerald-500/20 w-32 h-32 flex flex-col items-center justify-center">
+                    <p class="text-[6px] titan-font text-emerald-400 uppercase mb-3 text-center">Session Performance</p>
+                    <div class="flex flex-col gap-2 w-full">
+                        <div class="text-center">
+                            <p class="text-[5px] opacity-40 uppercase">Win Rate</p>
+                            <p class="text-[10px] font-black text-emerald-400">0%</p>
                         </div>
-                        <div class="bg-black/40 p-2 rounded-xl border border-white/5">
-                            <p class="text-[6px] opacity-40 uppercase">Net Profit</p>
-                            <p id="stat-netprofit" class="text-[10px] font-black text-yellow-500">Rp 0</p>
+                        <div class="text-center">
+                            <p class="text-[5px] opacity-40 uppercase">Net Profit</p>
+                            <p class="text-[8px] font-black text-yellow-500">Rp 0</p>
                         </div>
                     </div>
                 </div>
             </div>
+        </section>
+
+        <section class="px-6 grid grid-cols-3 gap-4 mb-2">
+            <div class="text-[10px] titan-font text-yellow-500 uppercase text-center">Radar API</div>
+            <div class="text-[10px] titan-font text-blue-500 uppercase text-center border-x border-white/10">Execution</div>
+            <div class="text-[10px] titan-font text-emerald-500 uppercase text-center">Vault</div>
         </section>
 
         <section class="px-6 grid grid-cols-3 gap-4">
-            <div class="flex flex-col"><div class="text-[10px] titan-font text-yellow-500 uppercase text-center mb-3">Radar API</div><div id="list-analysis" class="module-container space-y-5 no-scrollbar"></div></div>
-            <div class="flex flex-col"><div class="text-[10px] titan-font text-blue-500 uppercase text-center mb-3">Execution</div><div id="list-execution" class="module-container space-y-5 no-scrollbar"></div></div>
-            <div class="flex flex-col"><div class="text-[10px] titan-font text-emerald-500 uppercase text-center mb-3">Vault</div><div id="list-history" class="module-container space-y-3 no-scrollbar"></div></div>
+            <div id="radar-api" class="module-container space-y-4 no-scrollbar">
+                <p class="text-[8px] opacity-30 text-center mt-10 uppercase tracking-widest">Syncing Nodes...</p>
+            </div>
+            <div id="execution-api" class="module-container border-x border-white/10 px-2 space-y-4 no-scrollbar"></div>
+            <div id="vault-api" class="module-container space-y-4 no-scrollbar"></div>
         </section>
     </main>
 
-    <footer id="footer-nav" class="fixed bottom-0 left-0 right-0 p-5 bg-black/90 backdrop-blur-lg border-t border-white/5 z-40">
-        <div class="flex justify-around items-center max-w-md mx-auto">
-            <button class="flex flex-col items-center gap-1 text-emerald-400 active:scale-90"><i class="fa-solid fa-file-excel text-xl"></i><span class="text-[8px]">REPORT</span></button>
-            <button class="flex flex-col items-center gap-1 text-sky-400 active:scale-90"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></button>
+    <footer class="fixed bottom-0 left-0 right-0 p-5 bg-black/90 backdrop-blur-lg border-t border-white/5 z-40">
+        <div class="flex justify-around items-center">
+            <div class="flex flex-col items-center gap-1 text-emerald-500 opacity-50"><i class="fa-solid fa-file-excel text-xl"></i><span class="text-[8px]">REPORT</span></div>
+            <div class="flex flex-col items-center gap-1 text-sky-400"><i class="fa-brands fa-telegram text-2xl"></i><span class="text-[8px]">GROUP</span></div>
             
-            <div onclick="theOmniscientScan(true)" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl border-8 border-[#020308] thunder-blink cursor-pointer active:scale-90 transition-all">
+            <div onclick="theOmniscientScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 shadow-2xl border-8 border-[#020308] thunder-blink cursor-pointer">
                 <i class="fa-solid fa-bolt text-black text-2xl"></i>
             </div>
-            
-            <button onclick="handleAiScanClick()" class="flex flex-col items-center gap-1 text-emerald-400 active:scale-90">
-                <i id="brain-icon" class="fa-solid fa-brain text-xl transition-all"></i><span class="text-[8px]">AI SCAN</span>
-            </button>
-            <button class="flex flex-col items-center gap-1 opacity-20"><i class="fa-solid fa-shield-halved text-xl"></i><span class="text-[8px]">SECURE</span></button>
+
+            <div onclick="toggleApiModal()" class="flex flex-col items-center gap-1 text-emerald-400 cursor-pointer"><i class="fa-solid fa-brain text-xl"></i><span class="text-[8px]">AI SCAN</span></div>
+            <div class="flex flex-col items-center gap-1 opacity-20"><i class="fa-solid fa-shield-halved text-xl"></i><span class="text-[8px]">SECURE</span></div>
         </div>
     </footer>
 
     <script>
-        // --- CORE ENGINE CONFIG ---
-        let db = { 
-            equity: 10000000, 
-            lvl: 3, 
-            buckets: { scalp: 4000000, smart: 4000000, moon: 2000000 }, 
-            history: [], 
-            trades: [],
-            api: { key: '', secret: '', exchange: '' }
-        };
+        const PROXIES = ["https://api.allorigins.win/get?url=", "https://corsproxy.io/?", "https://thingproxy.freeboard.io/fetch/"];
+        let db = { equity: 0, api: { key: "", secret: "", provider: "" } };
 
-        // --- PING ENGINE ---
-        function runPingEngine() {
-            const start = Date.now();
-            fetch("https://api.coingecko.com/api/v3/ping")
-                .then(() => {
-                    const latency = Date.now() - start;
-                    const el = document.getElementById('ping-val');
-                    const dot = document.getElementById('ping-dot');
-                    el.innerText = `${latency}ms`;
-                    if(latency < 200) { el.style.color = '#10b981'; dot.className = 'w-1.5 h-1.5 rounded-full bg-emerald-400'; }
-                    else if(latency < 500) { el.style.color = '#ffd700'; dot.className = 'w-1.5 h-1.5 rounded-full bg-yellow-400'; }
-                    else { el.style.color = '#f43f5e'; dot.className = 'w-1.5 h-1.5 rounded-full bg-rose-400'; }
-                }).catch(() => {});
-        }
-        setInterval(runPingEngine, 5000);
-
-        // --- UI MODALS ---
-        function toggleNetModal() { document.getElementById('net-modal').classList.toggle('hidden'); }
-        function toggleApiModal() { document.getElementById('api-modal').classList.toggle('hidden'); }
-
-        function handleAiScanClick() {
-            if(db.lvl === 3) toggleApiModal();
-            else toast("AI Scan Protocols Initialized...", "emerald");
+        function toggleApiModal() {
+            document.getElementById('api-modal').classList.toggle('hidden');
         }
 
-        // --- MASTER NODE LOGIC ---
-        function saveMasterNode() {
-            const key = document.getElementById('api-key').value;
-            const secret = document.getElementById('api-secret').value;
-            const exchange = document.getElementById('api-exchange').value;
-
-            if(!key || !secret) return toast("API Key & Secret Wajib Diisi!", "rose");
-
-            db.api = { key, secret, exchange };
-            document.getElementById('api-status-text').innerText = `Status: ${exchange} NODE CONNECTED`;
-            document.getElementById('api-status-text').style.color = '#10b981';
+        function saveApiConfig() {
+            db.api.key = document.getElementById('api-key').value;
+            db.api.secret = document.getElementById('api-secret').value;
+            db.api.provider = document.getElementById('api-provider').value;
             
-            toast(`${exchange} Master Node Synced`, "emerald");
-            setTimeout(toggleApiModal, 1500);
-            
-            // Efek Visual
-            document.getElementById('brain-icon').classList.add('brain-glow');
-        }
-
-        // --- OMNISCIENT SCAN ENGINE ---
-        async function theOmniscientScan(isForce) {
-            if(isForce) toast("Tri-Node Deep Scan Initiated...", "gold");
-            const list = document.getElementById('list-analysis');
-            list.innerHTML = '<p class="text-[7px] titan-font text-center animate-pulse opacity-40 uppercase mt-4">Syncing API Nodes...</p>';
-            
-            try {
-                // Simulasi Fetching (Bisa diganti Real API)
-                setTimeout(() => {
-                    list.innerHTML = '';
-                    ["BTC", "ETH", "SOL", "BNB"].forEach(sym => {
-                        const score = (96 + Math.random() * 3.8).toFixed(1);
-                        list.innerHTML += `
-                            <div class="bg-white/5 border border-white/10 p-4 rounded-2xl relative">
-                                <div class="flex justify-between text-[7px] uppercase opacity-40"><span>API NODE</span><span>AI: ${score}%</span></div>
-                                <div class="flex justify-between items-center mt-2">
-                                    <span class="text-[10px] font-bold tracking-widest">${sym}/IDR</span>
-                                    <span class="text-[8px] text-emerald-400 font-black">LOCKED</span>
-                                </div>
-                                <button class="w-full py-3 bg-yellow-500 text-black text-[9px] font-black rounded-xl mt-4 uppercase btn-press">Lock Signal</button>
-                            </div>`;
-                    });
-                    document.getElementById('ui-live-count').innerText = `Live: ${Math.floor(Math.random() * 2000 + 1000)}`;
-                }, 1000);
-            } catch(e) { toast("Node Connection Error", "rose"); }
-        }
-
-        function toast(m, t) {
-            const a = document.getElementById('floating-notif');
-            const d = document.createElement('div');
-            d.className = `glass-premium px-5 py-3 border-l-4 ${t==='rose'?'border-rose-500':'border-yellow-500'} text-[10px] titan-font uppercase mb-3 text-white animate-bounce shadow-2xl`;
-            d.innerText = m;
-            a.appendChild(d);
-            setTimeout(()=>d.remove(), 3000);
-        }
-
-        function jumpLevel(l) {
-            [1,2,3].forEach(n => document.getElementById(`sw-${n}`).classList.remove('tab-active'));
-            document.getElementById(`sw-${l}`).classList.add('tab-active');
-            db.lvl = l;
-            
-            if(l === 3) {
-                document.getElementById('ui-mode-tag').innerText = "Master Node";
-                document.getElementById('ui-mode-tag').style.color = "var(--gold)";
+            if(db.api.key && db.api.secret) {
+                alert("Master API Config Deployed Successfully!");
+                toggleApiModal();
+                theOmniscientScan();
             } else {
-                document.getElementById('ui-mode-tag').innerText = "Training Mode";
-                document.getElementById('ui-mode-tag').style.color = "white";
+                alert("Missing Security Keys!");
             }
         }
 
-        // Init App
-        function initApp() {
-            document.getElementById('ui-equity').innerText = `Rp ${db.equity.toLocaleString()}`;
-            document.getElementById('eq-scalp').innerText = db.buckets.scalp.toLocaleString();
-            document.getElementById('eq-smart').innerText = db.buckets.smart.toLocaleString();
-            document.getElementById('eq-moon').innerText = db.buckets.moon.toLocaleString();
-            runPingEngine();
-            theOmniscientScan(false);
+        async function smartFetch(url) {
+            for (let i = 0; i < PROXIES.length; i++) {
+                try {
+                    const response = await fetch(PROXIES[i] + encodeURIComponent(url));
+                    if (!response.ok) throw new Error();
+                    const data = await response.json();
+                    return i === 0 ? JSON.parse(data.contents) : data;
+                } catch (e) { console.warn(`Node ${i+1} Fallback...`); }
+            }
+            throw new Error("Tri-Node Proxy Fail");
         }
 
-        initApp();
+        async function theOmniscientScan() {
+            const list = document.getElementById('radar-api');
+            list.innerHTML = '<p class="text-[7px] text-center animate-pulse opacity-50 uppercase">Syncing via Tri-Node...</p>';
+            
+            try {
+                const data = await smartFetch("https://indodax.com/api/summaries");
+                list.innerHTML = '';
+                const coins = ["btc_idr", "eth_idr", "sol_idr", "pepe_idr"];
+                
+                coins.forEach(coin => {
+                    const ticker = data.tickers[coin];
+                    if(ticker) {
+                        list.innerHTML += `
+                            <div class="bg-white/5 border border-white/10 p-4 rounded-2xl relative">
+                                <div class="flex justify-between text-[6px] uppercase opacity-30"><span>Market</span><span>AI: 98%</span></div>
+                                <div class="flex justify-between items-center mt-2">
+                                    <span class="text-[10px] titan-font">${coin.split('_')[0].toUpperCase()}</span>
+                                    <span class="text-[8px] text-emerald-400 font-bold">${parseInt(ticker.last).toLocaleString()}</span>
+                                </div>
+                                <button class="w-full py-2 bg-yellow-500 text-black text-[8px] font-black rounded-xl mt-3 uppercase btn-press">Lock</button>
+                            </div>`;
+                    }
+                });
+            } catch(e) {
+                list.innerHTML = '<p class="text-rose-500 text-[8px] text-center mt-4">API CONNECTION ERROR</p>';
+            }
+        }
+
+        function jumpLevel(lvl) {
+            document.querySelectorAll('#level-tabs button').forEach(b => b.classList.remove('tab-active'));
+            document.getElementById(`sw-${lvl}`).classList.add('tab-active');
+            if(lvl === 3) toggleApiModal();
+        }
+
+        // Initialize UI
+        document.getElementById('ui-equity').innerText = `Rp ${db.equity.toLocaleString()}`;
     </script>
 </body>
 </html>
