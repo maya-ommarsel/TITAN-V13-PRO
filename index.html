@@ -22,7 +22,7 @@
         .glass-premium { background: var(--glass); backdrop-filter: blur(60px); border: 1px solid rgba(255, 215, 0, 0.15); border-radius: 2rem; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        /* ULTRA-OPTIMIZATION SPASI (TANDA MERAH) */
+        /* ULTRA-OPTIMIZATION SPASI (TANDA MERAH DI GAMBAR) */
         .module-container { height: calc(100vh - 460px); overflow-y: auto; scroll-behavior: smooth; padding-bottom: 20px; }
         
         .btn-active { background: var(--gold) !important; color: black !important; font-weight: 900 !important; box-shadow: 0 0 20px rgba(255, 215, 0, 0.4); }
@@ -42,8 +42,6 @@
         .input-premium:focus { border-color: var(--gold); background: rgba(255,215,0,0.08); box-shadow: 0 0 15px rgba(255,215,0,0.1); }
         
         .signal-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 10px; border-radius: 1.2rem; }
-        .alert-tp { animation: blink-tp 0.5s infinite alternate; border-color: var(--emerald) !important; }
-        @keyframes blink-tp { from { box-shadow: 0 0 0px var(--emerald); } to { box-shadow: 0 0 15px var(--emerald); background: rgba(16, 185, 129, 0.15); } }
     </style>
 </head>
 <body oncontextmenu="return false">
@@ -58,7 +56,7 @@
     </div>
 
     <div id="auth-screen" class="fixed inset-0 z-[80000] bg-[#020308] overflow-y-auto p-8 flex flex-col items-center">
-        <div class="w-full max-w-sm text-center mt-6">
+        <div class="w-full max-w-sm text-center mt-6 text-white">
             <div id="master-chip" onclick="masterKnock()" class="w-20 h-20 mx-auto mb-6 bg-zinc-900 rounded-[2rem] border border-yellow-500/20 flex items-center justify-center shadow-2xl cursor-pointer active:scale-90 transition-all">
                 <i class="fa-solid fa-microchip text-4xl text-yellow-500"></i>
             </div>
@@ -180,7 +178,7 @@
         };
 
         let state = { 
-            user: null, lvl: 3, equity: 0, initialEquity: 0,
+            user: null, lvl: 1, equity: 0, 
             buckets: { scalp: 0, smart: 0, moon: 0 }, 
             trades: [], history: [], isAuth: false, isLocked: false 
         };
@@ -228,7 +226,6 @@
             document.getElementById('app-main').classList.remove('hidden');
             document.getElementById('app-footer').classList.remove('hidden');
             state.equity = parseFloat(localStorage.getItem('TITAN_FUND')) || 0;
-            state.initialEquity = state.equity;
             if (state.equity === 0) showBalanceInit(); else refreshEquity();
             jumpLevel(state.lvl);
             setInterval(heartbeat, 3000);
@@ -254,12 +251,12 @@
                 const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&per_page=15');
                 const d = await r.json();
                 list.innerHTML = d.map(c => `
-                    <div class="signal-card text-left relative overflow-hidden active:scale-95 transition-all">
+                    <div class="signal-card text-left relative overflow-hidden active:scale-95 transition-all text-white">
                         <div class="flex justify-between items-center mb-1">
                             <span class="text-[6px] titan-font text-emerald-400 font-bold">${85+Math.floor(Math.random()*14)}% AI</span>
-                            <span class="text-[6px] opacity-30 uppercase font-black">Gate.io</span>
+                            <span class="text-[6px] opacity-30 uppercase font-black tracking-widest">Global Node</span>
                         </div>
-                        <div class="flex justify-between items-center font-black text-white">
+                        <div class="flex justify-between items-center font-black">
                             <span class="text-[9px] tracking-tighter">${c.symbol.toUpperCase()}</span>
                             <span class="text-[7px] opacity-70">Rp ${c.current_price.toLocaleString()}</span>
                         </div>
@@ -282,10 +279,10 @@
 
         function renderExecution() {
             document.getElementById('exec-list').innerHTML = state.trades.map((t, i) => `
-                <div class="signal-card ${t.profit > 5 ? 'alert-tp' : ''} transition-all duration-300">
+                <div class="signal-card transition-all duration-300 text-white">
                     <div class="flex justify-between text-[6px] mb-1 uppercase opacity-40 font-bold"><span>${t.type}</span><span>${t.profit.toFixed(2)}%</span></div>
-                    <p class="text-[9px] font-black mb-1 tracking-tighter text-white">${t.sym}</p>
-                    <p class="text-[7px] opacity-60 font-bold mb-2 text-white">Rp ${t.curr.toLocaleString()}</p>
+                    <p class="text-[9px] font-black mb-1 tracking-tighter">${t.sym}</p>
+                    <p class="text-[7px] opacity-60 font-bold mb-2">Rp ${t.curr.toLocaleString()}</p>
                     <button onclick="secureProfit(${i})" class="w-full py-1.5 bg-blue-600 text-white text-[7px] font-black rounded-lg uppercase tracking-widest active:scale-95">Secure</button>
                 </div>`).join('');
         }
@@ -317,8 +314,11 @@
                 </div>`).join('');
         }
 
+        // --- LOGIKA PERBAIKAN: API SYNC HANYA UNTUK LEVEL 3 ---
         function handleAIScan() {
+            if(state.lvl < 3) return premiumToast("LEVEL 3 REQUIRED FOR API SYNC", "rose");
             if(state.isLocked) return showSecurityInfo();
+
             const content = `
                 <div class="popup-animate">
                     <i class="fa-solid fa-server text-4xl text-emerald-400 mb-4 drop-shadow-[0_0_10px_#10b981]"></i>
@@ -360,22 +360,42 @@
         function premiumToast(m, t) { 
             const a = document.getElementById('floating-notif'), d = document.createElement('div');
             d.className = `glass-premium px-5 py-4 border-l-4 ${t==='rose'?'border-rose-500':'border-emerald-500'} text-[9px] titan-font mb-3 flex items-center gap-3 popup-animate shadow-2xl`;
-            d.innerHTML = `<i class="fa-solid ${t==='rose'?'fa-triangle-exclamation text-rose-500':'fa-circle-check text-emerald-500'} text-lg"></i><span class="text-white uppercase font-black tracking-tighter">${m}</span>`;
+            d.innerHTML = `<i class="fa-solid ${t==='rose'?'fa-triangle-exclamation text-rose-500':'fa-circle-check text-emerald-500'} text-lg text-white"></i><span class="text-white uppercase font-black tracking-tighter">${m}</span>`;
             a.appendChild(d); setTimeout(()=> { d.style.opacity = '0'; d.style.transform = 'translateX(50px)'; setTimeout(()=>d.remove(), 500); }, 3000); 
         }
 
         function jumpLevel(l) {
+            state.lvl = l;
             [1,2,3].forEach(n => {
                 const b = document.getElementById(`lv-${n}`);
                 if(b) b.className = (n == l) ? "px-3 py-1.5 rounded-lg text-[7px] titan-font tab-active text-black" : "px-3 py-1.5 rounded-lg text-[7px] titan-font text-white/30";
             });
             document.getElementById('ui-label').innerText = l == 3 ? "MASTER NODE" : (l == 2 ? "ELITE MEMBER" : "TRAINING MODE");
+            const brain = document.getElementById('brain-icon');
+            if(l == 3) brain.style.color = "var(--emerald)"; else brain.style.color = "white";
         }
-        function attemptJump(l) { if(l > state.lvl && !state.user.isAdmin) return premiumToast(`LEVEL ${l} RESTRICTED`, "rose"); jumpLevel(l); }
-        function confirmLogout() { if(confirm("Terminate Session?")) { localStorage.clear(); location.reload(); } }
+
+        function attemptJump(l) { 
+            if(l > state.lvl && !state.user.isAdmin) return premiumToast(`LEVEL ${l} RESTRICTED`, "rose"); 
+            jumpLevel(l); 
+        }
+
+        function confirmLogout() { 
+            const content = `
+                <div class="popup-animate">
+                    <i class="fa-solid fa-power-off text-4xl text-rose-500 mb-4"></i>
+                    <h3 class="titan-font text-white mb-4 uppercase">Terminate Session?</h3>
+                    <div class="flex gap-4">
+                        <button onclick="closeModal()" class="flex-1 py-3 bg-white/5 rounded-xl font-bold uppercase text-[10px]">Batal</button>
+                        <button onclick="location.reload()" class="flex-1 py-3 bg-rose-600 rounded-xl font-bold uppercase text-[10px]">Oke</button>
+                    </div>
+                </div>`;
+            openModal(content);
+        }
+
         function showTutorial() { premiumToast("PROTOCOL: MAINTAIN 20% GAIN", "gold"); }
         function showBalanceInit() { openModal(`<div><i class="fa-solid fa-wallet text-4xl text-yellow-500 mb-4"></i><h3 class="titan-font text-white mb-6 uppercase tracking-widest">Initial Equity</h3><input type="number" id="init-val" placeholder="Min Rp 1.000.000" class="input-premium text-center mb-6"><button onclick="saveFund()" class="w-full py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black uppercase">Activate</button></div>`); }
-        function saveFund() { const v = parseFloat(document.getElementById('init-val').value); if(v < 1000000) return premiumToast("MIN Rp 1.000.000", "rose"); state.equity = v; state.initialEquity = v; refreshEquity(); closeModal(); }
+        function saveFund() { const v = parseFloat(document.getElementById('init-val').value); if(v < 1000000) return premiumToast("MIN Rp 1.000.000", "rose"); state.equity = v; refreshEquity(); closeModal(); }
         function exportToExcel() { const ws = XLSX.utils.json_to_sheet(state.history); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "Vault"); XLSX.writeFile(wb, `TITAN_V13_REPORT.xlsx`); }
         function startCamera() { navigator.mediaDevices.getUserMedia({video:true}).then(s => document.getElementById('face-video').srcObject = s).catch(e=>console.log("Cam Blocked")); }
     </script>
