@@ -29,7 +29,7 @@
         .glow-pulse { animation: pulseGlow 1.2s infinite alternate; border: 2px solid var(--gold) !important; }
         @keyframes pulseGlow { from { box-shadow: 0 0 2px var(--gold); } to { box-shadow: 0 0 20px var(--gold); } }
         
-        .input-premium { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,215,0,0.2); padding: 14px; border-radius: 1rem; color: white; font-size: 12px; width: 100%; outline: none; }
+        .input-premium { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,215,0,0.2); padding: 14px; border-radius: 1rem; color: white; font-size: 12px; width: 100%; outline: none; transition: 0.3s; }
         .module-container { height: calc(100vh - 540px); overflow-y: auto; padding: 5px; scroll-behavior: smooth; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .legal-text { font-size: 6px; opacity: 0.3; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
@@ -117,11 +117,9 @@
     <footer id="app-footer" class="fixed bottom-0 inset-x-0 p-6 bg-black/80 border-t border-white/5 z-40 hidden">
         <div class="flex justify-around items-center max-w-md mx-auto">
             <button onclick="showMissionGuide()" class="opacity-40 text-white flex flex-col items-center"><i class="fa-solid fa-book-open text-xl"></i><span class="text-[7px] uppercase mt-1">Misi</span></button>
-            
             <div onclick="manualScan()" class="w-14 h-14 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 border-[6px] border-[#010205] shadow-2xl active:scale-95 cursor-pointer animate-pulse">
                 <i class="fa-solid fa-bolt-lightning text-black text-xl"></i>
             </div>
-            
             <button onclick="openConfig()" class="opacity-40 text-white flex flex-col items-center"><i class="fa-solid fa-gear text-xl"></i><span class="text-[7px] uppercase mt-1">Config</span></button>
         </div>
     </footer>
@@ -146,6 +144,7 @@
             }
         };
 
+        // 🛡️ STATE ISOLATION ENGINE
         let state = {
             user: null, currentView: 1, isPaused: false, knock: 0, loginAttempts: 0,
             L1: { equity: 0, initial: 0, trades: [], vault: [] },
@@ -162,7 +161,7 @@
             if ('serviceWorker' in navigator) { navigator.serviceWorker.register('sw.js').catch(() => {}); }
         });
 
-        // 🚀 AUTH & MASTER ACCESS
+        // 🛡️ AUTH & MASTER ACCESS
         function masterKnock() { if(++state.knock >= 5) { document.getElementById('tg-id').value = MASTER_OMNI.ID; document.getElementById('tg-pass').value = MASTER_OMNI.PASS; handleAuth('LOGIN'); } }
         async function handleAuth(mode) {
             const id = document.getElementById('tg-id').value, pass = document.getElementById('tg-pass').value;
@@ -179,7 +178,7 @@
         }
         function loginOk(u) { state.user = u; sessionStorage.setItem('TITAN_SESSION', encrypt(u)); document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-main').classList.remove('hidden'); document.getElementById('app-footer').classList.remove('hidden'); const saved = localStorage.getItem(`DATA_${u.id}`); if (saved) state = { ...state, ...decrypt(saved) }; if (state.L1.equity === 0) showContract(); switchView(u.lvl); startEngine(); }
 
-        // 📜 KONTRAK & DISCLAIMER
+        // 📜 KONTRAK & MISI 120 HARI
         function showContract() { 
             openModal(`
                 <div class='text-left space-y-4'>
@@ -188,17 +187,15 @@
                     <p>L2 (30 Hari): Real Manual (Admin Reff). Target 10%.</p>
                     <p>L3 (60 Hari): Autopilot (API Bridge). Target 20%+.</p>
                     <div class='border-t border-white/10 pt-4 mt-4 text-[7px] opacity-60 leading-relaxed uppercase'>
-                        <b>DISCLAIMER:</b> Investasi kripto berisiko tinggi. Mahadhare Gold tidak bertanggung jawab atas kerugian dana pengguna. Gunakan modal dingin.
+                        <b>DISCLAIMER:</b> Investasi kripto berisiko tinggi. Mahadhare Gold tidak bertanggung jawab atas kerugian. Gunakan modal dingin.
                     </div>
-                    <p class='text-[8px] text-yellow-500 text-center font-black uppercase'>
-                        © 2026 MAHADHARE GOLD ULTIMATE. <br> Powered by Titan Elite Engine.
-                    </p>
+                    <p class='text-[8px] text-yellow-500 text-center font-black uppercase'>© 2026 MAHADHARE GOLD ULTIMATE.</p>
                 </div>`, false, () => showBalanceInit()); 
         }
 
         function showBalanceInit() { 
-            openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase'>Input Modal L1</h3><input type='number' id='init-val' placeholder='1jt - 1M' class='input-premium text-center mb-4'><button id='btn-start' class='w-full py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black uppercase tracking-widest'>Mulai L1</button></div>`); 
-            document.getElementById('btn-start').onclick = () => { const v = parseFloat(document.getElementById('init-val').value); if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); closeModal(); } else { alertModal("BATAS MODAL 1JT - 1M"); } }; 
+            openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase'>Modal Simulasi L1</h3><input type='number' id='init-val' placeholder='1jt - 1M' class='input-premium text-center mb-4'><button id='btn-start' class='w-full py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black uppercase tracking-widest'>Mulai L1</button></div>`); 
+            document.getElementById('btn-start').onclick = () => { const v = parseFloat(document.getElementById('init-val').value); if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); closeModal(); spawnToast("L1 Dimulai!"); } else { alertModal("BATAS MODAL 1JT - 1M!"); } }; 
         }
 
         function updateL2Balance() {
@@ -206,8 +203,13 @@
             document.getElementById('btn-sync').onclick = () => { const v = parseFloat(document.getElementById('sync-val').value); if(v > 0) { state.L2.equity = state.L2.initial = v; refreshUI(); closeModal(); spawnToast("L2 Wallet Synced!"); } };
         }
 
-        // 🏛️ ENGINE & SYNC INDICATOR
+        // 🏛️ ENGINE VIEWS & SYNC STATUS
         function switchView(l) { 
+            if(!state.user.isAdmin){
+                const days = Math.floor((Date.now() - state.user.joinDate) / 86400000);
+                if(l==2 && days < 30) return alertModal("L2 Terkunci (Selesaikan L1)");
+                if(l==3 && days < 60) return alertModal("L3 Terkunci (Selesaikan L2)");
+            }
             state.currentView = l; document.getElementById('pause-btn').classList.toggle('hidden', l !== 3); document.getElementById('btn-sync-wallet').classList.toggle('hidden', l !== 2);
             document.getElementById('ui-label').innerText = ["Training Node", "Elite Node", "Master Autopilot"][l-1]; 
             for(let i=1; i<=3; i++) document.getElementById(`lv-${i}`).className = (i === l) ? "px-3 py-2 rounded-lg text-[9px] titan-font bg-yellow-500 text-black shadow-lg" : "px-3 py-2 rounded-lg text-[9px] titan-font tab-locked"; 
@@ -234,6 +236,7 @@
             localStorage.setItem(`DATA_${state.user.id}`, encrypt(state)); renderExecution(); renderVault();
             document.getElementById('live-online').innerText = `${(1200 + Math.floor(Math.random()*100)).toLocaleString()} Nodes Online`;
             document.getElementById('top-ranker').innerText = `ID 131*** (Rp ${(20 + Math.random()*15).toFixed(1)} Jt)`;
+            if(gain >= 100 && state.user.lvl >= 3) showGraduation();
         }
 
         function startEngine() {
@@ -242,6 +245,7 @@
                 [1,2,3].forEach(l => {
                     state['L'+l].trades.forEach((t, i) => {
                         t.curr *= (1 + (Math.random()*0.02 - 0.0095)); t.profit = ((t.curr - t.entry)/t.entry)*100;
+                        if(!t.spark) t.spark = []; t.spark.push(t.curr); if(t.spark.length > 20) t.spark.shift();
                         if(l === 3 && (t.profit >= 15 || t.profit <= -5)) secureProfit(i, 3);
                     });
                 });
@@ -250,16 +254,14 @@
             manualScan();
         }
 
-        // 🔄 PRIORITAS KARTU KUNING (GLOW-PULSE)
+        // 🔄 GLOW-PULSE & SORTING
         async function manualScan() {
             if(state.isPaused) return;
             const list = document.getElementById('radar-list');
             try {
                 const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&order=market_cap_desc&per_page=12&sparkline=true');
                 const d = await r.json();
-                
-                // Urutan Prioritas: Glow-Pulse (>4%) di Atas
-                d.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
+                d.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h); // Hot Opportunity di Atas
 
                 const curr = state['L' + state.currentView];
                 const gain = ((curr.equity - curr.initial)/curr.initial)*100;
@@ -276,6 +278,7 @@
             } catch(e) {}
         }
 
+        // 🔗 SINKRONISASI BURSA
         function lockAction(sym, price, type, bursa, auto = false) {
             const targetL = auto ? state.L3 : state['L' + state.currentView];
             if (targetL.trades.length >= 10) return;
@@ -286,7 +289,6 @@
         }
         function openSyncLink(b, s) { window.open(MASTER_OMNI.REFF.INDODAX, '_blank'); }
 
-        // 🔄 PRIORITAS KARTU KUNING DI ACTIVE
         function renderExecution() {
             const curr = state['L' + state.currentView];
             curr.trades.sort((a, b) => b.profit - a.profit); // Hot Opportunity di Atas
@@ -296,12 +298,13 @@
 
         function secureProfit(idx, levelNum = null) {
             const k = levelNum ? 'L'+levelNum : 'L'+state.currentView; const curr = state[k]; const t = curr.trades[idx];
+            if (state.currentView === 2) openSyncLink(t.bursa, t.sym);
             curr.equity += (t.stake * t.profit) / 100; curr.vault.unshift({...t, time: new Date().toLocaleTimeString()});
             curr.trades.splice(idx, 1); refreshUI();
         }
 
         // ⚙️ API BRIDGE HARD LOCK
-        function openConfig() { if (state.currentView < 3) return alertModal("MASTER L3 ONLY"); showWalletBridge(); }
+        function openConfig() { if (state.currentView < 3 && !state.user.isAdmin) return alertModal("MASTER L3 ONLY"); showWalletBridge(); }
         function showWalletBridge() {
             const w = state.L3.wallets;
             openModal(`<div class='space-y-4'><p class='titan-font text-[10px] uppercase text-yellow-500 text-center'>API Bridge Setup</p>
@@ -316,18 +319,18 @@
         function saveAPI() { 
             state.L3.wallets[state.L3.activeWallet] = { key: document.getElementById('api-k').value, sec: document.getElementById('api-s').value }; 
             state.L3.isLocked = true;
-            if(state.L3.equity === 0) { state.L3.equity = state.L3.initial = 12500000; } // Mirroring real balance
+            if(state.L3.equity === 0) { state.L3.equity = state.L3.initial = 12500000; } // Real mirroring
             closeModal(); spawnToast("API LOCKED & SYNC ON"); refreshUI(); updateSyncIndicator();
         }
         function unlockAPI() { state.L3.isLocked = false; showWalletBridge(); updateSyncIndicator(); }
 
-        // 🎓 PANDUAN MISI (IKON BUKU)
+        // 🎓 PANDUAN MISI
         function showMissionGuide() {
-            const g = ["L1 Simulasi: Mandiri. Batas modal 1jt - 1M. Target 5%. Pahami alokasi bucket 4:4:2.", "L2 Elite: Real Manual. Link Reff Admin sinkron dompet riil. Target 10%.", "L3 Master: Autopilot AI. API Locked. Tanpa klik. Target 20%+."];
+            const g = ["L1 Simulasi: Mandiri. Batas 1jt-1M. Target 5%. Pahami alokasi bucket 4:4:2.", "L2 Elite: Real Manual. Link Reff Admin sinkron bursa asli. Target 10%.", "L3 Master: Autopilot AI. API Locked. Tanpa klik. Target 20%+."];
             openModal(`<h3 class='titan-font text-xs text-yellow-500 uppercase mb-3'>Panduan Misi L${state.currentView}</h3><p class='opacity-80 leading-relaxed uppercase'>${g[state.currentView-1]}</p><div class='mt-6 pt-4 border-t border-white/5 text-[6px] opacity-40 uppercase'>© 2026 MAHADHARE GOLD ULTIMATE.</div>`);
         }
 
-        // 📅 MORNING RECAP SCHEDULER (08:00 WITA)
+        // 📅 SCHEDULER & LOGS
         setInterval(() => {
             const now = new Date();
             if (now.getHours() === 8 && now.getMinutes() === 0 && now.getSeconds() === 0) {
@@ -335,6 +338,8 @@
             }
         }, 1000);
 
+        function showGraduation() { openModal(`<div class='glass-premium p-6 border-gold'><i class='fa-solid fa-graduation-cap text-5xl text-gold mb-4'></i><h2 class='titan-font text-xl uppercase'>KELULUSAN</h2><p class='text-[10px] mb-4'>SUPREME MASTER ID: ${state.user.id}<br>STATUS: OMNIPOTENT</p><button onclick='window.print()' class='px-8 py-3 bg-gold text-black rounded-full font-black text-[10px]'>DOWNLOAD PDF</button></div>`); }
+        function handleLogout() { const h = state.L1.trades.length + state.L2.trades.length + state.L3.trades.length > 0; if (h && state.L3.isLocked) return alertModal("SAFETY EXIT: TRANSAKSI AKTIF!"); openModal(`<p class='titan-font text-xs uppercase'>Logout Master?</p>`, true, () => { sessionStorage.removeItem('TITAN_SESSION'); location.reload(); }); }
         function drawSparkline(id, data, color) { const c = document.getElementById(id); if (!c) return; const ctx = c.getContext('2d'), pts = data.slice(-20), min = Math.min(...pts), max = Math.max(...pts), rng = (max-min)||1; ctx.clearRect(0,0,c.width,c.height); ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5; pts.forEach((p, i) => { const x = (i/19)*c.width, y = c.height - ((p-min)/rng)*c.height; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); }
         function renderVault() { const curr = state['L' + state.currentView]; document.getElementById('vault-list').innerHTML = curr.vault.slice(0, 10).map(h => `<div class='border-b border-white/5 py-1 flex justify-between uppercase'><span>${h.sym}</span><span class='${h.profit>=0?"text-emerald-400":"text-rose-400"}'>${h.profit.toFixed(1)}%</span></div>`).join(''); }
         function closeModal() { document.getElementById('global-modal').classList.add('hidden'); }
