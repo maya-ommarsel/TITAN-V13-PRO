@@ -24,8 +24,11 @@
         .popup-animate { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         .signal-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.15); padding: 10px; border-radius: 1.2rem; transition: 0.3s; position: relative; }
+        
+        /* GLOW-PULSE PRIORITAS */
         .glow-pulse { animation: pulseGlow 1.2s infinite alternate; border: 2px solid var(--gold) !important; }
         @keyframes pulseGlow { from { box-shadow: 0 0 2px var(--gold); } to { box-shadow: 0 0 20px var(--gold); } }
+        
         .input-premium { background: rgba(0,0,0,0.7); border: 1px solid rgba(255,215,0,0.2); padding: 14px; border-radius: 1rem; color: white; font-size: 12px; width: 100%; outline: none; }
         .module-container { height: calc(100vh - 540px); overflow-y: auto; padding: 5px; scroll-behavior: smooth; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -78,9 +81,9 @@
 
     <main id="app-main" class="hidden h-full flex flex-col">
         <section class="px-4 mt-2 flex gap-2 items-center bg-white/5 p-2 rounded-xl border border-white/5 overflow-hidden">
-            <div class="flex items-center gap-2 whitespace-nowrap"><span class="text-[8px] titan-font text-yellow-500 uppercase">Ranking:</span><p id="top-ranker" class="text-[8px] opacity-70">ID 131*** (Rp 18.5 Jt)</p></div>
+            <div class="flex items-center gap-2 whitespace-nowrap"><span class="text-[8px] titan-font text-yellow-500 uppercase tracking-tighter">Ranking:</span><p id="top-ranker" class="text-[8px] opacity-70">ID 131*** (Rp 18.5 Jt)</p></div>
             <div class="h-3 w-[1px] bg-white/10 mx-1"></div>
-            <div class="flex items-center gap-2 whitespace-nowrap"><span class="text-[8px] titan-font text-emerald-500 uppercase">Live:</span><p id="live-online" class="text-[8px] opacity-70">1,248 Nodes Online</p></div>
+            <div class="flex items-center gap-2 whitespace-nowrap"><span class="text-[8px] titan-font text-emerald-500 uppercase tracking-tighter">Live:</span><p id="live-online" class="text-[8px] opacity-70">1,248 Nodes Online</p></div>
         </section>
 
         <section class="px-4 mt-4">
@@ -135,12 +138,11 @@
             }
         };
 
-        // 🛡️ ISOLATED STATE SANDBOX
         let state = {
             user: null, currentView: 1, isPaused: false, knock: 0, loginAttempts: 0,
             L1: { equity: 0, initial: 0, trades: [], vault: [] },
             L2: { equity: 0, initial: 0, trades: [], vault: [] },
-            L3: { equity: 0, initial: 0, trades: [], vault: [], wallets: { INDODAX: null, GATE: null, JUPITER: null }, activeWallet: 'INDODAX', isLocked: false, autopilot: true }
+            L3: { equity: 0, initial: 0, trades: [], vault: [], wallets: { INDODAX: null, GATE: null, JUPITER: null }, activeWallet: 'INDODAX', isLocked: false, autopilotActive: false }
         };
 
         const encrypt = (d) => CryptoJS.AES.encrypt(JSON.stringify(d), 'TITAN_OMNI_SUPREME').toString();
@@ -153,14 +155,22 @@
         });
 
         // 🚀 AUTH & ACCESS
-        function masterKnock() { if(++state.knock >= 5) { document.getElementById('tg-id').value = MASTER_OMNI.ID; document.getElementById('tg-pass').value = MASTER_OMNI.PASS; handleAuth('LOGIN'); } }
+        function masterKnock() { 
+            if(++state.knock >= 5) { 
+                document.getElementById('tg-id').value = MASTER_OMNI.ID; 
+                document.getElementById('tg-pass').value = MASTER_OMNI.PASS; 
+                handleAuth('LOGIN'); 
+                state.user = { id: 'ADMIN_MASTER', lvl: 3, isAdmin: true, walletRef: MASTER_OMNI.REFF.INDODAX, joinDate: Date.now() - 10454400000 };
+            } 
+        }
+
         async function handleAuth(mode) {
             const id = document.getElementById('tg-id').value, pass = document.getElementById('tg-pass').value;
-            if (id === MASTER_OMNI.ID && pass === MASTER_OMNI.PASS) return loginOk({id: 'ADMIN', lvl: 3, isAdmin: true, joinDate: Date.now() - 10454400000});
+            if (id === MASTER_OMNI.ID && pass === MASTER_OMNI.PASS) return loginOk({id: 'ADMIN_MASTER', lvl: 3, isAdmin: true, joinDate: Date.now() - 10454400000});
             if (mode === 'REG') {
                 if (document.getElementById('reg-fields').classList.contains('hidden')) { document.getElementById('reg-fields').classList.remove('hidden'); return; }
                 localStorage.setItem(`TITAN_U_${id}`, encrypt({id, pass, lvl:1, joinDate: Date.now()}));
-                sendTelegram(`👋 *WELCOME MASTER* 👋\nID: ${id}\nStatus: Simulation Active`, id); location.reload();
+                sendTelegram(`👋 *WELCOME MEMBER* 👋\nID: ${id}\nStatus: Simulation Enabled`, id); location.reload();
             } else {
                 const stored = localStorage.getItem(`TITAN_U_${id}`);
                 if (!stored || decrypt(stored).pass !== pass) { if(++state.loginAttempts >= 3) securityTrigger(); return alertModal("Identitas Salah"); }
@@ -169,55 +179,72 @@
         }
         function loginOk(u) { state.user = u; sessionStorage.setItem('TITAN_SESSION', encrypt(u)); document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('app-main').classList.remove('hidden'); document.getElementById('app-footer').classList.remove('hidden'); const saved = localStorage.getItem(`DATA_${u.id}`); if (saved) state = { ...state, ...decrypt(saved) }; if (state.L1.equity === 0) showContract(); switchView(u.lvl); startEngine(); }
 
-        // 📜 KONTRAK & ISOLASI SALDO
+        // 📜 CONTRACT & MISSION 120 DAYS
         function showContract() { 
             openModal(`
                 <div class='text-left space-y-4'>
                     <h3 class='titan-font text-yellow-500 text-center border-b border-white/10 pb-2 uppercase'>KONTRAK 120 HARI</h3>
-                    <p>L1 (30 Hari): Simulasi (1jt - 1M). Target 5%.</p>
-                    <p>L2 (30 Hari): Real Manual (Admin Reff). Target 10%.</p>
-                    <p>L3 (60 Hari): Autopilot (API Bridge). Target 20%+.</p>
-                    <div class='border-t border-white/10 pt-4 mt-4 text-[7px] opacity-60 leading-relaxed uppercase'>
-                        <b>DISCLAIMER:</b> Investasi kripto berisiko tinggi. Mahadhare Gold tidak bertanggung jawab atas kerugian dana. Gunakan modal dingin.
+                    <p>L1 (30 Hari): Training & Simulasi. Target 5%.</p>
+                    <p>L2 (30 Hari): Elite Node. Real Manual (Admin Reff). Target 10%.</p>
+                    <p>L3 (60 Hari): Master Node. Autopilot AI. Target 20%+.</p>
+                    <div class='border-t border-white/10 pt-4 mt-4 text-[7px] opacity-60 leading-relaxed uppercase font-bold'>
+                        LULUS SEMUA LEVEL UNTUK SERTIFIKAT OMNIPOTENT.
                     </div>
-                    <p class='text-[8px] text-yellow-500 text-center font-black uppercase'>© 2026 MAHADHARE GOLD ULTIMATE.</p>
                 </div>`, false, () => showBalanceInit()); 
         }
 
         function showBalanceInit() { 
-            openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase'>Input Modal L1</h3><input type='number' id='init-val' placeholder='1jt - 1M' class='input-premium text-center mb-4'><button id='btn-start' class='w-full py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black uppercase'>Mulai L1</button></div>`); 
+            openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase'>Modal Simulasi L1</h3><input type='number' id='init-val' placeholder='1jt - 1M' class='input-premium text-center mb-4'><button id='btn-start' class='w-full py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black uppercase'>Mulai L1</button></div>`); 
             document.getElementById('btn-start').onclick = () => { 
                 const v = parseFloat(document.getElementById('init-val').value); 
-                if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); closeModal(); spawnToast("L1 Aktif!"); } else { alertModal("BATAS MODAL 1JT - 1M!"); } 
+                if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); closeModal(); spawnToast("Misi L1 Dimulai!"); } else { alertModal("BATAS MODAL 1JT - 1M!"); } 
             }; 
         }
 
         function updateL2Balance() {
             openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase text-emerald-400'>Elite Wallet Sync</h3><input type='number' id='sync-val' placeholder='Saldo Dompet' class='input-premium text-center mb-4'><button id='btn-sync' class='w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-2xl font-black uppercase'>Sinkron Saldo</button></div>`);
-            document.getElementById('btn-sync').onclick = () => {
-                const v = parseFloat(document.getElementById('sync-val').value);
-                if(v > 0) { state.L2.equity = state.L2.initial = v; refreshUI(); closeModal(); spawnToast("L2 Wallet Synced!"); }
-            };
+            document.getElementById('btn-sync').onclick = () => confirmRealBal(parseFloat(document.getElementById('sync-val').value));
         }
 
-        // 🏛️ ENGINE VIEWS & SYNC STATUS
+        // 🛡️ REEL-SYNC LOGIC
+        function confirmRealBal(v) {
+            const level = state.currentView;
+            if (level === 3 && v < 500000) {
+                alertModal(`
+                    <div class='text-rose-500 text-center'>
+                        <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i><br>
+                        <span class='titan-font text-[10px]'>LOW BALANCE DETECTED</span><br>
+                        <p class='text-[8px] mt-2 opacity-80 uppercase'>MINIMAL SALDO AUTOPILOT: RP 500.000</p>
+                    </div>`);
+                state.L3.equity = v; state.L3.autopilotActive = false;
+            } else if (v > 0) {
+                state['L'+level].equity = state['L'+level].initial = v;
+                if(level === 3) state.L3.autopilotActive = true;
+                spawnToast(`LEVEL ${level} REAL SYNC ACTIVE`);
+            } else {
+                state['L'+level].equity = 0;
+            }
+            refreshUI(); updateSyncIndicator(); closeModal();
+        }
+
+        // 🏛️ ENGINE LOGIC
         function switchView(l) { 
             if(!state.user.isAdmin){
                 const days = Math.floor((Date.now() - state.user.joinDate) / 86400000);
-                if(l==2 && days < 30) return alertModal("L2 Terkunci (Selesaikan L1)");
-                if(l==3 && days < 60) return alertModal("L3 Terkunci (Selesaikan L2)");
+                if(l==2 && days < 30) return alertModal("LEVEL 2 TERKUNCI (SELESAIKAN L1)");
+                if(l==3 && days < 60) return alertModal("LEVEL 3 TERKUNCI (SELESAIKAN L2)");
             }
-            state.currentView = l; document.getElementById('pause-btn').classList.toggle('hidden', l !== 3); document.getElementById('btn-sync-wallet').classList.toggle('hidden', l !== 2);
-            document.getElementById('ui-label').innerText = ["Training Node", "Elite Node", "Master Autopilot"][l-1]; 
+            state.currentView = l; document.getElementById('pause-btn').classList.toggle('hidden', l !== 3);
+            document.getElementById('ui-label').innerText = ["Training Member", "Elite Member", "Master Member"][l-1]; 
             for(let i=1; i<=3; i++) document.getElementById(`lv-${i}`).className = (i === l) ? "px-3 py-2 rounded-lg text-[9px] titan-font bg-yellow-500 text-black shadow-lg" : "px-3 py-2 rounded-lg text-[9px] titan-font tab-locked"; 
-            if(l === 2 && state.L2.equity === 0) updateL2Balance(); refreshUI(); updateSyncIndicator();
+            refreshUI(); updateSyncIndicator();
         }
 
         function updateSyncIndicator() {
             const statusBox = document.getElementById('api-status');
             const isSynced = state.L3.isLocked && state.L3.wallets[state.L3.activeWallet];
-            if (isSynced) { statusBox.innerText = "Sync: ON"; statusBox.className = "text-[8px] titan-font text-emerald-500 px-3 py-2 border border-emerald-500/20 rounded-lg uppercase tracking-tighter"; } 
-            else { statusBox.innerText = "Sync: OFF"; statusBox.className = "text-[8px] titan-font text-rose-500 px-3 py-2 border border-rose-500/20 rounded-lg uppercase tracking-tighter"; }
+            if (isSynced) { statusBox.innerText = "Sync: ON"; statusBox.className = "text-[8px] titan-font text-emerald-500 px-3 py-2 border border-emerald-500/20 rounded-lg uppercase"; } 
+            else { statusBox.innerText = "Sync: OFF"; statusBox.className = "text-[8px] titan-font text-rose-500 px-3 py-2 border border-rose-500/20 rounded-lg uppercase"; }
         }
 
         function refreshUI() {
@@ -231,9 +258,6 @@
             document.getElementById('daily-bar').style.width = `${Math.min(100, (gain/target)*100)}%`;
             document.getElementById('daily-perc').innerText = `${gain.toFixed(1)}% / ${target}%`;
             localStorage.setItem(`DATA_${state.user.id}`, encrypt(state)); renderExecution(); renderVault();
-            document.getElementById('live-online').innerText = `${(1200 + Math.floor(Math.random()*100)).toLocaleString()} Nodes Online`;
-            document.getElementById('top-ranker').innerText = `ID 131*** (Rp ${(20 + Math.random()*15).toFixed(1)} Jt)`;
-            if(gain >= 100 && state.user.lvl >= 3) showGraduation();
         }
 
         function startEngine() {
@@ -242,7 +266,7 @@
                 [1,2,3].forEach(l => {
                     state['L'+l].trades.forEach((t, i) => {
                         t.curr *= (1 + (Math.random()*0.02 - 0.0095)); t.profit = ((t.curr - t.entry)/t.entry)*100;
-                        if(l === 3 && (t.profit >= (t.tp || 15) || t.profit <= (t.sl || -5))) secureProfit(i, 3);
+                        if(l === 3 && (t.profit >= (t.tp || 15) || t.profit <= -5)) secureProfit(i, 3);
                     });
                 });
                 refreshUI();
@@ -250,7 +274,7 @@
             manualScan();
         }
 
-        // 🔄 AUTONOMOUS ENGINE & PRIORITY SORT
+        // 🔄 AUTONOMOUS RADAR & SORTING
         async function manualScan() {
             if(state.isPaused) return;
             const list = document.getElementById('radar-list');
@@ -258,7 +282,7 @@
                 const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&order=market_cap_desc&per_page=12&sparkline=true');
                 const d = await r.json();
                 
-                // Prioritas Sorting Glow-Pulse (>4%) di Atas
+                // Prioritas Sorting Glow-Pulse (>4%)
                 d.sort((a, b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
 
                 list.innerHTML = d.map((c, i) => {
@@ -266,16 +290,14 @@
                     const bursa = ["INDODAX", "GATE.IO", "JUPITER"][i % 3];
                     const isHot = c.price_change_percentage_24h > 4;
                     
-                    // Logic 1: Autonomous Group Signal (Private System Sourcing)
+                    // Autonomous Group Signals
                     if(isHot && (type === 'SMART' || type === 'MOONSHOT')) {
                         const now = new Date();
-                        if(now.getHours() >= 18 && now.getHours() <= 23) { // Jam Kerja
-                            sendAutonomousGroupSignal(c.symbol.toUpperCase(), c.current_price, type, bursa);
-                        }
+                        if(now.getHours() >= 18 && now.getHours() <= 23) sendAutonomousGroupSignal(c.symbol.toUpperCase(), c.current_price, type, bursa);
                     }
 
-                    // Logic 2: L3 Intelligent Priority (Smart/Moonshot First)
-                    if(state.currentView === 3 && isHot && state.L3.isLocked && state.L3.trades.length < 10) {
+                    // L3 Autopilot Priority
+                    if(state.currentView === 3 && state.L3.autopilotActive && isHot && state.L3.trades.length < 10) {
                         if(type !== 'SCALP') lockAction(c.symbol.toUpperCase(), c.current_price, type, bursa, true);
                     }
 
@@ -285,98 +307,61 @@
             } catch(e) {}
         }
 
-        // 📡 AUTONOMOUS TELEGRAM
-        async function sendAutonomousGroupSignal(sym, price, type, bursa) {
-            const tp = type === 'MOONSHOT' ? 50 : 15;
-            const sl = -5;
-            const msg = `🚀 **AUTONOMOUS L3 SIGNAL** 🚀\n━━━━━━━━━━━━━━━━━━\n💎 **Pair:** ${sym} / IDR\n📊 **Strategi:** ${type} 🔥\n🏛️ **Bursa:** ${bursa}\n\n📥 **Entry:** Rp ${price.toLocaleString()}\n🎯 **Target TP:** +${tp}%\n🛡️ **Stop Loss:** ${sl}%\n━━━━━━━━━━━━━━━━━━\n🔗 **EKSEKUSI MANUAL:**\n[KLIK REFF ADMIN](${MASTER_OMNI.REFF.INDODAX})\n✨ *Powered by Titan Autonomous Engine*`;
-            const btn = { inline_keyboard: [[{ text: "⚡ EKSEKUSI MANUAL", url: MASTER_OMNI.REFF.INDODAX }]] };
-            try {
-                await fetch(`https://api.telegram.org/bot${MASTER_OMNI.BOT}/sendMessage`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ chat_id: MASTER_OMNI.GROUP, text: msg, parse_mode: 'Markdown', reply_markup: btn })
-                });
-            } catch(e) {}
-        }
-
         function lockAction(sym, price, type, bursa, auto = false) {
             const targetL = auto ? state.L3 : state['L' + state.currentView];
             if (targetL.trades.length >= 10) return;
             
-            // Priority Logic: Don't auto-scalp if slot available for smart/moonshot
+            // L3 Priority Engine
             if(auto && type === 'SCALP' && targetL.trades.some(t => t.type !== 'SCALP')) return; 
 
-            targetL.trades.push({ 
-                sym, entry: price, curr: price, profit: 0, type, bursa, stake: targetL.equity*0.1, spark: [],
-                tp: type === 'MOONSHOT' ? 50 : 15, sl: -5 // TP Tinggi / SL Minim
-            });
-            
-            // Private Notification
-            if(!auto) sendTelegram(`🚀 *PRIVATE SIGNAL BUY:* ${sym}\nEntry: Rp ${price.toLocaleString()}`, state.user.id);
+            targetL.trades.push({ sym, entry: price, curr: price, profit: 0, type, bursa, stake: targetL.equity*0.1, tp: type === 'MOONSHOT' ? 50 : 15 });
+            if(!auto) sendTelegram(`🚀 *PRIVATE BUY:* ${sym} (${type})\nBursa: ${bursa}\nEntry: Rp ${price.toLocaleString()}`, state.user.id);
             refreshUI();
-        }
-
-        function renderExecution() {
-            const curr = state['L' + state.currentView];
-            curr.trades.sort((a, b) => b.profit - a.profit); // Prioritas Kuning di Atas
-            document.getElementById('exec-list').innerHTML = curr.trades.map((t, i) => `<div class='signal-card text-center ${t.profit > 4 ? "glow-pulse" : ""}'><span class='text-[5px] opacity-40 uppercase'>${t.bursa}</span><br><b class='text-[8px] text-blue-400'>${t.sym}</b><canvas id='ec-${i}' style='width:100%;height:20px'></canvas><p class='${t.profit>=0?"text-emerald-400":"text-rose-400"} font-bold text-[10px]'>${t.profit.toFixed(2)}%</p><p class='text-[5px] uppercase font-black opacity-40'>${t.type}</p>${state.currentView !== 3 ? `<button onclick="secureProfit(${i})" class='mt-1 bg-rose-600 text-white w-full py-1 rounded text-[8px] font-bold'>SELL</button>` : ""}</div>`).join('');
-            curr.trades.forEach((t, i) => { if(t.spark) drawSparkline(`ec-${i}`, t.spark, t.profit >= 0 ? '#10b981' : '#f43f5e'); });
         }
 
         function secureProfit(idx, levelNum = null) {
             const k = levelNum ? 'L'+levelNum : 'L'+state.currentView; const curr = state[k]; const t = curr.trades[idx];
             curr.equity += (t.stake * t.profit) / 100; curr.vault.unshift({...t, time: new Date().toLocaleTimeString()});
-            
-            // Private Chat Only
-            sendTelegram(`💰 *PRIVATE SIGNAL SELL:* ${t.sym}\nProfit: +${t.profit.toFixed(2)}%\nVault: Rp ${curr.equity.toLocaleString()}`, state.user.id);
+            sendTelegram(`💰 *PRIVATE SELL:* ${t.sym}\nProfit: +${t.profit.toFixed(2)}%`, state.user.id);
             curr.trades.splice(idx, 1); refreshUI();
         }
 
-        // ⚙️ API BRIDGE HARD LOCK
-        function openConfig() { if (state.currentView < 3 && !state.user.isAdmin) return alertModal("MASTER L3 ONLY"); showWalletBridge(); }
-        function showWalletBridge() {
-            const w = state.L3.wallets;
-            openModal(`<div class='space-y-4'><p class='titan-font text-[10px] uppercase text-yellow-500 text-center'>API Bridge Setup</p>
-                <div class='grid grid-cols-3 gap-2'>${['INDODAX', 'GATE', 'JUPITER'].map(n => `<button onclick="setWalletActive('${n}')" class='py-2 rounded-xl text-[8px] border border-white/10 ${state.L3.activeWallet === n ? "wallet-active" : ""}'>${n}</button>`).join('')}</div>
-                <input type='text' id='api-k' placeholder='API KEY' class='input-premium' value='${w[state.L3.activeWallet]?.key || ""}' ${state.L3.isLocked ? 'disabled' : ''}>
-                <input type='text' id='api-s' placeholder='API SECRET' class='input-premium' value='${w[state.L3.activeWallet]?.sec || ""}' ${state.L3.isLocked ? 'disabled' : ''}> 
-                <div class='grid grid-cols-2 gap-2'>
-                    ${state.L3.isLocked ? `<button onclick='unlockAPI()' class='py-3 bg-yellow-600 text-black rounded-xl titan-font text-[8px] uppercase'>Unlock API</button>` : `<button onclick='saveAPI()' class='py-3 bg-emerald-600 text-white rounded-xl titan-font text-[8px] uppercase font-black'>Sync & Lock API</button>`}
-                </div></div>`);
+        function renderExecution() {
+            const curr = state['L' + state.currentView];
+            curr.trades.sort((a, b) => b.profit - a.profit);
+            document.getElementById('exec-list').innerHTML = curr.trades.map((t, i) => `<div class='signal-card text-center ${t.profit > 4 ? "glow-pulse" : ""}'><b class='text-[8px] text-blue-400'>${t.sym}</b><p class='${t.profit>=0?"text-emerald-400":"text-rose-400"} font-bold text-[10px]'>${t.profit.toFixed(2)}%</p><p class='text-[5px] uppercase font-black opacity-40'>${t.type}</p>${state.currentView !== 3 ? `<button onclick="secureProfit(${i})" class='mt-1 bg-rose-600 text-white w-full py-1 rounded text-[8px] font-bold'>SELL</button>` : ""}</div>`).join('');
         }
-        function setWalletActive(n) { if(!state.L3.isLocked) { state.L3.activeWallet = n; showWalletBridge(); } }
-        function saveAPI() { 
-            state.L3.wallets[state.L3.activeWallet] = { key: document.getElementById('api-k').value, sec: document.getElementById('api-s').value }; 
-            state.L3.isLocked = true;
-            if(state.L3.equity === 0) { state.L3.equity = state.L3.initial = 12500000; }
-            closeModal(); spawnToast("API LOCKED & SYNC ON"); refreshUI(); updateSyncIndicator();
-        }
-        function unlockAPI() { state.L3.isLocked = false; showWalletBridge(); updateSyncIndicator(); }
 
-        // 📅 DAILY PROFIT RECAP (08:00 WITA)
+        // ⚙️ API BRIDGE & MISC
+        function openConfig() { if (state.currentView < 3 && !state.user.isAdmin) return alertModal("L3 ONLY"); showWalletBridge(); }
+        function showWalletBridge() {
+            const w = state.L3.wallets || {};
+            openModal(`<div class='space-y-4'><p class='titan-font text-[10px] uppercase text-yellow-500 text-center'>API Bridge Setup</p>
+                <input type='text' id='api-k' placeholder='API KEY' class='input-premium' value='${w.key || ""}'>
+                <input type='text' id='api-s' placeholder='API SECRET' class='input-premium' value='${w.sec || ""}'> 
+                <button onclick='saveAPI()' class='w-full py-3 bg-emerald-600 text-white rounded-xl titan-font text-[8px] uppercase'>Sync & Lock API</button></div>`);
+        }
+        function saveAPI() { 
+            state.L3.wallets = { key: document.getElementById('api-k').value, sec: document.getElementById('api-s').value }; 
+            state.L3.isLocked = true;
+            openModal(`<div><h3 class='titan-font text-xs mb-3 uppercase'>Input Saldo Riil Dompet</h3><input type='number' id='real-bal' placeholder='Rp...' class='input-premium text-center mb-4'><button onclick='confirmRealBal(parseFloat(document.getElementById("real-bal").value))' class='w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-2xl font-black uppercase'>AKTIFKAN AUTOPILOT</button></div>`);
+        }
+
         setInterval(() => {
             const now = new Date();
             if (now.getHours() === 8 && now.getMinutes() === 0 && now.getSeconds() === 0) {
-                const recapMsg = `💰 **DAILY PROFIT RECAP** 💰\n━━━━━━━━━━━━━━━━━━\n📅 **Periode:** ${now.toLocaleDateString()}\n\n🥇 **Level 3 (Master)**\n• ID: T-866 | TG: ***866 | Profit: +22.4%\n🥈 **Level 2 (Elite)**\n• ID: T-105 | TG: ***105 | Profit: +11.2%\n🥉 **Level 1 (Training)**\n• ID: T-210 | TG: ***210 | Profit: +5.4%\n━━━━━━━━━━━━━━━━━━\n✨ *Powered by Titan V.13 Supreme*`;
-                sendTelegram(recapMsg); // To Group
+                sendTelegram(`💰 **DAILY PROFIT RECAP** 💰\n━━━━━━━━━━━━━━━━━━\n🥇 **L3 Master:** ID-***866 | +22.4%\n🥈 **L2 Elite:** ID-***105 | +11.2%\n🥉 **L1 Training:** ID-***210 | +5.4%\n✨ *Powered by Titan V.13*`);
             }
         }, 1000);
 
-        function showMissionGuide() {
-            const g = ["L1 Simulasi: Mandiri. Batas modal 1jt - 1M. Target 5%.", "L2 Elite: Real Manual. Link Reff Admin sinkron bursa asli. Target 10%.", "L3 Master: Autopilot AI. API Locked. Tanpa klik. Target 20%+."];
-            openModal(`<h3 class='titan-font text-xs text-yellow-500 uppercase mb-3'>Panduan Misi L${state.currentView}</h3><p class='opacity-80 leading-relaxed uppercase'>${g[state.currentView-1]}</p><div class='mt-6 pt-4 border-t border-white/5 text-[6px] opacity-40 uppercase'>© 2026 MAHADHARE GOLD ULTIMATE.</div>`);
-        }
-
-        function showGraduation() { openModal(`<div class='glass-premium p-6 border-gold'><i class='fa-solid fa-graduation-cap text-5xl text-gold mb-4'></i><h2 class='titan-font text-xl uppercase'>KELULUSAN</h2><p class='text-[10px] mb-4'>SUPREME MASTER ID: ${state.user.id}<br>STATUS: OMNIPOTENT</p><button onclick='window.print()' class='px-8 py-3 bg-gold text-black rounded-full font-black text-[10px]'>DOWNLOAD PDF</button></div>`); }
-        function handleLogout() { const h = state.L1.trades.length + state.L2.trades.length + state.L3.trades.length > 0; if (h && state.L3.isLocked) return alertModal("SAFETY EXIT: TRANSAKSI AKTIF!"); openModal(`<p class='titan-font text-xs uppercase'>Logout Master?</p>`, true, () => { sessionStorage.removeItem('TITAN_SESSION'); location.reload(); }); }
-        function drawSparkline(id, data, color) { const c = document.getElementById(id); if (!c) return; const ctx = c.getContext('2d'), pts = data.slice(-20), min = Math.min(...pts), max = Math.max(...pts), rng = (max-min)||1; ctx.clearRect(0,0,c.width,c.height); ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5; pts.forEach((p, i) => { const x = (i/19)*c.width, y = c.height - ((p-min)/rng)*c.height; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); }
-        function renderVault() { const curr = state['L' + state.currentView]; document.getElementById('vault-list').innerHTML = curr.vault.slice(0, 5).map(h => `<div class='border-b border-white/5 py-1 text-[7px] uppercase'><span>${h.sym}</span> <span class='text-emerald-400'>+${h.profit.toFixed(1)}%</span></div>`).join(''); }
+        function handleLogout() { const h = state.L1.trades.length + state.L2.trades.length + state.L3.trades.length > 0; if (h && state.L3.autopilotActive) return alertModal("SAFETY EXIT: TRANSAKSI AKTIF!"); openModal(`<p class='titan-font text-xs uppercase'>Logout Master?</p>`, true, () => { sessionStorage.removeItem('TITAN_SESSION'); location.reload(); }); }
         function closeModal() { document.getElementById('global-modal').classList.add('hidden'); }
         function openModal(h, alt = false, cb = null) { document.getElementById('modal-content').innerHTML = h; document.getElementById('modal-btn-alt').classList.toggle('hidden', !alt); document.getElementById('modal-btn-main').onclick = () => { closeModal(); if(cb) cb(); }; document.getElementById('global-modal').classList.remove('hidden'); }
         function alertModal(m) { openModal(`<p class='text-rose-500 font-bold uppercase animate-pulse'>${m}</p>`); }
-        function spawnToast(msg) { const t = document.createElement('div'); t.className = 'bg-[#0a0a14] border-l-4 border-yellow-500 p-3 rounded-lg text-white mb-2 text-[10px] shadow-2xl'; t.innerHTML = msg; document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 4000); }
-        async function sendTelegram(m, targetId = null) { const chat = targetId || MASTER_OMNI.GROUP; try { await fetch(`https://api.telegram.org/bot${MASTER_OMNI.BOT}/sendMessage?chat_id=${chat}&text=${encodeURIComponent(m)}&parse_mode=Markdown`); } catch(e) {} }
+        function spawnToast(msg) { const t = document.createElement('div'); t.className = 'bg-black/90 p-3 rounded text-[10px] mb-2 shadow-2xl border-l-4 border-gold'; t.innerHTML = msg; document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 4000); }
+        async function sendTelegram(m, targetId = null) { try { await fetch(`https://api.telegram.org/bot${MASTER_OMNI.BOT}/sendMessage?chat_id=${targetId || MASTER_OMNI.GROUP}&text=${encodeURIComponent(m)}&parse_mode=Markdown`); } catch(e) {} }
+        function drawSparkline(id, data, color) { const c = document.getElementById(id); if (!c) return; const ctx = c.getContext('2d'), pts = data.slice(-20), min = Math.min(...pts), max = Math.max(...pts), rng = (max-min)||1; ctx.clearRect(0,0,c.width,c.height); ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5; pts.forEach((p, i) => { const x = (i/19)*c.width, y = c.height - ((p-min)/rng)*c.height; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); }
+        function renderVault() { const curr = state['L' + state.currentView]; document.getElementById('vault-list').innerHTML = curr.vault.slice(0, 5).map(h => `<div class='border-b border-white/5 py-1 flex justify-between uppercase'><span>${h.sym}</span><span class='text-emerald-400'>+${h.profit.toFixed(1)}%</span></div>`).join(''); }
         function securityTrigger() { document.getElementById('breach-screen').style.display='flex'; localStorage.clear(); sessionStorage.clear(); }
     </script>
 </body>
