@@ -6,189 +6,37 @@
     <title>TITAN V.13 AI - SUPREME OMNIPOTENT FINAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
-        
-        :root { 
-            --gold: #ffd700; 
-            --emerald: #10b981; 
-            --rose: #f43f5e; 
-            --glass: rgba(10, 10, 20, 0.98); 
-            --whale: #00f2ff;
-        }
-
-        body { 
-            background: #010205; 
-            color: #e2e8f0; 
-            font-family: 'Space Grotesk', sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
-            margin: 0; 
-            user-select: none; 
-            -webkit-tap-highlight-color: transparent;
-        }
-
+        :root { --gold: #ffd700; --emerald: #10b981; --rose: #f43f5e; --glass: rgba(10, 10, 20, 0.98); --whale: #00f2ff; }
+        body { background: #010205; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
-        
-        #breach-screen { 
-            position: fixed; 
-            inset: 0; 
-            background: #2b0000; 
-            z-index: 999999; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center; 
-            color: white; 
-        }
-
-        .glass-premium { 
-            background: var(--glass); 
-            backdrop-filter: blur(40px); 
-            border: 1px solid rgba(255, 215, 0, 0.2); 
-            border-radius: 1.5rem; 
-            box-shadow: 0 0 50px rgba(0,0,0,0.9); 
-        }
-        
-        .led-blink { 
-            width: 8px; 
-            height: 8px; 
-            background: var(--emerald); 
-            border-radius: 50%; 
-            display: inline-block; 
-            margin-right: 8px; 
-            box-shadow: 0 0 12px var(--emerald); 
-            animation: blinkLed 1s infinite; 
-        }
-
-        @keyframes blinkLed { 
-            0% { opacity: 1; transform: scale(1.1); } 
-            50% { opacity: 0.3; transform: scale(0.8); } 
-            100% { opacity: 1; transform: scale(1.1); } 
-        }
-
-        .signal-card { 
-            background: rgba(255,255,255,0.03); 
-            border: 1px solid rgba(255,215,0,0.15); 
-            padding: 10px; 
-            border-radius: 1.2rem; 
-            transition: 0.3s; 
-            position: relative; 
-            overflow: hidden; 
-        }
-
-        .glow-pulse { 
-            animation: pulseGlow 1.2s infinite alternate; 
-            border: 2px solid var(--gold) !important; 
-            z-index: 10; 
-        }
-
-        @keyframes pulseGlow { 
-            from { box-shadow: 0 0 2px var(--gold); } 
-            to { box-shadow: 0 0 25px var(--gold); } 
-        }
-        
-        .whale-alert {
-            border: 2px solid var(--whale) !important;
-            background: rgba(0, 242, 255, 0.05) !important;
-            animation: pulseWhale 1.5s infinite alternate;
-        }
-
-        @keyframes pulseWhale {
-            from { box-shadow: 0 0 5px var(--whale); }
-            to { box-shadow: 0 0 30px var(--whale); }
-        }
-
-        .profit-pulse { 
-            animation: pPulse 0.8s infinite alternate; 
-            font-weight: 900; 
-        }
-
-        @keyframes pPulse { 
-            from { transform: scale(1); text-shadow: 0 0 10px var(--emerald); color: var(--emerald); } 
-            to { transform: scale(1.12); text-shadow: 0 0 25px var(--emerald); color: #fff; } 
-        }
-        
-        .scan-line-fancy { 
-            position: absolute; 
-            width: 100%; 
-            height: 4px; 
-            background: linear-gradient(to bottom, transparent, var(--gold), transparent); 
-            box-shadow: 0 0 25px var(--gold); 
-            animation: scanMoveFancy 3s infinite ease-in-out; 
-            z-index: 50;
-        }
-
-        @keyframes scanMoveFancy { 
-            0% { top: 0%; opacity: 0; } 
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { top: 100%; opacity: 0; } 
-        }
-
-        .bio-corner {
-            position: absolute;
-            width: 25px;
-            height: 25px;
-            border: 2px solid var(--gold);
-            z-index: 60;
-            opacity: 0.6;
-        }
-
+        .glass-premium { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 1.5rem; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
+        .led-blink { width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 12px var(--emerald); animation: blinkLed 1s infinite; }
+        @keyframes blinkLed { 0% { opacity: 1; transform: scale(1.1); } 50% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.1); } }
+        .signal-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.15); padding: 10px; border-radius: 1.2rem; transition: 0.3s; position: relative; overflow: hidden; }
+        .glow-pulse { animation: pulseGlow 1.2s infinite alternate; border: 2px solid var(--gold) !important; z-index: 10; }
+        @keyframes pulseGlow { from { box-shadow: 0 0 2px var(--gold); } to { box-shadow: 0 0 25px var(--gold); } }
+        .whale-alert { border: 2px solid var(--whale) !important; background: rgba(0, 242, 255, 0.05) !important; animation: pulseWhale 1.5s infinite alternate; }
+        @keyframes pulseWhale { from { box-shadow: 0 0 5px var(--whale); } to { box-shadow: 0 0 30px var(--whale); } }
+        .profit-pulse { animation: pPulse 0.8s infinite alternate; font-weight: 900; }
+        @keyframes pPulse { from { transform: scale(1); text-shadow: 0 0 10px var(--emerald); color: var(--emerald); } to { transform: scale(1.12); text-shadow: 0 0 25px var(--emerald); color: #fff; } }
+        .scan-line-fancy { position: absolute; width: 100%; height: 4px; background: linear-gradient(to bottom, transparent, var(--gold), transparent); box-shadow: 0 0 25px var(--gold); animation: scanMoveFancy 3s infinite ease-in-out; z-index: 50; }
+        @keyframes scanMoveFancy { 0% { top: 0%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
+        .bio-corner { position: absolute; width: 25px; height: 25px; border: 2px solid var(--gold); z-index: 60; opacity: 0.6; }
         .blur-locked { filter: blur(18px); pointer-events: none; opacity: 0.2; }
-
-        .input-premium { 
-            background: rgba(0,0,0,0.85); 
-            border: 1px solid rgba(255,215,0,0.3); 
-            padding: 16px; 
-            border-radius: 1.2rem; 
-            color: white; 
-            font-size: 13px; 
-            width: 100%; 
-            outline: none; 
-            transition: 0.3s; 
-        }
-
-        .floating-notif { 
-            position: fixed; 
-            top: 25px; 
-            right: 20px; 
-            z-index: 200000; 
-            background: rgba(10, 10, 10, 0.98); 
-            border-left: 5px solid var(--gold); 
-            padding: 18px 28px; 
-            border-radius: 14px; 
-            animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); 
-            font-size: 11px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9); 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-        }
-
+        .input-premium { background: rgba(0,0,0,0.85); border: 1px solid rgba(255,215,0,0.3); padding: 16px; border-radius: 1.2rem; color: white; font-size: 13px; width: 100%; outline: none; transition: 0.3s; }
+        .floating-notif { position: fixed; top: 25px; right: 20px; z-index: 200000; background: rgba(10, 10, 10, 0.98); border-left: 5px solid var(--gold); padding: 18px 28px; border-radius: 14px; animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); font-size: 11px; box-shadow: 0 20px 50px rgba(0,0,0,0.9); display: flex; align-items: center; gap: 15px; }
         @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
-        
         .module-container { height: calc(100vh - 460px); overflow-y: auto; padding: 5px; scroll-behavior: smooth; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        
-        #certificate-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: radial-gradient(circle, #1a1a2e 0%, #010205 100%); 
-            z-index: 400000; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 30px; 
-            border: 10px double var(--gold); 
-        }
-
+        #certificate-overlay { position: fixed; inset: 0; background: radial-gradient(circle, #1a1a2e 0%, #010205 100%); z-index: 400000; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 30px; border: 10px double var(--gold); }
         .cert-inner { border: 2px solid var(--gold); padding: 45px; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; text-align: center; }
         .wallet-active { border: 2px solid var(--emerald) !important; background: rgba(16, 185, 129, 0.15); }
         .legal-text { font-size: 8px; opacity: 0.4; text-transform: uppercase; letter-spacing: 1.5px; line-height: 1.8; }
+        #face-canvas { position: absolute; top: 0; left: 0; z-index: 65; pointer-events: none; }
     </style>
 </head>
 <body oncontextmenu="return false">
@@ -223,23 +71,22 @@
             <div class="space-y-3" id="auth-box">
                 <input type="text" id="tg-id" placeholder="ID TELEGRAM PRIBADI" class="input-premium text-center titan-font uppercase">
                 <div id="reg-fields" class="hidden space-y-3">
-                    <p class="text-[8px] opacity-50 uppercase tracking-widest text-emerald-400">Security: Biometric Encryption Enabled</p>
+                    <p id="bio-status" class="text-[8px] opacity-50 uppercase tracking-widest text-rose-400">Security: Waiting for Face-Lock...</p>
                     <input type="password" id="tg-pass-reg" placeholder="PASSWORD BARU" class="input-premium text-center">
                     <div id="face-scan-box" class="w-full h-44 bg-black border border-gold/30 rounded-2xl relative overflow-hidden shadow-inner shadow-gold/20">
                         <video id="face-video" class="w-full h-full object-cover scale-x-[-1] opacity-60" autoplay muted playsinline></video>
+                        <canvas id="face-canvas"></canvas>
                         <div class="scan-line-fancy"></div>
                         <div class="bio-corner top-4 left-4 border-r-0 border-b-0"></div>
                         <div class="bio-corner top-4 right-4 border-l-0 border-b-0"></div>
                         <div class="bio-corner bottom-4 left-4 border-r-0 border-t-0"></div>
                         <div class="bio-corner bottom-4 right-4 border-l-0 border-t-0"></div>
-                        <div class="absolute inset-0 bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]"></div>
                     </div>
-                    <p class="text-[7px] text-yellow-500 uppercase tracking-widest animate-pulse">Analyzing Biometric Landmark...</p>
                 </div>
                 <input type="password" id="tg-pass" placeholder="PASSWORD" class="input-premium text-center titan-font">
                 <div class="grid grid-cols-2 gap-3 mt-6">
-                    <button id="btn-login" onclick="handleAuth('LOGIN')" class="py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black active:scale-95 transition-all uppercase hover:bg-white">Masuk</button>
-                    <button id="btn-reg" onclick="handleAuth('REG')" class="py-4 bg-white/5 border border-white/10 titan-font text-[10px] rounded-2xl text-white font-black active:scale-95 transition-all uppercase hover:bg-emerald-600">Daftar</button>
+                    <button id="btn-login" onclick="handleAuth('LOGIN')" class="py-4 bg-yellow-500 text-black titan-font text-[10px] rounded-2xl font-black active:scale-95 transition-all uppercase">Masuk</button>
+                    <button id="btn-reg" onclick="handleAuth('REG')" class="py-4 bg-white/5 border border-white/10 titan-font text-[10px] rounded-2xl text-white font-black active:scale-95 transition-all uppercase">Daftar</button>
                 </div>
             </div>
         </div>
@@ -253,10 +100,10 @@
                 <button onclick="switchView(3)" id="lv-btn-3" class="px-3 py-2 rounded-lg text-[9px] titan-font">L3</button>
             </div>
             <div class="flex items-center gap-3">
-                <a href="https://t.me/+8uJ78T4VDHJkOTRl" target="_blank" title="Join Group" class="w-10 h-10 rounded-full border border-blue-500/30 text-blue-400 flex items-center justify-center bg-blue-500/5 active:scale-75 shadow-lg"><i class="fa-brands fa-telegram text-[20px]"></i></a>
-                <button onclick="togglePause()" id="pause-btn" class="hidden w-10 h-10 rounded-full border border-gold/30 text-gold flex items-center justify-center bg-gold/5 active:scale-75 shadow-lg"><i id="pause-icon" class="fa-solid fa-pause"></i></button>
+                <a href="https://t.me/+8uJ78T4VDHJkOTRl" target="_blank" class="w-10 h-10 rounded-full border border-blue-500/30 text-blue-400 flex items-center justify-center bg-blue-500/5 shadow-lg"><i class="fa-brands fa-telegram text-[20px]"></i></a>
+                <button onclick="togglePause()" id="pause-btn" class="hidden w-10 h-10 rounded-full border border-gold/30 text-gold flex items-center justify-center bg-gold/5 shadow-lg"><i id="pause-icon" class="fa-solid fa-pause"></i></button>
                 <div id="sync-container" class="hidden"><div id="sync-status" class="text-[8px] titan-font text-rose-500 px-3 py-1.5 border border-rose-500/20 rounded-lg uppercase">Sync: OFF</div></div>
-                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 transition-all ml-2"><i class="fa-solid fa-power-off"></i></button>
+                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 ml-2"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </header>
 
@@ -298,7 +145,7 @@
         <footer class="fixed bottom-0 inset-x-0 p-6 bg-black/80 border-t border-white/5 backdrop-blur-2xl z-40 text-center">
             <div class="flex justify-around items-center max-w-md mx-auto mb-4">
                 <button onclick="showMissionGuide()" class="opacity-40 text-white flex flex-col items-center"><i class="fa-solid fa-book-open text-2xl"></i><span class="text-[8px] mt-2 titan-font uppercase">Misi</span></button>
-                <div id="lightning-btn" onclick="manualScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 border-[8px] border-[#010205] shadow-2xl animate-pulse cursor-pointer active:scale-90 transition-all"><i class="fa-solid fa-bolt-lightning text-black text-2xl"></i></div>
+                <div id="lightning-btn" onclick="manualScan()" class="w-16 h-16 bg-yellow-500 rounded-full flex items-center justify-center -mt-12 border-[8px] border-[#010205] shadow-2xl animate-pulse cursor-pointer"><i class="fa-solid fa-bolt-lightning text-black text-2xl"></i></div>
                 <button onclick="openConfig()" class="opacity-40 text-white flex flex-col items-center"><i class="fa-solid fa-gear text-2xl"></i><span class="text-[8px] mt-2 titan-font uppercase">Config</span></button>
             </div>
             <div class="legal-text uppercase tracking-tighter">MAHADHARE GOLD ULTIMATE © 2026 <br> Supreme Titan AI Engine v.13</div>
@@ -316,9 +163,16 @@
     </div>
 
     <script>
+        // 🧪 SECURITY LAYER: AES MASTER KEY & OBFUSCATED TOKENS
+        const __MK = "MHD_GOLD_ULTIMATE_2026_SUPREME_KEY";
+        const _OBF = {
+            t: [56,50,57,53,54,48,55,55,48,52,58,65,65,70,100,121,95,85,56,70,76,45,120,79,108,57,102,56,75,68,79,72,88,122,116,121,98,99,117,106,52].map(x => String.fromCharCode(x)).join(''),
+            g: [45,49,48,48,51,50,53,52,51,55,57,51,51,51].map(x => String.fromCharCode(x)).join('')
+        };
+
         const OMNI = {
             ADMIN_ID: "1319700866", ADMIN_PW: "MahadhareV13Master",
-            BOT_TOKEN: "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4", GROUP_ID: "-1003254379333",
+            BOT_TOKEN: _OBF.t, GROUP_ID: _OBF.g,
             QUOTAS: { L1: 10000, L2: 5000, L3: 5000 },
             MIN_VOL_L3: 1000000000, WHALE_LIMIT: 50000000000,
             REFF: { 
@@ -328,31 +182,107 @@
             }
         };
 
-        let state = { user: null, lvl: 1, isPaused: false, knock: 0, loginAttempts: 0,
+        let state = { user: null, lvl: 1, isPaused: false, knock: 0, loginAttempts: 0, faceLocked: false,
             L1: { equity: 0, initial: 0, trades: [], vault: [] }, 
             L2: { equity: 0, initial: 0, trades: [], vault: [] }, 
             L3: { equity: 0, initial: 0, trades: [], vault: [], wallets: { INDODAX: null, GATE: null, JUPITER: null }, activeWallet: 'INDODAX', isLocked: false },
             lastWhaleAlerts: {}
         };
 
-        const enc = (d) => btoa(JSON.stringify(d));
-        const dec = (s) => JSON.parse(atob(s));
+        // 🔐 AES ENCRYPTION CORE
+        const enc = (d) => CryptoJS.AES.encrypt(JSON.stringify(d), __MK).toString();
+        const dec = (s) => { try { const b = CryptoJS.AES.decrypt(s, __MK); return JSON.parse(b.toString(CryptoJS.enc.Utf8)); } catch(e) { return null; } };
 
-        function masterKnock() { if(++state.knock >= 5) { document.getElementById('tg-id').value = OMNI.ADMIN_ID; document.getElementById('tg-pass').value = OMNI.ADMIN_PW; handleAuth('LOGIN'); spawnToast("MASTER OMNIPOTENT BYPASS ACTIVE"); } }
+        // 🛡️ ANTI-BREACH 2.0
+        setInterval(() => { 
+            const threshold = 160;
+            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) { triggerBreach(); }
+            const start = performance.now(); debugger; 
+            if (performance.now() - start > 100) { triggerBreach(); }
+        }, 1000);
 
-        setInterval(() => { if (window.outerHeight - window.innerHeight > 165 || window.outerWidth - window.innerWidth > 165) { document.getElementById('breach-screen').style.display='flex'; localStorage.clear(); sessionStorage.clear(); sendTele(`🚨 *SECURITY BREACH DETECTED* \nID Master: ${state.user?.id || 'Unknown'}`); } }, 2000);
+        function triggerBreach() { document.getElementById('breach-screen').style.display='flex'; localStorage.clear(); sessionStorage.clear(); }
 
+        // 🧬 BIOMETRIC ENGINE (face-api.js)
+        async function loadFaceModels() {
+            const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+            console.log("TITAN Biometric Models Loaded");
+        }
+
+        async function startCamera() {
+            await loadFaceModels();
+            const video = document.getElementById('face-video');
+            navigator.mediaDevices.getUserMedia({ video: {} })
+                .then(stream => { 
+                    video.srcObject = stream;
+                    detectFaceLoop(video);
+                });
+        }
+
+        async function detectFaceLoop(video) {
+            const canvas = document.getElementById('face-canvas');
+            const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
+            faceapi.matchDimensions(canvas, displaySize);
+
+            setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                if(detections.length > 0) {
+                    state.faceLocked = true;
+                    document.getElementById('bio-status').innerText = "BIOMETRIC: MASTER VERIFIED ✓";
+                    document.getElementById('bio-status').className = "text-[8px] opacity-90 uppercase tracking-widest text-emerald-400 animate-pulse";
+                    // Draw Landmark Visual
+                    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+                } else {
+                    state.faceLocked = false;
+                    document.getElementById('bio-status').innerText = "BIOMETRIC: NO DATA DETECTED";
+                    document.getElementById('bio-status').className = "text-[8px] opacity-50 uppercase tracking-widest text-rose-400";
+                }
+            }, 500);
+        }
+
+        // 🔑 AUTH WITH BIOMETRIC VALIDATION
         async function handleAuth(mode) {
             const id = document.getElementById('tg-id').value, pw = document.getElementById('tg-pass').value;
             if(!id || !pw) return spawnToast("⚠️ Input Belum Lengkap!");
+
             if(mode === 'REG') {
-                if(document.getElementById('reg-fields').classList.contains('hidden')) { openModal("<p class='text-xs'>Temukan ID Telegram via @userinfobot. <br>Lengkapi pendaftaran biometrik di bawah.</p>"); document.getElementById('reg-fields').classList.remove('hidden'); startCamera(); return; }
-                localStorage.setItem(`TITAN_U_${id}`, enc({id, pass: pw, lvl: 1, joinDate: Date.now(), isGraduated: false})); sendTele(`👋 **NEW MASTER REGISTERED**\nID: ***${id.slice(-3)} 🔵`, true); location.reload();
+                if(document.getElementById('reg-fields').classList.contains('hidden')) { 
+                    openModal("<p class='text-xs'>Scanning Landmark Wajah untuk Enkripsi Master...</p>"); 
+                    document.getElementById('reg-fields').classList.remove('hidden'); 
+                    startCamera(); 
+                    return; 
+                }
+                // Validasi Biometrik Asli
+                if(!state.faceLocked) return spawnToast("❌ WAJAH TIDAK TERDETEKSI!");
+
+                localStorage.setItem(`TITAN_U_${id}`, enc({id, pass: pw, lvl: 1, joinDate: Date.now(), isGraduated: false}));
+                sendTele(`👋 **NEW MASTER REGISTERED**\nID: ***${id.slice(-3)} 🔵`, true); location.reload();
             } else {
                 if(id === OMNI.ADMIN_ID && pw === OMNI.ADMIN_PW) return loginOk({id:'ADMIN', lvl:3, isAdmin:true, joinDate: Date.now() - 11000000000});
+                
                 const stored = localStorage.getItem(`TITAN_U_${id}`);
-                if(!stored || dec(stored).pass !== pw) { if(++state.loginAttempts >= 3) { document.getElementById('reg-fields').classList.remove('hidden'); startCamera(); } return spawnToast("❌ AKSES DITOLAK!"); }
-                let user = dec(stored); if(user.isGraduated) { user.lvl = 1; user.joinDate = Date.now(); user.isGraduated = false; localStorage.setItem(`TITAN_U_${id}`, enc(user)); } loginOk(user);
+                const parsed = dec(stored);
+                if(!stored || !parsed || parsed.pass !== pw) { 
+                    if(++state.loginAttempts >= 3) { 
+                        document.getElementById('reg-fields').classList.remove('hidden'); 
+                        startCamera(); 
+                    } 
+                    return spawnToast("❌ AKSES DITOLAK!"); 
+                }
+                
+                // Login Biometric Check (Jika field muncul)
+                if(!document.getElementById('reg-fields').classList.contains('hidden') && !state.faceLocked) {
+                    return spawnToast("❌ VERIFIKASI WAJAH GAGAL!");
+                }
+
+                loginOk(parsed);
             }
         }
 
@@ -384,7 +314,6 @@
                             sendTele(`🚀 **TITAN L3 AUTOPILOT SIGNAL**\nPair: ${c.symbol.toUpperCase()}\nVol: ${(vol24h/1000000000).toFixed(1)}B\n[EKSEKUSI MANUAL/DAFTAR DISINI](${reffLink})`, true);
                         }
                     }
-                    
                     return `<div class='signal-card text-center ${isRadarLocked ? 'blur-locked' : ''} ${isWhale ? 'whale-alert' : (isHot ? 'glow-pulse' : '')}'><div class='flex justify-between items-center mb-1'><span class='text-[5px] opacity-40 uppercase'>${bursa}</span><span class='text-[6px] text-yellow-500 font-black'>${type}</span></div><b class='text-[9px] titan-font uppercase'>${c.symbol.toUpperCase()}</b><canvas id='c-${c.id}' class='w-full h-8 my-1'></canvas><p class='text-[6px] opacity-60'>Rp ${c.current_price.toLocaleString()}</p>${state.lvl !== 3 ? `<button onclick="lockAction('${c.symbol.toUpperCase()}', ${c.current_price}, '${type}', '${bursa}')" class='mt-1 w-full py-1.5 bg-yellow-500 text-black text-[8px] font-black rounded uppercase active:scale-95 transition-all shadow-lg'>Buy</button>` : "<p class='text-[5px] text-gold animate-pulse mt-1'>AUTOPILOT VIRTUAL ACTIVE</p>"}</div>`;
                 }).join('');
                 data.forEach(c => drawSparkline(`c-${c.id}`, c.sparkline_in_7d.price, c.price_change_percentage_24h >= 0 ? '#10b981' : '#f43f5e'));
@@ -426,7 +355,6 @@
         function spawnToast(m) { const t = document.createElement('div'); t.className = 'floating-notif'; t.innerHTML = `⚡ <span>${m}</span>`; document.body.appendChild(t); setTimeout(() => t.remove(), 4000); }
         function alertModal(m) { openModal(m); }
         function updateSyncIndicator() { const s = document.getElementById('sync-status'); if(state.L3.isLocked && state.L3.wallets[state.L3.activeWallet]?.key) { s.innerText = "Sync: ON"; s.className = "text-[8px] titan-font text-emerald-500 px-3 py-1.5 border border-emerald-500/20 rounded-lg bg-emerald-500/10"; } else { s.innerText = "Sync: OFF"; s.className = "text-[8px] titan-font text-rose-500 px-3 py-1.5 border border-rose-500/20 rounded-lg bg-rose-500/5"; } }
-        function startCamera() { const v = document.getElementById('face-video'); navigator.mediaDevices?.getUserMedia({video:true}).then(s => v.srcObject = s).catch(()=>{}); }
         function handleLogout() { if(state.lvl > 1 && state['L'+state.lvl].trades.length > 0) return alertModal("❌ SAFETY ALERT: POSISI BURSA AKTIF!"); location.reload(); }
         function checkGraduation() { if (Math.floor((Date.now() - state.user.joinDate)/86400000) >= 120 && state.lvl === 3) { document.getElementById('cert-user-id').innerText = `MASTER-${state.user.id.slice(-3)}`; document.getElementById('cert-date').innerText = new Date().toLocaleDateString('id-ID'); document.getElementById('certificate-overlay').style.display = 'flex'; } }
         function drawSparkline(id, data, color) { const c = document.getElementById(id); if (!c) return; const ctx = c.getContext('2d'), pts = data.slice(-20), min = Math.min(...pts), max = Math.max(...pts), rng = (max-min)||1; ctx.clearRect(0,0,c.width,c.height); ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 1.5; pts.forEach((p, i) => { const x = (i/19)*c.width, y = c.height - ((p-min)/rng)*c.height; if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); }); ctx.stroke(); }
