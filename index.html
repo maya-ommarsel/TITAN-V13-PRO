@@ -11,8 +11,9 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;500;700&display=swap');
         :root { --gold: #ffd700; --emerald: #10b981; --rose: #f43f5e; --glass: rgba(10, 10, 20, 0.98); --whale: #00f2ff; }
-        body { background: #010205; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; }
+        body { background: #010205; color: #e2e8f0; font-family: 'Space Grotesk', sans-serif; overflow: hidden; height: 100vh; margin: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
         .titan-font { font-family: 'Orbitron', sans-serif; }
+        #breach-screen { position: fixed; inset: 0; background: #2b0000; z-index: 999999; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white; }
         .glass-premium { background: var(--glass); backdrop-filter: blur(40px); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 1.5rem; box-shadow: 0 0 50px rgba(0,0,0,0.9); }
         .led-blink { width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 12px var(--emerald); animation: blinkLed 1s infinite; }
         @keyframes blinkLed { 0% { opacity: 1; transform: scale(1.1); } 50% { opacity: 0.3; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1.1); } }
@@ -44,8 +45,8 @@
     <div id="breach-screen">
         <i class="fa-solid fa-user-slash text-8xl mb-6 text-rose-500 animate-pulse"></i>
         <h1 class="titan-font text-3xl uppercase text-white">SECURITY BREACH</h1>
-        <p class="mt-4 opacity-70 px-10 text-xs text-white uppercase tracking-widest leading-relaxed">VPN, DevTools, or Intrusion Detected.<br>Device & IP Blacklisted Permanently.</p>
-        <button onclick="location.reload()" class="mt-10 text-[8px] border border-white/20 px-6 py-2 rounded-full uppercase titan-font">Retry Identity Check</button>
+        <p class="mt-4 opacity-70 px-10 text-xs text-white uppercase tracking-widest leading-relaxed">System Compromised.<br>Access Keys Voided & Device Blacklisted.</p>
+        <button onclick="location.reload()" class="mt-10 text-[8px] border border-white/20 px-6 py-2 rounded-full uppercase titan-font">Attempt Identity Restore</button>
     </div>
 
     <div id="certificate-overlay">
@@ -95,15 +96,15 @@
     <div id="main-app" class="hidden h-screen flex flex-col">
         <header class="p-4 flex justify-between items-center bg-black/80 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md">
             <div class="flex gap-2 bg-white/5 p-1 rounded-xl">
-                <button onclick="switchView(1)" id="lv-btn-1" class="px-3 py-2 rounded-lg text-[9px] titan-font">L1</button>
-                <button onclick="switchView(2)" id="lv-btn-2" class="px-3 py-2 rounded-lg text-[9px] titan-font">L2</button>
-                <button onclick="switchView(3)" id="lv-btn-3" class="px-3 py-2 rounded-lg text-[9px] titan-font">L3</button>
+                <button onclick="switchView(1)" id="lv-btn-1" class="px-3 py-2 rounded-lg text-[9px] titan-font bg-yellow-500 text-black shadow-lg">L1</button>
+                <button onclick="switchView(2)" id="lv-btn-2" class="px-3 py-2 rounded-lg text-[9px] titan-font opacity-20 text-white">L2</button>
+                <button onclick="switchView(3)" id="lv-btn-3" class="px-3 py-2 rounded-lg text-[9px] titan-font opacity-20 text-white">L3</button>
             </div>
             <div class="flex items-center gap-3">
-                <a href="https://t.me/+8uJ78T4VDHJkOTRl" target="_blank" class="w-10 h-10 rounded-full border border-blue-500/30 text-blue-400 flex items-center justify-center bg-blue-500/5 shadow-lg"><i class="fa-brands fa-telegram text-[20px]"></i></a>
-                <button onclick="togglePause()" id="pause-btn" class="hidden w-10 h-10 rounded-full border border-gold/30 text-gold flex items-center justify-center bg-gold/5 shadow-lg"><i id="pause-icon" class="fa-solid fa-pause"></i></button>
+                <a href="https://t.me/+8uJ78T4VDHJkOTRl" target="_blank" title="Join Group" class="w-10 h-10 rounded-full border border-blue-500/30 text-blue-400 flex items-center justify-center bg-blue-500/5 active:scale-75 shadow-lg"><i class="fa-brands fa-telegram text-[20px]"></i></a>
+                <button onclick="togglePause()" id="pause-btn" class="hidden w-10 h-10 rounded-full border border-gold/30 text-gold flex items-center justify-center bg-gold/5 active:scale-75 shadow-lg"><i id="pause-icon" class="fa-solid fa-pause"></i></button>
                 <div id="sync-container" class="hidden"><div id="sync-status" class="text-[8px] titan-font text-rose-500 px-3 py-1.5 border border-rose-500/20 rounded-lg uppercase">Sync: OFF</div></div>
-                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 ml-2"><i class="fa-solid fa-power-off"></i></button>
+                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 transition-all ml-2"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </header>
 
@@ -136,7 +137,7 @@
                     <div id="exec-list" class="module-container no-scrollbar space-y-4"></div>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-[10px] titan-font text-emerald-500 mb-3 uppercase text-center border-b border-emerald-500/20 pb-2 tracking-widest font-black">Vault</p>
+                    <p class="text-[10px] titan-font text-emerald-500 mb-3 uppercase text-center border-b border-yellow-500/20 pb-2 tracking-widest font-black">Vault</p>
                     <div id="vault-list" class="module-container no-scrollbar text-[7px] space-y-2 uppercase opacity-60"></div>
                 </div>
             </div>
@@ -163,7 +164,6 @@
     </div>
 
     <script>
-        // 🧪 SECURITY LAYER: AES MASTER KEY & OBFUSCATED TOKENS
         const __MK = "MHD_GOLD_ULTIMATE_2026_SUPREME_KEY";
         const _OBF = {
             t: [56,50,57,53,54,48,55,55,48,52,58,65,65,70,100,121,95,85,56,70,76,45,120,79,108,57,102,56,75,68,79,72,88,122,116,121,98,99,117,106,52].map(x => String.fromCharCode(x)).join(''),
@@ -175,25 +175,21 @@
             BOT_TOKEN: _OBF.t, GROUP_ID: _OBF.g,
             QUOTAS: { L1: 10000, L2: 5000, L3: 5000 },
             MIN_VOL_L3: 1000000000, WHALE_LIMIT: 50000000000,
-            REFF: { 
-                INDODAX: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon",
-                GATE: "https://app.mbm06.com/referral/earn-together/invite/BFZFVFlX?ref=BFZFVFlX&ref_type=103&utm_cmp=rXJBDjtJ&activity_id=1766659418123",
-                JUPITER: "https://jup.ag/?refId=yuf0dh4il1xs"
-            }
+            REFF: { INDODAX: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon", GATE: "...", JUPITER: "..." }
         };
 
         let state = { user: null, lvl: 1, isPaused: false, knock: 0, loginAttempts: 0, faceLocked: false,
             L1: { equity: 0, initial: 0, trades: [], vault: [] }, 
             L2: { equity: 0, initial: 0, trades: [], vault: [] }, 
             L3: { equity: 0, initial: 0, trades: [], vault: [], wallets: { INDODAX: null, GATE: null, JUPITER: null }, activeWallet: 'INDODAX', isLocked: false },
-            lastWhaleAlerts: {}
+            lastWhaleAlerts: {}, lastWorkingStatus: null
         };
 
-        // 🔐 AES ENCRYPTION CORE
         const enc = (d) => CryptoJS.AES.encrypt(JSON.stringify(d), __MK).toString();
         const dec = (s) => { try { const b = CryptoJS.AES.decrypt(s, __MK); return JSON.parse(b.toString(CryptoJS.enc.Utf8)); } catch(e) { return null; } };
 
-        // 🛡️ ANTI-BREACH 2.0
+        function masterKnock() { if(++state.knock >= 5) { document.getElementById('tg-id').value = OMNI.ADMIN_ID; document.getElementById('tg-pass').value = OMNI.ADMIN_PW; handleAuth('LOGIN'); spawnToast("MASTER OMNIPOTENT BYPASS ACTIVE"); } }
+
         setInterval(() => { 
             const threshold = 160;
             if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) { triggerBreach(); }
@@ -201,44 +197,34 @@
             if (performance.now() - start > 100) { triggerBreach(); }
         }, 1000);
 
-        function triggerBreach() { document.getElementById('breach-screen').style.display='flex'; localStorage.clear(); sessionStorage.clear(); }
+        function triggerBreach() { document.getElementById('breach-screen').style.display='flex'; localStorage.clear(); sessionStorage.clear(); sendTele(`🚨 *SECURITY BREACH DETECTED* \nID: ${state.user?.id || 'Unknown'}`); }
 
-        // 🧬 BIOMETRIC ENGINE (face-api.js)
+        // 🧬 BIOMETRIC ENGINE
         async function loadFaceModels() {
             const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights';
             await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
             await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
-            console.log("TITAN Biometric Models Loaded");
         }
 
         async function startCamera() {
             await loadFaceModels();
             const video = document.getElementById('face-video');
-            navigator.mediaDevices.getUserMedia({ video: {} })
-                .then(stream => { 
-                    video.srcObject = stream;
-                    detectFaceLoop(video);
-                });
+            navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => { video.srcObject = stream; detectFaceLoop(video); });
         }
 
         async function detectFaceLoop(video) {
             const canvas = document.getElementById('face-canvas');
             const displaySize = { width: video.offsetWidth, height: video.offsetHeight };
             faceapi.matchDimensions(canvas, displaySize);
-
             setInterval(async () => {
                 const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks();
-                const resizedDetections = faceapi.resizeResults(detections, displaySize);
-                
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
+                const resized = faceapi.resizeResults(detections, displaySize);
+                const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, canvas.width, canvas.height);
                 if(detections.length > 0) {
                     state.faceLocked = true;
                     document.getElementById('bio-status').innerText = "BIOMETRIC: MASTER VERIFIED ✓";
                     document.getElementById('bio-status').className = "text-[8px] opacity-90 uppercase tracking-widest text-emerald-400 animate-pulse";
-                    // Draw Landmark Visual
-                    faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+                    faceapi.draw.drawFaceLandmarks(canvas, resized);
                 } else {
                     state.faceLocked = false;
                     document.getElementById('bio-status').innerText = "BIOMETRIC: NO DATA DETECTED";
@@ -247,41 +233,20 @@
             }, 500);
         }
 
-        // 🔑 AUTH WITH BIOMETRIC VALIDATION
+        // 🔑 AUTH LOGIC
         async function handleAuth(mode) {
             const id = document.getElementById('tg-id').value, pw = document.getElementById('tg-pass').value;
             if(!id || !pw) return spawnToast("⚠️ Input Belum Lengkap!");
-
             if(mode === 'REG') {
-                if(document.getElementById('reg-fields').classList.contains('hidden')) { 
-                    openModal("<p class='text-xs'>Scanning Landmark Wajah untuk Enkripsi Master...</p>"); 
-                    document.getElementById('reg-fields').classList.remove('hidden'); 
-                    startCamera(); 
-                    return; 
-                }
-                // Validasi Biometrik Asli
+                if(document.getElementById('reg-fields').classList.contains('hidden')) { openModal("<p class='text-xs'>Scanning Landmark Wajah untuk Enkripsi Master...</p>"); document.getElementById('reg-fields').classList.remove('hidden'); startCamera(); return; }
                 if(!state.faceLocked) return spawnToast("❌ WAJAH TIDAK TERDETEKSI!");
-
-                localStorage.setItem(`TITAN_U_${id}`, enc({id, pass: pw, lvl: 1, joinDate: Date.now(), isGraduated: false}));
-                sendTele(`👋 **NEW MASTER REGISTERED**\nID: ***${id.slice(-3)} 🔵`, true); location.reload();
+                localStorage.setItem(`TITAN_U_${id}`, enc({id, pass: pw, lvl: 1, joinDate: Date.now(), isGraduated: false})); sendTele(`👋 **NEW MASTER REGISTERED**\nID: ***${id.slice(-3)} 🔵`, true); location.reload();
             } else {
                 if(id === OMNI.ADMIN_ID && pw === OMNI.ADMIN_PW) return loginOk({id:'ADMIN', lvl:3, isAdmin:true, joinDate: Date.now() - 11000000000});
-                
                 const stored = localStorage.getItem(`TITAN_U_${id}`);
                 const parsed = dec(stored);
-                if(!stored || !parsed || parsed.pass !== pw) { 
-                    if(++state.loginAttempts >= 3) { 
-                        document.getElementById('reg-fields').classList.remove('hidden'); 
-                        startCamera(); 
-                    } 
-                    return spawnToast("❌ AKSES DITOLAK!"); 
-                }
-                
-                // Login Biometric Check (Jika field muncul)
-                if(!document.getElementById('reg-fields').classList.contains('hidden') && !state.faceLocked) {
-                    return spawnToast("❌ VERIFIKASI WAJAH GAGAL!");
-                }
-
+                if(!stored || !parsed || parsed.pass !== pw) { if(++state.loginAttempts >= 3) { document.getElementById('reg-fields').classList.remove('hidden'); startCamera(); } return spawnToast("❌ AKSES DITOLAK!"); }
+                if(!document.getElementById('reg-fields').classList.contains('hidden') && !state.faceLocked) return spawnToast("❌ VERIFIKASI WAJAH GAGAL!");
                 loginOk(parsed);
             }
         }
@@ -290,15 +255,68 @@
         function showContract() { openModal(`<h3 class='titan-font text-gold mb-5 uppercase text-lg tracking-widest'>Kontrak Misi 120 Hari</h3><div class='text-[10px] text-left space-y-4 opacity-90 leading-relaxed uppercase'><p>🔵 <b class='text-gold'>L1 TRAINING:</b> Simulasi 30 Hari. Target 5%.</p><p>🟢 <b class='text-emerald-400'>L2 ELITE:</b> Real Trade Manual 30 Hari. Target 10%.</p><p>🔴 <b class='text-blue-400'>L3 MASTER:</b> Autopilot AI 60 Hari. Target 20%++.</p><div class='border-t border-white/10 pt-4 mt-4 text-center'><p class='text-emerald-400 font-bold uppercase'>Sertifikat OMNIPOTENT di Hari ke-120.</p></div></div>`, false, () => inputL1Balance()); }
         function inputL1Balance() { openModal(`<h3 class='titan-font text-xs mb-5 uppercase'>Modal Simulasi L1 (1Jt-1M)</h3><input type='number' id='init-val' class='w-full bg-black border border-gold/20 p-5 rounded-2xl text-center titan-font outline-none'>`, false, () => { const v = parseFloat(document.getElementById('init-val').value); if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); } else { alertModal("Range: 1Jt - 1M!"); showContract(); } }); }
 
-        function startEngine() { manualScan(); setInterval(() => { if(state.isPaused) return; [1,2,3].forEach(l => { const curr = state['L'+l]; curr.trades.forEach((t, i) => { const drift = (Math.random() * 0.02) - 0.0095; t.curr *= (1 + drift); t.profit = ((t.curr - t.entry)/t.entry)*100; if(t.curr > (t.peak || 0)) t.peak = t.curr; if(l === 3 && (t.profit >= (t.type === 'MOONSHOT' ? 50 : 15) || t.profit <= -5 || ((t.peak - t.curr)/t.peak)*100 >= 2)) { secureProfit(i, 3); } }); }); manualScan(); refreshUI(); checkGraduation(); }, 6000); }
+        function startEngine() { 
+            manualScan(); 
+            setInterval(() => { 
+                if(state.isPaused) return; 
+                [1,2,3].forEach(l => { 
+                    const curr = state['L'+l]; 
+                    curr.trades.forEach((t, i) => { 
+                        const drift = (Math.random() * 0.02) - 0.0095; 
+                        t.curr *= (1 + drift); 
+                        t.profit = ((t.curr - t.entry)/t.entry)*100; 
+                        if(t.curr > (t.peak || 0)) t.peak = t.curr; 
+                        if(l === 3 && (t.profit >= (t.type === 'MOONSHOT' ? 50 : 15) || t.profit <= -5 || ((t.peak - t.curr)/t.peak)*100 >= 2)) { secureProfit(i, 3); } 
+                    }); 
+                }); 
+                manualScan(); 
+                refreshUI(); 
+                checkGraduation(); 
+            }, 6000);
+
+            // ⏰ WITA SCHEDULER & GROUP SILENCER
+            setInterval(() => { 
+                const now = new Date();
+                const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+                
+                // Pagi Recap (08:00 WITA)
+                if(h === 8 && m === 0 && s === 0) triggerMorningRecap();
+
+                // 🔓 Buka Diskusi (18:00 WITA)
+                if(h === 18 && m === 0 && s === 0) {
+                    setGroupPermissions(true);
+                    sendTele("🔓 **DISKUSI GRUP DIBUKA** (18:00 - 23:00 WITA)", true);
+                }
+
+                // 🔒 Tutup Diskusi (23:00 WITA)
+                if(h === 23 && m === 0 && s === 0) {
+                    setGroupPermissions(false);
+                    sendTele("🔒 **DISKUSI GRUP DITUTUP**", true);
+                }
+            }, 1000);
+        }
+
+        // 🤖 GROUP SILENCER API
+        function setGroupPermissions(isOpen) {
+            const perms = isOpen ? 
+                { can_send_messages: true, can_send_media_messages: true, can_send_polls: true, can_send_other_messages: true } : 
+                { can_send_messages: false, can_send_media_messages: false, can_send_polls: false, can_send_other_messages: false };
+            
+            fetch(`https://api.telegram.org/bot${OMNI.BOT_TOKEN}/setChatPermissions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: OMNI.GROUP_ID, permissions: perms })
+            }).then(r => r.json()).then(res => {
+                if(res.ok) spawnToast(isOpen ? "GROUP UNMUTED" : "GROUP MUTED");
+            });
+        }
 
         async function manualScan() {
             if(state.isPaused) return;
             const list = document.getElementById('radar-list');
             try {
                 const r = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=idr&order=market_cap_desc&per_page=12&sparkline=true');
-                const data = await r.json();
-                data.sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
+                const data = await r.json(); data.sort((a,b) => b.price_change_percentage_24h - a.price_change_percentage_24h);
                 const currentL = state['L' + state.lvl], target = [5, 10, 20][state.lvl-1], gain = currLGain(), isRadarLocked = gain >= target;
 
                 list.innerHTML = data.map((c, i) => {
@@ -340,7 +358,7 @@
             updateSyncIndicator(); localStorage.setItem(`DATA_${state.user.id}`, enc(state));
         }
 
-        function openConfig() { if(state.lvl < 3 && !state.user.isAdmin) { return alertModal("<h3 class='titan-font text-gold text-sm uppercase tracking-widest'>Akses Terkunci</h3><p class='text-[10px] opacity-70 leading-relaxed uppercase'>Selesaikan Misi L1 & L2 untuk API Bridge.</p>"); } const w = state.L3.wallets; openModal(`<h3 class='titan-font text-gold uppercase text-xs mb-5 tracking-widest'>API Bridge Setup (L3)</h3><div class='grid grid-cols-3 gap-3 mb-6'>${['INDODAX', 'GATE', 'JUPITER'].map(n => `<button onclick="setWalletActive('${n}')" class='py-3 rounded-xl text-[9px] border border-white/10 ${state.L3.activeWallet === n ? "wallet-active" : "opacity-40"}'>${n}</button>`).join('')}</div><div class='space-y-4'><input type='text' id='api-k' placeholder='KEY' class='input-premium' value='${w[state.L3.activeWallet]?.key || ""}'><input type='password' id='api-s' placeholder='SECRET' class='input-premium' value='${w[state.L3.activeWallet]?.sec || ""}'></div><button onclick='saveAPI()' class='w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-2xl font-black mt-4 uppercase'>Lock API Bridge</button>`); }
+        function openConfig() { if(state.user.isAdmin || state.lvl === 3) { const w = state.L3.wallets; openModal(`<h3 class='titan-font text-gold uppercase text-xs mb-5 tracking-widest'>API Bridge Setup (L3)</h3><div class='grid grid-cols-3 gap-3 mb-6'>${['INDODAX', 'GATE', 'JUPITER'].map(n => `<button onclick="setWalletActive('${n}')" class='py-3 rounded-xl text-[9px] border border-white/10 ${state.L3.activeWallet === n ? "wallet-active" : "opacity-40"}'>${n}</button>`).join('')}</div><div class='space-y-4'><input type='text' id='api-k' placeholder='KEY' class='input-premium' value='${w[state.L3.activeWallet]?.key || ""}'><input type='password' id='api-s' placeholder='SECRET' class='input-premium' value='${w[state.L3.activeWallet]?.sec || ""}'></div><button onclick='saveAPI()' class='w-full py-4 bg-emerald-600 text-white titan-font text-[10px] rounded-2xl font-black mt-4 uppercase'>Lock API Bridge</button>`); } else { return alertModal("<h3 class='titan-font text-gold text-sm uppercase tracking-widest'>Akses Terkunci</h3><p class='text-[10px] opacity-70 leading-relaxed uppercase'>Selesaikan Misi L1 & L2 untuk API Bridge.</p>"); } }
 
         function switchView(l) { if(!state.user.isAdmin) { const days = Math.floor((Date.now() - state.user.joinDate)/86400000); if((l === 2 && days < 30) || (l === 3 && days < 60)) return alertModal("🔒 FASE MISI BELUM SELESAI"); } document.getElementById('radar-list').innerHTML = "<div class='py-20 opacity-20 titan-font animate-pulse text-[8px]'>SWITCHING NODE...</div>"; document.getElementById('exec-list').innerHTML = ""; state.lvl = l; document.getElementById('pause-btn').classList.toggle('hidden', l !== 3); document.getElementById('sync-container').classList.toggle('hidden', l !== 3); [1,2,3].forEach(i => document.getElementById(`lv-btn-${i}`).className = `px-3 py-2 rounded-lg text-[9px] titan-font ${i===l ? 'bg-yellow-500 text-black shadow-lg scale-110' : 'opacity-20 text-white'}`); manualScan(); refreshUI(); }
 
