@@ -248,15 +248,15 @@
     <div id="main-app" class="hidden h-screen flex flex-col">
         <header class="p-4 flex justify-between items-center bg-black/80 border-b border-white/5 sticky top-0 z-50 backdrop-blur-md">
             <div class="flex gap-2 bg-white/5 p-1 rounded-xl">
-                <button onclick="switchView(1)" id="lv-btn-1" class="px-3 py-2 rounded-lg text-[9px] titan-font bg-yellow-500 text-black shadow-lg">L1</button>
-                <button onclick="switchView(2)" id="lv-btn-2" class="px-3 py-2 rounded-lg text-[9px] titan-font opacity-20 text-white">L2</button>
-                <button onclick="switchView(3)" id="lv-btn-3" class="px-3 py-2 rounded-lg text-[9px] titan-font opacity-20 text-white">L3</button>
+                <button onclick="switchView(1)" id="lv-btn-1" class="px-3 py-2 rounded-lg text-[9px] titan-font">L1</button>
+                <button onclick="switchView(2)" id="lv-btn-2" class="px-3 py-2 rounded-lg text-[9px] titan-font">L2</button>
+                <button onclick="switchView(3)" id="lv-btn-3" class="px-3 py-2 rounded-lg text-[9px] titan-font">L3</button>
             </div>
             <div class="flex items-center gap-3">
                 <a href="https://t.me/+8uJ78T4VDHJkOTRl" target="_blank" title="Join Group" class="w-10 h-10 rounded-full border border-blue-500/30 text-blue-400 flex items-center justify-center bg-blue-500/5 active:scale-75 shadow-lg"><i class="fa-brands fa-telegram text-[20px]"></i></a>
                 <button onclick="togglePause()" id="pause-btn" class="hidden w-10 h-10 rounded-full border border-gold/30 text-gold flex items-center justify-center bg-gold/5 active:scale-75 shadow-lg"><i id="pause-icon" class="fa-solid fa-pause"></i></button>
                 <div id="sync-container" class="hidden"><div id="sync-status" class="text-[8px] titan-font text-rose-500 px-3 py-1.5 border border-rose-500/20 rounded-lg uppercase">Sync: OFF</div></div>
-                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 ml-2"><i class="fa-solid fa-power-off"></i></button>
+                <button onclick="handleLogout()" class="text-rose-500 text-xl active:scale-90 transition-all ml-2"><i class="fa-solid fa-power-off"></i></button>
             </div>
         </header>
 
@@ -281,15 +281,15 @@
 
             <div class="grid grid-cols-3 gap-3 pb-32">
                 <div class="flex flex-col">
-                    <p class="text-[10px] titan-font text-yellow-500 mb-3 uppercase text-center border-b border-yellow-500/20 pb-2 font-black">Radar</p>
+                    <p class="text-[10px] titan-font text-yellow-500 mb-3 uppercase text-center border-b border-yellow-500/20 pb-2 tracking-widest font-black">Radar</p>
                     <div id="radar-list" class="module-container no-scrollbar space-y-4"></div>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-[10px] titan-font text-blue-500 mb-3 uppercase text-center border-b border-yellow-500/20 pb-2 font-black">Active <span id="slot-count">(0/10)</span></p>
+                    <p class="text-[10px] titan-font text-blue-500 mb-3 uppercase text-center border-b border-yellow-500/20 pb-2 tracking-widest font-black">Active <span id="slot-count">(0/10)</span></p>
                     <div id="exec-list" class="module-container no-scrollbar space-y-4"></div>
                 </div>
                 <div class="flex flex-col">
-                    <p class="text-[10px] titan-font text-emerald-500 mb-3 uppercase text-center border-b border-emerald-500/20 pb-2 font-black">Vault</p>
+                    <p class="text-[10px] titan-font text-emerald-500 mb-3 uppercase text-center border-b border-emerald-500/20 pb-2 tracking-widest font-black">Vault</p>
                     <div id="vault-list" class="module-container no-scrollbar text-[7px] space-y-2 uppercase opacity-60"></div>
                 </div>
             </div>
@@ -356,8 +356,8 @@
             }
         }
 
-        function loginOk(u) { state.user = u; document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); const saved = localStorage.getItem(`DATA_${u.id}`); if(saved) state = {...state, ...dec(saved)}; if(state.L1.equity === 0) showContract(); switchView(u.lvl); startEngine(); }
-        function showContract() { openModal(`<h3 class='titan-font text-gold mb-5 uppercase text-lg tracking-widest'>Kontrak Misi 120 Hari</h3><div class='text-[10px] text-left space-y-4 opacity-90 leading-relaxed uppercase'><p>🔵 <b class='text-gold'>L1 TRAINING:</b> Simulasi 30 Hari. Target 5%.</p><p>🟢 <b class='text-emerald-400'>L2 ELITE:</b> Real Trade Manual 30 Hari. Target 10%.</p><p>🔴 <b class='text-blue-400'>L3 MASTER:</b> Autopilot AI 60 Hari. Target 20%++.</p></div>`, false, () => inputL1Balance()); }
+        function loginOk(u) { state.user = u; document.getElementById('auth-screen').classList.add('hidden'); document.getElementById('main-app').classList.remove('hidden'); const saved = localStorage.getItem(`DATA_${u.id}`); if(saved) state = {...state, ...dec(saved)}; if(state.L1.equity === 0) showContract(); switchView(state.lvl || u.lvl); startEngine(); }
+        function showContract() { openModal(`<h3 class='titan-font text-gold mb-5 uppercase text-lg tracking-widest'>Kontrak Misi 120 Hari</h3><div class='text-[10px] text-left space-y-4 opacity-90 leading-relaxed uppercase'><p>🔵 <b class='text-gold'>L1 TRAINING:</b> Simulasi 30 Hari. Target 5%.</p><p>🟢 <b class='text-emerald-400'>L2 ELITE:</b> Real Trade Manual 30 Hari. Target 10%.</p><p>🔴 <b class='text-blue-400'>L3 MASTER:</b> Autopilot AI 60 Hari. Target 20%++.</p><div class='border-t border-white/10 pt-4 mt-4 text-center'><p class='text-emerald-400 font-bold uppercase'>Sertifikat OMNIPOTENT di Hari ke-120.</p></div></div>`, false, () => inputL1Balance()); }
         function inputL1Balance() { openModal(`<h3 class='titan-font text-xs mb-5 uppercase'>Modal Simulasi L1 (1Jt-1M)</h3><input type='number' id='init-val' class='w-full bg-black border border-gold/20 p-5 rounded-2xl text-center titan-font outline-none'>`, false, () => { const v = parseFloat(document.getElementById('init-val').value); if(v >= 1000000 && v <= 1000000000) { state.L1.equity = state.L1.initial = v; refreshUI(); } else { alertModal("Range: 1Jt - 1M!"); showContract(); } }); }
 
         function startEngine() { manualScan(); setInterval(() => { if(state.isPaused) return; [1,2,3].forEach(l => { const curr = state['L'+l]; curr.trades.forEach((t, i) => { const drift = (Math.random() * 0.02) - 0.0095; t.curr *= (1 + drift); t.profit = ((t.curr - t.entry)/t.entry)*100; if(t.curr > (t.peak || 0)) t.peak = t.curr; if(l === 3 && (t.profit >= (t.type === 'MOONSHOT' ? 50 : 15) || t.profit <= -5 || ((t.peak - t.curr)/t.peak)*100 >= 2)) { secureProfit(i, 3); } }); }); manualScan(); refreshUI(); checkGraduation(); }, 6000); }
@@ -385,7 +385,7 @@
                         }
                     }
                     
-                    return `<div class='signal-card text-center ${isRadarLocked ? 'blur-locked' : ''} ${isWhale ? 'whale-alert' : (isHot ? 'glow-pulse' : '')}'><div class='flex justify-between items-center mb-1'><span class='text-[5px] opacity-40 uppercase'>${bursa}</span><span class='text-[6px] text-yellow-500 font-black'>${type}</span></div><b class='text-[9px] titan-font uppercase'>${c.symbol.toUpperCase()}</b><canvas id='c-${c.id}' class='w-full h-8 my-1'></canvas><p class='text-[6px] opacity-60'>Rp ${c.current_price.toLocaleString()}</p>${state.lvl !== 3 ? `<button onclick="lockAction('${c.symbol.toUpperCase()}', ${c.current_price}, '${type}', '${bursa}')" class='mt-1 w-full py-1.5 bg-yellow-500 text-black text-[8px] font-black rounded uppercase'>Buy</button>` : "<p class='text-[5px] text-gold animate-pulse mt-1'>AUTOPILOT VIRTUAL ACTIVE</p>"}</div>`;
+                    return `<div class='signal-card text-center ${isRadarLocked ? 'blur-locked' : ''} ${isWhale ? 'whale-alert' : (isHot ? 'glow-pulse' : '')}'><div class='flex justify-between items-center mb-1'><span class='text-[5px] opacity-40 uppercase'>${bursa}</span><span class='text-[6px] text-yellow-500 font-black'>${type}</span></div><b class='text-[9px] titan-font uppercase'>${c.symbol.toUpperCase()}</b><canvas id='c-${c.id}' class='w-full h-8 my-1'></canvas><p class='text-[6px] opacity-60'>Rp ${c.current_price.toLocaleString()}</p>${state.lvl !== 3 ? `<button onclick="lockAction('${c.symbol.toUpperCase()}', ${c.current_price}, '${type}', '${bursa}')" class='mt-1 w-full py-1.5 bg-yellow-500 text-black text-[8px] font-black rounded uppercase active:scale-95 transition-all shadow-lg'>Buy</button>` : "<p class='text-[5px] text-gold animate-pulse mt-1'>AUTOPILOT VIRTUAL ACTIVE</p>"}</div>`;
                 }).join('');
                 data.forEach(c => drawSparkline(`c-${c.id}`, c.sparkline_in_7d.price, c.price_change_percentage_24h >= 0 ? '#10b981' : '#f43f5e'));
             } catch(e) {}
