@@ -1,3 +1,5 @@
+<button onclick="localStorage.setItem('TITAN_DEVICE_ID', 'MASTER_DEVICE_001'); alert('Perangkat Admin Terdaftar!')" style="position:fixed; top:0; left:0; z-index:999999; opacity:0.01; width:50px; height:50px;">SET</button>
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -22,6 +24,8 @@
         .led-blink { width: 8px; height: 8px; background: var(--emerald); border-radius: 50%; display: inline-block; animation: blinkLed 1s infinite; }
         @keyframes blinkLed { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
         .signal-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,215,0,0.15); padding: 10px; border-radius: 1rem; }
+        .floating-notif { position: fixed; top: 25px; right: 20px; z-index: 200000; background: rgba(10, 10, 10, 0.98); border-left: 5px solid var(--gold); padding: 18px 28px; border-radius: 14px; animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); font-size: 11px; display: flex; align-items: center; gap: 15px; }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
     </style>
 </head>
 <body oncontextmenu="return false">
@@ -110,13 +114,10 @@
     </div>
 
     <script>
-        // Obfuscated Security Config
-        const _A_ID = "1319700866";
-        const _A_PW = "MahadhareV13Master";
-        const _D_KEY = "MASTER_DEVICE_001"; // Kunci Perangkat Admin
+        const _MK = "TITAN_OMNIPOTENT_2026_SECRET";
         const _T_K = "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4";
         const _T_G = "-1003254379333";
-        const _MK = "TITAN_OMNIPOTENT_2026_SECRET";
+        const _D_KEY = "MASTER_DEVICE_001";
 
         let state = { user: null, lvl: 1, isPaused: false, knock: 0, faceVerified: false, 
                       L1: { equity: 0, initial: 0, trades: [] },
@@ -126,27 +127,31 @@
         const enc = (d) => CryptoJS.AES.encrypt(JSON.stringify(d), _MK).toString();
         const dec = (s) => { try { return JSON.parse(CryptoJS.AES.decrypt(s, _MK).toString(CryptoJS.enc.Utf8)); } catch(e) { return null; } };
 
-        // 🛡️ Admin Device Bypass (Khusus Admin Device)
+        function spawnToast(m) {
+            const t = document.createElement('div'); t.className = 'floating-notif';
+            t.innerHTML = `⚡ <span>${m}</span>`; document.body.appendChild(t);
+            setTimeout(() => t.remove(), 4000);
+        }
+
         function masterKnock() {
             if (++state.knock >= 5) {
                 const devId = localStorage.getItem('TITAN_DEVICE_ID');
                 if (devId === _D_KEY) {
-                    state.user = { id: "SUPREME_ADMIN", lvl: 3, isAdmin: true, joinDate: 0 };
+                    state.user = { id: "ADMIN_SUPREME", lvl: 3, isAdmin: true, joinDate: 0 };
                     spawnToast("⭐ ADMIN IMMORTAL ACTIVE");
                     loginOk(state.user);
                 } else {
                     state.knock = 0;
-                    sendBreachAlert("Unauthorized Knock Attempted");
+                    sendBreachAlert("Unauthorized Admin Bypass Attempt");
                     spawnToast("⚠️ ACCESS RESTRICTED");
                 }
             }
         }
 
-        // 🕵️ Anti-Breach Logic
         setInterval(() => {
             const threshold = 160;
             if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-                sendBreachAlert("DevTools Detected");
+                sendBreachAlert("DevTools Intervention");
                 triggerBreach();
             }
         }, 2000);
@@ -155,20 +160,21 @@
 
         async function sendBreachAlert(reason) {
             const ip = await fetch('https://api.ipify.org?format=json').then(r => r.json()).catch(() => ({ip:'Unknown'}));
-            const msg = `🚨 *BREACH ALERT*\nID: ${state.user?.id || 'Unknown'}\nIP: ${ip.ip}\nReason: ${reason}`;
+            const msg = `🚨 *BREACH ALERT*\nID: ${state.user?.id || 'Visitor'}\nIP: ${ip.ip}\nReason: ${reason}`;
             fetch(`https://api.telegram.org/bot${_T_K}/sendMessage?chat_id=${_T_G}&text=${encodeURIComponent(msg)}&parse_mode=Markdown`);
         }
 
-        // 🧬 Biometric Verify
         async function initBiometrics() {
             const MODEL_URL = 'https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights';
-            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-            document.getElementById('face-loader').style.display = 'none';
-            const video = document.getElementById('face-video');
-            navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
-                video.srcObject = stream;
-                startFaceDetection(video);
-            });
+            try {
+                await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+                document.getElementById('face-loader').style.display = 'none';
+                const video = document.getElementById('face-video');
+                navigator.mediaDevices.getUserMedia({ video: {} }).then(stream => {
+                    video.srcObject = stream;
+                    startFaceDetection(video);
+                });
+            } catch(e) { spawnToast("Model AI Load Failed"); }
         }
 
         async function startFaceDetection(video) {
@@ -186,18 +192,15 @@
             }, 500);
         }
 
-        // 🔑 Auth Logic
         async function handleAuth(mode) {
             const id = document.getElementById('tg-id').value;
             const pass = document.getElementById('tg-pass').value;
-
             if (mode === 'REG') {
                 if (document.getElementById('reg-fields').classList.contains('hidden')) {
                     document.getElementById('reg-fields').classList.remove('hidden');
-                    initBiometrics();
-                    return;
+                    initBiometrics(); return;
                 }
-                if (!state.faceVerified) return spawnToast("❌ BIOMETRIC REQUIRED");
+                if (!state.faceVerified) return spawnToast("❌ SCAN WAJAH DIBUTUHKAN");
                 const uData = { id, pass: document.getElementById('tg-pass-reg').value, joinDate: Date.now(), lvl: 1 };
                 localStorage.setItem(`TITAN_U_${id}`, btoa(JSON.stringify(uData)));
                 location.reload();
@@ -205,7 +208,7 @@
                 const raw = localStorage.getItem(`TITAN_U_${id}`);
                 if (raw && JSON.parse(atob(raw)).pass === pass) {
                     loginOk(JSON.parse(atob(raw)));
-                } else spawnToast("❌ ACCESS DENIED");
+                } else spawnToast("❌ AKSES DITOLAK");
             }
         }
 
@@ -220,19 +223,16 @@
             startEngine();
         }
 
-        // 🏆 Certificate & Validation
         function downloadCertificate() {
             const certArea = document.getElementById('cert-to-download');
             const masterId = state.user.id.toUpperCase();
             document.getElementById('cert-master-id').innerText = masterId;
             document.getElementById('cert-hash-val').innerText = `HASH: ${CryptoJS.MD5(masterId + _MK).toString().toUpperCase()}`;
             document.getElementById('cert-date-val').innerText = new Date().toLocaleDateString('id-ID');
-
             html2canvas(certArea, { backgroundColor: '#010205' }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `CERT_${masterId}.png`;
-                link.href = canvas.toDataURL();
-                link.click();
+                link.href = canvas.toDataURL(); link.click();
             });
         }
 
@@ -253,6 +253,7 @@
             const curr = state['L' + state.lvl], gain = curr.initial > 0 ? ((curr.equity - curr.initial)/curr.initial)*100 : 0;
             document.getElementById('balance-display').innerText = `Rp ${curr.equity.toLocaleString('id-ID')}`;
             document.getElementById('daily-bar').style.width = `${Math.min(100, (gain/5)*100)}%`;
+            document.getElementById('ui-label').innerText = state.lvl === 3 ? "Autopilot Master" : "Training Node";
             localStorage.setItem(`DATA_${state.user.id}`, enc(state));
         }
 
@@ -272,10 +273,9 @@
         function checkGraduation() {
             if (state.user?.isAdmin) return;
             const days = Math.floor((Date.now() - state.user.joinDate)/86400000);
-            if (days >= 120) document.getElementById('certificate-overlay').style.display = 'flex';
+            if (days >= 120 && state.lvl === 3) document.getElementById('certificate-overlay').style.display = 'flex';
         }
 
-        function spawnToast(m) { console.log(m); } // Implement as needed
         function handleLogout() { location.reload(); }
         function executeSelfDestructCycle() { localStorage.removeItem(`DATA_${state.user.id}`); location.reload(); }
     </script>
