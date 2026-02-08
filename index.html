@@ -3,382 +3,595 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN V.13 | OMNIPOTENT SYSTEM</title>
+    <title>TITAN V.13 - OMNIPOTENT MASTER</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --neon-emerald: #00ff88;
-            --neon-gold: #ffcc00;
-            --neon-rose: #ff2d55;
-            --bg-deep: #020408;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-gold: #ffcc00;
+            --emerald: #00ff88;
+            --rose: #ff3e3e;
+            --glass: rgba(255, 255, 255, 0.05);
+            --bg-deep: #050505;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
-        body { 
-            background: var(--bg-deep); 
-            color: #e0e0e0; 
-            font-family: 'Rajdhani', sans-serif; 
-            overflow: hidden;
-            height: 100vh;
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg-deep); color: white; margin: 0; overflow-x: hidden; }
+
+        /* SECURITY OVERLAY */
+        #security-breach {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: #ff0000;
+            color: white;
+            z-index: 10000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            text-align: center;
         }
 
-        /* --- PRE-LOADER / SECURITY BREACH --- */
-        #security-alert {
-            position: fixed; inset: 0; background: radial-gradient(circle, #400, #000);
-            display: none; flex-direction: column; justify-content: center; align-items: center;
-            z-index: 99999; text-transform: uppercase; letter-spacing: 5px; color: #fff;
-        }
-
-        /* --- AUTH INTERFACE (SMART SCAN) --- */
-        #master-auth {
-            position: fixed; inset: 0; background: var(--bg-deep);
-            z-index: 10000; display: flex; justify-content: center; align-items: center;
-        }
-
-        .auth-card {
-            width: 350px; padding: 30px; background: var(--glass);
-            border: 1px solid var(--glass-border); border-radius: 20px;
-            backdrop-filter: blur(20px); text-align: center;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
-        }
-
-        .face-scanner-box {
-            width: 200px; height: 200px; margin: 0 auto 20px;
-            border: 2px solid var(--neon-emerald); border-radius: 20px;
-            position: relative; overflow: hidden; box-shadow: 0 0 20px var(--neon-emerald);
-        }
-
-        .scan-laser {
-            position: absolute; width: 100%; height: 2px; background: var(--neon-emerald);
-            box-shadow: 0 0 15px var(--neon-emerald); animation: laser 2s infinite;
-        }
-
-        @keyframes laser { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-
-        /* --- MAIN DASHBOARD LAYOUT --- */
-        .titan-terminal { display: none; height: 100vh; flex-direction: column; }
-
-        .top-bar {
-            height: 70px; display: flex; align-items: center; justify-content: space-between;
-            padding: 0 25px; border-bottom: 1px solid var(--glass-border);
-            background: rgba(2, 4, 8, 0.8); backdrop-filter: blur(15px);
-        }
-
-        .balance-monitor {
-            flex: 1; text-align: center; font-family: 'Orbitron', sans-serif;
-            font-size: 1.2rem; color: var(--neon-emerald); text-shadow: 0 0 10px var(--neon-emerald);
-        }
-
-        /* --- GRID SYSTEM --- */
-        .terminal-grid {
-            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
-            padding: 20px; flex: 1; overflow: hidden;
-        }
-
-        .grid-col {
-            background: var(--glass); border: 1px solid var(--glass-border);
-            border-radius: 15px; display: flex; flex-direction: column; overflow: hidden;
-        }
-
-        .col-header {
-            padding: 15px; background: rgba(255,255,255,0.02);
-            font-weight: bold; font-family: 'Orbitron'; font-size: 0.8rem;
+        /* MASTER DASHBOARD LAYOUT */
+        .app-container { display: none; padding-top: 60px; }
+        
+        .header {
+            position: fixed; top: 0; width: 100%; height: 60px;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(10px);
             display: flex; justify-content: space-between; align-items: center;
+            padding: 0 15px; z-index: 1000; border-bottom: 1px solid var(--glass);
         }
 
-        /* --- CARD STYLING --- */
-        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; scrollbar-width: none; }
-        .scroll-area::-webkit-scrollbar { display: none; }
+        .microchip-logo { width: 35px; cursor: pointer; transition: 0.3s; }
+        .microchip-logo:active { transform: scale(0.9); }
 
-        .titan-card {
-            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
-            border-radius: 12px; padding: 15px; margin-bottom: 15px;
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+        .sync-badge {
+            font-size: 10px; padding: 4px 8px; border-radius: 20px;
+            text-transform: uppercase; font-weight: bold;
+        }
+        .sync-off { background: var(--rose); color: white; }
+        .sync-on { background: var(--emerald); color: black; box-shadow: 0 0 10px var(--emerald); }
+
+        /* 3 COLUMN DASHBOARD */
+        .main-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px; padding: 15px; height: calc(100vh - 80px);
         }
 
-        .titan-card:hover { border-color: var(--neon-emerald); background: rgba(0,255,136,0.05); }
+        .column-panel {
+            background: var(--glass); border-radius: 15px;
+            padding: 10px; overflow-y: auto; border: 1px solid var(--glass);
+        }
+
+        .panel-title { 
+            text-align: center; font-size: 12px; color: var(--primary-gold);
+            margin-bottom: 15px; letter-spacing: 2px; font-weight: bold;
+        }
+
+        /* KARTU TRADING */
+        .trade-card {
+            background: rgba(255,255,255,0.03); border-radius: 12px;
+            padding: 12px; margin-bottom: 12px; border-left: 3px solid #444;
+            position: relative; transition: 0.4s;
+        }
 
         .glow-pulse {
-            animation: glowPulse 2s infinite;
-            border: 1px solid var(--neon-gold) !important;
+            box-shadow: 0 0 15px var(--primary-gold);
+            border: 1px solid var(--primary-gold);
+            animation: pulse-gold 1.5s infinite;
         }
 
-        @keyframes glowPulse {
-            0% { box-shadow: 0 0 5px var(--neon-gold); }
-            50% { box-shadow: 0 0 20px var(--neon-gold); }
-            100% { box-shadow: 0 0 5px var(--neon-gold); }
+        @keyframes pulse-gold {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
         }
 
-        /* --- UI ELEMENTS --- */
-        .badge {
-            font-size: 10px; padding: 2px 8px; border-radius: 4px;
-            background: var(--glass-border); color: #aaa;
+        .strategy-label {
+            font-size: 8px; font-weight: bold; padding: 2px 5px;
+            background: #222; border-radius: 4px; position: absolute; top: 10px; right: 10px;
         }
 
-        .btn-action {
-            background: var(--neon-emerald); color: #000; border: none;
-            padding: 8px 15px; border-radius: 5px; font-weight: bold;
-            font-family: 'Orbitron'; cursor: pointer; font-size: 0.7rem;
+        /* LEVEL SWITCHER */
+        .level-nav {
+            display: flex; justify-content: center; gap: 10px; padding: 10px;
+        }
+        .btn-lvl {
+            background: #111; border: 1px solid var(--glass); color: #666;
+            padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 12px;
+        }
+        .btn-lvl.active { border-color: var(--primary-gold); color: var(--primary-gold); background: rgba(255,204,0,0.1); }
+
+        /* ICON BOOK & CONFIG */
+        .tool-bar { display: flex; gap: 15px; align-items: center; }
+        .icon-book { 
+            width: 25px; cursor: pointer; opacity: 1; 
+            filter: drop-shadow(0 0 5px var(--primary-gold));
+            animation: book-glow 2s infinite;
+        }
+        .icon-config { width: 25px; cursor: pointer; transition: 0.3s; }
+        .config-locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
+
+        @keyframes book-glow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
-        .btn-locked { filter: grayscale(1); opacity: 0.3; cursor: not-allowed; }
+        /* MODAL GLASSMORPISM */
+        .modal {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 2000; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-content {
+            background: #111; border: 1px solid var(--primary-gold);
+            padding: 25px; border-radius: 20px; width: 100%; max-width: 400px;
+            text-align: center; box-shadow: 0 0 30px rgba(255,204,0,0.2);
+        }
 
-        /* --- SYNC INDICATORS --- */
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
-        .on { background: var(--neon-emerald); box-shadow: 0 0 10px var(--neon-emerald); }
-        .off { background: var(--neon-rose); box-shadow: 0 0 10px var(--neon-rose); }
+        /* LOGIN & REGISTER */
+        #auth-screen {
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #111, #000);
+        }
+        .auth-card {
+            width: 90%; max-width: 350px; background: var(--glass); padding: 30px;
+            border-radius: 20px; border: 1px solid var(--glass); text-align: center;
+        }
+        .input-titan {
+            width: 100%; padding: 12px; margin: 10px 0; background: rgba(0,0,0,0.5);
+            border: 1px solid var(--glass); border-radius: 8px; color: white; outline: none;
+        }
+        .btn-titan {
+            width: 100%; padding: 12px; background: var(--primary-gold); color: black;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
 
+        .master-device-btn {
+            position: fixed; top: 10px; left: 10px; width: 10px; height: 10px; opacity: 0; z-index: 5000;
+        }
     </style>
 </head>
 <body>
 
-    <div id="security-alert">
-        <h1>Critical Breach</h1>
-        <p id="breach-msg">Unauthorized Access Detected</p>
+    <div class="master-device-btn" onclick="lockMasterDevice()"></div>
+
+    <div id="security-breach">
+        <h1>SECURITY BREACH</h1>
+        <p>IDENTITAS PERANGKAT DIBLOKIR PERMANEN</p>
     </div>
 
-    <section id="master-auth">
+    <div id="auth-screen">
         <div class="auth-card">
-            <div id="master-chip" onclick="unlockAdmin()" style="font-size: 30px; cursor: pointer; opacity: 0.5;">💠</div>
-            <h2 style="font-family: 'Orbitron'; margin-bottom: 20px; letter-spacing: 2px;">V.13 CORE</h2>
-            <div class="face-scanner-box">
-                <div class="scan-laser"></div>
-                <video id="bio-feed" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
+            <img src="https://cdn-icons-png.flaticon.com/512/8030/8030198.png" width="60" class="microchip-logo" onclick="adminKnock()">
+            <h2 id="auth-title">TITAN V.13 LOGIN</h2>
+            <div id="biometric-area" style="display:none; margin-bottom: 15px;">
+                <div style="width: 100px; height: 100px; border: 2px solid var(--primary-gold); margin: 0 auto; border-radius: 50%; position: relative; overflow: hidden;">
+                    <video id="face-cam" autoplay muted style="width:100%; height:100%; object-fit: cover;"></video>
+                    <div style="position:absolute; top:0; left:0; width:100%; height:2px; background:var(--primary-gold); animation: scan-line 2s infinite;"></div>
+                </div>
+                <p style="font-size: 10px; color: var(--primary-gold); margin-top: 5px;">DETEKSI BIOMETRIK AKTIF</p>
             </div>
-            <div id="auth-form">
-                <input type="text" id="master-id" placeholder="TELEGRAM ID" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); padding:12px; color:#fff; border-radius:8px; margin-bottom:10px;">
-                <input type="password" id="master-key" placeholder="SECURE KEY" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); padding:12px; color:#fff; border-radius:8px; margin-bottom:20px;">
-                <button class="btn-action" onclick="initSystem()" style="width:100%; height:45px;">AUTHORIZE ACCESS</button>
+            <input type="text" id="tg-id" class="input-titan" placeholder="ID TELEGRAM">
+            <input type="password" id="tg-pass" class="input-titan" placeholder="PASSWORD">
+            <button class="btn-titan" id="main-auth-btn" onclick="processAuth()">MASUK</button>
+            <p style="font-size: 12px; margin-top: 15px;">Belum punya akun? <span style="color:var(--primary-gold); cursor:pointer" onclick="toggleAuthMode()">Daftar</span></p>
+        </div>
+    </div>
+
+    <div class="app-container" id="app">
+        <div class="header">
+            <div class="tool-bar">
+                <img src="https://cdn-icons-png.flaticon.com/512/8030/8030198.png" class="microchip-logo">
+                <div id="sync-status" class="sync-badge sync-off">SYNC OFF</div>
+            </div>
+            
+            <div id="main-balance" style="text-align: center;">
+                <div style="font-size: 10px; color: #aaa;">EQUITY TOTAL</div>
+                <div id="balance-value" style="font-size: 18px; font-weight: bold; color: var(--primary-gold);">0%</div>
+            </div>
+
+            <div class="tool-bar">
+                <img src="https://cdn-icons-png.flaticon.com/512/330/330731.png" class="icon-book" onclick="openMissionBook()">
+                <img src="https://cdn-icons-png.flaticon.com/512/3524/3524659.png" id="config-btn" class="icon-config config-locked" onclick="openConfig()">
+                <img src="https://cdn-icons-png.flaticon.com/512/1828/1828445.png" width="25" onclick="triggerLogout()">
             </div>
         </div>
-    </section>
 
-    <main class="titan-terminal" id="terminal">
-        <header class="top-bar">
-            <div style="display:flex; align-items:center; gap:15px;">
-                <span id="sync-dot" class="status-dot off"></span>
-                <span style="font-size:0.7rem; letter-spacing:2px;" id="node-text">NODE: SYNC_OFF</span>
-            </div>
-            
-            <div class="balance-monitor" id="dashboard-balance">
-                0% <span style="font-size:0.8rem; color:#666;">PROFIT_POOL</span>
-            </div>
+        <div class="level-nav">
+            <button class="btn-lvl active" id="btn-l1" onclick="switchLevel(1)">LEVEL 1</button>
+            <button class="btn-lvl" id="btn-l2" onclick="switchLevel(2)">LEVEL 2</button>
+            <button class="btn-lvl" id="btn-l3" onclick="switchLevel(3)">LEVEL 3</button>
+        </div>
 
-            <div style="display:flex; gap:20px; align-items:center;">
-                <span id="book-icon" class="book-active" style="cursor:pointer; font-size:1.2rem;">📖</span>
-                <span id="config-btn" onclick="openConfig()" style="cursor:pointer; font-size:1.2rem; opacity:0.3;">⚙️</span>
-                <span onclick="systemShutdown()" style="cursor:pointer; font-size:1.2rem; color:var(--neon-rose);">⏻</span>
+        <div class="main-grid">
+            <div class="column-panel">
+                <div class="panel-title">RADAR MONITOR</div>
+                <div id="radar-list"></div>
             </div>
-        </header>
-
-        <nav style="display:flex; justify-content:center; gap:10px; padding:10px; background:rgba(0,0,0,0.3);">
-            <button onclick="switchMode(1)" class="btn-action" id="nav-l1">LEVEL_01</button>
-            <button onclick="switchMode(2)" class="btn-action btn-locked" id="nav-l2">LEVEL_02</button>
-            <button onclick="switchMode(3)" class="btn-action btn-locked" id="nav-l3">LEVEL_03</button>
-        </nav>
-
-        <section class="terminal-grid">
-            <div class="grid-col">
-                <div class="col-header">
-                    <span>RADAR_SCANNER</span>
-                    <span id="slot-count" style="color:var(--neon-gold);">0/10 SLOT</span>
-                </div>
-                <div class="scroll-area" id="radar-engine"></div>
+            <div class="column-panel">
+                <div class="panel-title">ACTIVE POSITIONS</div>
+                <div id="active-list"></div>
             </div>
-
-            <div class="grid-col">
-                <div class="col-header">ACTIVE_EXECUTIONS</div>
-                <div class="scroll-area" id="active-engine"></div>
+            <div class="column-panel">
+                <div class="panel-title">SECURE VAULT</div>
+                <div id="vault-list"></div>
             </div>
+        </div>
+    </div>
 
-            <div class="grid-col">
-                <div class="col-header">VAULT_ARCHIVE</div>
-                <div class="scroll-area" id="vault-engine"></div>
-            </div>
-        </section>
-    </main>
+    <div id="modal-premium" class="modal">
+        <div class="modal-content">
+            <h3 id="modal-title" style="color: var(--primary-gold);"></h3>
+            <p id="modal-body" style="font-size: 13px; line-height: 1.6;"></p>
+            <div id="modal-footer"></div>
+        </div>
+    </div>
 
     <script>
-        // --- MASTER DATA & CONFIG ---
-        const MASTER_CONFIG = {
-            id: "1319700866",
-            token: "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4",
-            group: "-1003254379333",
-            links: {
-                indodax: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon",
-                gate: "https://app.mbm06.com/referral/earn-together/invite/BFZFVFlX?ref=BFZFVFlX",
-                jupiter: "https://jup.ag/?refId=yuf0dh4il1xs"
-            }
-        };
+        // --- MASTER CONFIGURATION & STATE ---
+        const MASTER_ID = "1319700866";
+        const BOT_TOKEN = "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4";
+        const GROUP_ID = "-1003254379333";
 
-        let sysState = {
-            currentLvl: 1,
+        let state = {
+            user: null,
+            lvl: 1,
             isSync: false,
-            knock: 0,
-            simEquity: 0,
-            realEquity: 0,
-            slots: 0,
-            activePositions: [],
-            vault: []
+            equity: { L1: 0, L2: 0, L3: 0 },
+            trades: { L1: [], L2: [], L3: [] },
+            vault: { L1: [], L2: [], L3: [] },
+            isDevLocked: false,
+            targetHit: false,
+            knockCount: 0
         };
 
-        // --- SECURITY ENGINE ---
-        const securityGuard = () => {
+        // --- SECURITY CORE ---
+        function antiHack() {
             const devtools = /./;
             devtools.toString = function() {
-                triggerBreach("DevTools Detected");
+                document.getElementById('security-breach').style.display = 'flex';
+                localStorage.clear();
+                return '';
             };
+            console.log('%c', devtools);
             
-            // Check orientation and VPN simulation
-            window.addEventListener('resize', () => {
-                if(window.outerWidth - window.innerWidth > 100) triggerBreach("Resize Violation");
+            window.addEventListener('keydown', (e) => {
+                if(e.keyCode == 123 || (e.ctrlKey && e.shiftKey && e.keyCode == 73)) {
+                    e.preventDefault();
+                    document.getElementById('security-breach').style.display = 'flex';
+                }
             });
-        };
+        }
+        antiHack();
 
-        function triggerBreach(reason) {
-            document.getElementById('security-alert').style.display = 'flex';
-            document.getElementById('breach-msg').innerText = `PROTOCOL_VIOLATION: ${reason}`;
-            localStorage.clear();
-            setTimeout(() => location.reload(), 3000);
+        function lockMasterDevice() {
+            state.isDevLocked = true;
+            alert("MASTER DEVICE PINNED.");
         }
 
-        // --- AUTH SYSTEM ---
-        function unlockAdmin() {
-            sysState.knock++;
-            if(sysState.knock >= 5) {
-                document.getElementById('master-id').value = MASTER_CONFIG.id;
-                document.getElementById('master-key').value = "TITAN_V13_MASTER";
-                initSystem();
+        function adminKnock() {
+            state.knockCount++;
+            if(state.knockCount >= 5) {
+                document.getElementById('tg-id').value = MASTER_ID;
+                document.getElementById('tg-pass').value = "MahadhareV13Master";
+                processAuth();
             }
         }
 
-        async function initSystem() {
-            const mid = document.getElementById('master-id').value;
-            if(mid !== MASTER_CONFIG.id) return alert("BIOMETRIC MISMATCH");
+        // --- AUTHENTICATION LOGIC ---
+        let authMode = 'login';
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'register' : 'login';
+            document.getElementById('auth-title').innerText = authMode === 'login' ? 'TITAN V.13 LOGIN' : 'TITAN V.13 REGISTER';
+            document.getElementById('biometric-area').style.display = authMode === 'login' ? 'none' : 'block';
+            document.getElementById('main-auth-btn').innerText = authMode === 'login' ? 'MASUK' : 'DAFTAR';
+            if(authMode === 'register') startCamera();
+        }
+
+        async function startCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            document.getElementById('face-cam').srcObject = stream;
+        }
+
+        function processAuth() {
+            const id = document.getElementById('tg-id').value;
+            const pass = document.getElementById('tg-pass').value;
+
+            if(!id || !pass) return alert("DATA TIDAK LENGKAP");
+
+            // Simulasi Enkripsi & Simpan
+            state.user = { id, pass };
+            document.getElementById('auth-screen').style.display = 'none';
+            document.getElementById('app').style.display = 'block';
             
-            document.getElementById('master-auth').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('master-auth').style.display = 'none';
-                document.getElementById('terminal').style.display = 'flex';
-                startMataDewa();
-            }, 500);
+            showContract();
         }
 
-        // --- MATA DEWA AI ENGINE ---
-        const assetPool = ["BTC", "ETH", "SOL", "BNB", "TIA", "JUP", "PEPE", "LINK", "AVAX", "NEAR", "INJ", "RNDR"];
-
-        function startMataDewa() {
-            setInterval(updateRadar, 7000);
-            renderUI();
+        // --- MISSION CONTROL ---
+        function showContract() {
+            showModal(
+                "KONTRAK MISI 120 HARI",
+                `Selamat Datang Master. Anda memasuki fase pelatihan berjangka:<br><br>
+                <b>LEVEL 1 (30 Hari):</b> Simulasi Psikologi (Target 5%).<br>
+                <b>LEVEL 2 (30 Hari):</b> Real Manual Trade (Target 10%).<br>
+                <b>LEVEL 3 (60 Hari):</b> Autopilot Full (Target 20%+).<br><br>
+                Selesaikan misi untuk mendapatkan Sertifikat Kelulusan MD5 Signature.`,
+                `<button class="btn-titan" onclick="initLevel1Modal()">SAYA SETUJU & MULAI</button>`
+            );
         }
 
-        function updateRadar() {
-            const radar = document.getElementById('radar-engine');
-            radar.innerHTML = '';
+        function initLevel1Modal() {
+            showModal(
+                "ALOKASI MODAL L1",
+                "Masukkan modal simulasi Anda (Min 1jt - Max 1M). Modal akan otomatis dipecah ke Bucket 4:4:2.",
+                `<input type="number" id="init-equity" class="input-titan" placeholder="1.000.000">
+                 <button class="btn-titan" onclick="startL1()">MULAI SIMULASI</button>`
+            );
+        }
 
-            const market = assetPool.map(sym => ({
-                sym,
-                price: (Math.random() * 60000).toFixed(2),
-                change: (Math.random() * 12 - 5).toFixed(2),
-                strategy: Math.random() > 0.7 ? 'MOONSHOT' : (Math.random() > 0.4 ? 'SMART' : 'SCALP')
-            })).sort((a,b) => b.change - a.change);
+        function startL1() {
+            const val = parseInt(document.getElementById('init-equity').value);
+            if(val < 1000000 || val > 1000000000) return alert("Range Modal: 1Jt - 1M");
+            state.equity.L1 = val;
+            closeModal();
+            updateUI();
+            startMarketEngine();
+        }
 
-            market.forEach(coin => {
+        // --- TRADING ENGINE (MATA DEWA) ---
+        const ASSETS = ["BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "DOGE", "MATIC", "DOT", "LTC", "AVAX", "LINK"];
+        let marketData = [];
+
+        function startMarketEngine() {
+            setInterval(() => {
+                marketData = ASSETS.map(symbol => {
+                    const price = Math.random() * 50000;
+                    const change = (Math.random() * 10) - 4.5; // -4.5% s/d 5.5%
+                    let strategy = "SCALP";
+                    if(change > 3) strategy = "SMART";
+                    if(change > 4.5) strategy = "MOONSHOT";
+
+                    return { symbol, price, change, strategy, bursa: "Indodax" };
+                });
+                
+                // Sorting: Glow-Pulse (>4%) di atas
+                marketData.sort((a, b) => b.change - a.change);
+                renderRadar();
+                if(state.lvl === 3 && state.isSync) runAutopilot();
+            }, 7000);
+        }
+
+        function renderRadar() {
+            const list = document.getElementById('radar-list');
+            list.innerHTML = "";
+            
+            if(state.targetHit) {
+                list.innerHTML = `<div style="text-align:center; padding:20px; opacity:0.5; filter:grayscale(1)">
+                    <img src="https://cdn-icons-png.flaticon.com/512/2553/2553228.png" width="50"><br>TARGET HARIAN TERCAPAI</div>`;
+                return;
+            }
+
+            marketData.forEach(coin => {
                 const isHot = coin.change > 4;
                 const card = document.createElement('div');
-                card.className = `titan-card ${isHot ? 'glow-pulse' : ''}`;
+                card.className = `trade-card ${isHot ? 'glow-pulse' : ''}`;
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-family:'Orbitron'; font-size:0.9rem;">${coin.sym}/USDT</span>
-                        <span style="color:${coin.change > 0 ? 'var(--neon-emerald)' : 'var(--neon-rose)'}">${coin.change}%</span>
-                    </div>
-                    <div style="font-size:10px; margin:8px 0; color:#888;">${coin.strategy} • LIQUIDITY_HIGH</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <span style="font-weight:bold;">$${coin.price}</span>
-                        ${sysState.currentLvl < 3 ? `<button onclick="executeBuy('${coin.sym}', ${coin.price}, '${coin.strategy}')" class="btn-action">EXECUTE</button>` : ''}
-                    </div>
+                    <div class="strategy-label">${coin.strategy}</div>
+                    <div style="font-weight:bold; color:var(--primary-gold)">${coin.symbol}/IDR</div>
+                    <div style="font-size:11px; color:#888">${coin.bursa}</div>
+                    <div style="margin:8px 0; font-size:14px">Rp ${coin.price.toLocaleString()}</div>
+                    <div style="color:${coin.change >= 0 ? 'var(--emerald)' : 'var(--rose)'}">${coin.change.toFixed(2)}%</div>
+                    ${state.lvl !== 3 ? `<button onclick="executeBuy('${coin.symbol}')" style="width:100%; margin-top:10px; background:var(--emerald); border:none; padding:5px; border-radius:4px; font-weight:bold; cursor:pointer">BUY</button>` : ''}
                 `;
-                radar.appendChild(card);
+                list.appendChild(card);
             });
         }
 
-        // --- TRADING LOGIC ---
-        function executeBuy(sym, price, strat) {
-            if(sysState.slots >= 10) return alert("MAX_SLOTS_REACHED");
+        function executeBuy(symbol) {
+            if(state.trades['L'+state.lvl].length >= 10) return alert("SLOT PENUH (Maks 10)");
             
-            const pos = {
-                id: Date.now(),
-                sym,
-                entry: price,
-                strat,
-                profit: 0
-            };
-            sysState.activePositions.push(pos);
-            sysState.slots++;
-            renderActive();
-            document.getElementById('slot-count').innerText = `${sysState.slots}/10 SLOT`;
-        }
-
-        function renderActive() {
-            const area = document.getElementById('active-engine');
-            area.innerHTML = '';
-            sysState.activePositions.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'titan-card';
-                card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>${p.sym}</span>
-                        <span class="badge" style="background:var(--neon-emerald); color:#000;">${p.strat}</span>
-                    </div>
-                    <div style="margin:10px 0; font-family:'Orbitron'; color:var(--neon-emerald);">+${(Math.random()*5).toFixed(2)}%</div>
-                    <button class="btn-action" style="width:100%; background:var(--neon-rose);" onclick="executeSell(${p.id})">CLOSE_POSITION</button>
-                `;
-                area.appendChild(card);
-            });
-        }
-
-        function executeSell(id) {
-            sysState.activePositions = sysState.activePositions.filter(p => p.id !== id);
-            sysState.slots--;
-            document.getElementById('slot-count').innerText = `${sysState.slots}/10 SLOT`;
-            renderActive();
-            // Add to vault logic here...
-        }
-
-        // --- NAVIGATION & LVL LOGIC ---
-        function switchMode(lvl) {
-            if(lvl === 3) {
-                document.getElementById('config-btn').style.opacity = '1';
-                document.getElementById('dashboard-balance').innerHTML = sysState.isSync ? "Rp 25.000.000" : "0% <span style='font-size:0.8rem; color:#666;'>PROFIT_POOL</span>";
-            } else {
-                document.getElementById('config-btn').style.opacity = '0.3';
-                document.getElementById('dashboard-balance').innerText = "Rp 1.000.000";
+            const coin = marketData.find(c => c.symbol === symbol);
+            const newTrade = { ...coin, entry: coin.price, time: new Date().toLocaleTimeString() };
+            
+            if(state.lvl === 2) {
+                // Deep Link Logic
+                const links = {
+                    Indodax: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon",
+                    Jupiter: "https://jup.ag/?refId=yuf0dh4il1xs"
+                };
+                window.open(links[coin.bursa], '_blank');
             }
-            sysState.currentLvl = lvl;
-            updateRadar();
+
+            state.trades['L'+state.lvl].push(newTrade);
+            updateUI();
         }
 
-        function openConfig() {
-            if(sysState.currentLvl < 3) return alert("KHUSUS LEVEL 3 MASTER");
-            // API Setup Popup Logic...
-            alert("API BRIDGE READY: Menunggu Kredensial Master.");
-        }
+        // --- LEVEL & UI NAVIGATION ---
+        function switchLevel(lvl) {
+            // Logic Guard
+            if(lvl === 2 && state.equity.L1 === 0) return alert("SELESAIKAN LEVEL 1!");
+            if(lvl === 3 && state.equity.L2 === 0) return alert("SELESAIKAN LEVEL 2!");
 
-        function renderUI() {
-            // Initial Camera Feed for Pro-Look
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => document.getElementById('bio-feed').srcObject = stream)
-                .catch(e => console.log("Bio-Feed Offline"));
+            state.lvl = lvl;
+            document.querySelectorAll('.btn-lvl').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-l'+lvl).classList.add('active');
             
-            updateRadar();
-            securityGuard();
+            // Config Button Lock
+            const configBtn = document.getElementById('config-btn');
+            if(lvl === 3) {
+                configBtn.classList.remove('config-locked');
+            } else {
+                configBtn.classList.add('config-locked');
+            }
+
+            if(lvl === 2 && state.equity.L2 === 0) {
+                showModal("ELITE WALLET SYNC", "Klik untuk sinkronisasi saldo dompet riil Anda (Min Rp 500.000).", 
+                `<input type="number" id="l2-equity" class="input-titan" placeholder="500000">
+                 <button class="btn-titan" onclick="syncL2()">SYNC WALLET</button>`);
+            }
+
+            updateUI();
         }
 
-        function systemShutdown() {
-            if(confirm("TERMINATE ALL SESSIONS?")) location.reload();
+        function syncL2() {
+            const val = parseInt(document.getElementById('l2-equity').value);
+            if(val < 500000) return alert("Minimal Rp 500.000");
+            state.equity.L2 = val;
+            closeModal();
+            updateUI();
+        }
+
+        function updateUI() {
+            const balVal = document.getElementById('balance-value');
+            const syncBadge = document.getElementById('sync-status');
+
+            if(state.lvl === 3) {
+                if(!state.isSync) {
+                    balVal.innerText = "0%";
+                    syncBadge.className = "sync-badge sync-off";
+                    syncBadge.innerText = "SYNC OFF";
+                } else {
+                    balVal.innerText = "Rp " + state.equity.L3.toLocaleString();
+                    syncBadge.className = "sync-badge sync-on";
+                    syncBadge.innerText = "SYNC ON";
+                }
+            } else {
+                balVal.innerText = "Rp " + state.equity['L'+state.lvl].toLocaleString();
+                syncBadge.className = "sync-badge sync-off";
+                syncBadge.innerText = "TRAINING MODE";
+            }
+
+            renderRadar();
+            renderActiveAndVault();
+        }
+
+        function renderActiveAndVault() {
+            const activeList = document.getElementById('active-list');
+            const vaultList = document.getElementById('vault-list');
+            activeList.innerHTML = "";
+            vaultList.innerHTML = "";
+
+            state.trades['L'+state.lvl].forEach((t, index) => {
+                const current = marketData.find(c => c.symbol === t.symbol)?.price || t.entry;
+                const pnl = ((current - t.entry) / t.entry) * 100;
+                
+                const card = document.createElement('div');
+                card.className = "trade-card";
+                card.style.borderLeftColor = pnl >= 0 ? 'var(--emerald)' : 'var(--rose)';
+                card.innerHTML = `
+                    <div style="font-weight:bold">${t.symbol}</div>
+                    <div style="font-size:10px; color:#888">Entry: ${t.entry.toFixed(2)}</div>
+                    <div style="font-size:14px; color:${pnl >= 0 ? 'var(--emerald)' : 'var(--rose)'}">${pnl.toFixed(2)}%</div>
+                    ${state.lvl !== 3 ? `<button onclick="closeTrade(${index})" style="width:100%; background:#444; border:none; color:white; padding:5px; margin-top:5px; border-radius:4px;">SELL</button>` : ''}
+                `;
+                activeList.appendChild(card);
+            });
+
+            state.vault['L'+state.lvl].forEach(v => {
+                const card = document.createElement('div');
+                card.className = "trade-card";
+                card.style.opacity = "0.7";
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between">
+                        <span>${v.symbol}</span>
+                        <span style="color:${v.pnl >= 0 ? 'var(--emerald)' : 'var(--rose)'}">${v.pnl.toFixed(2)}%</span>
+                    </div>
+                    <div style="font-size:9px; color:#555">${v.time} | ${v.strategy}</div>
+                `;
+                vaultList.appendChild(card);
+            });
+        }
+
+        function closeTrade(index) {
+            const trade = state.trades['L'+state.lvl][index];
+            const current = marketData.find(c => c.symbol === trade.symbol)?.price || trade.entry;
+            const pnl = ((current - trade.entry) / trade.entry) * 100;
+
+            state.vault['L'+state.lvl].unshift({ ...trade, pnl, time: new Date().toLocaleTimeString() });
+            state.trades['L'+state.lvl].splice(index, 1);
+            
+            // Check Target
+            const totalProfit = state.vault['L'+state.lvl].reduce((sum, item) => sum + item.pnl, 0);
+            const targets = { L1: 5, L2: 10, L3: 20 };
+            if(totalProfit >= targets['L'+state.lvl]) state.targetHit = true;
+
+            updateUI();
+        }
+
+        // --- LEVEL 3 SPECIAL (AUTOPILOT & CONFIG) ---
+        function openConfig() {
+            if(state.lvl !== 3) {
+                showModal("AKSES DITOLAK", "Fitur Config Bridge hanya tersedia untuk LEVEL 3 MASTER.", `<button class="btn-titan" onclick="closeModal()">MENGERTI</button>`);
+                return;
+            }
+
+            showModal("API BRIDGE SETUP", 
+            `Hubungkan API Bursa Indodax/Gate/Jupiter untuk mengaktifkan Autopilot Riil.
+            <input type="text" id="api-key" class="input-titan" placeholder="API KEY">
+            <input type="password" id="api-secret" class="input-titan" placeholder="API SECRET">`,
+            `<button class="btn-titan" onclick="saveAPI()">SYNC & LOCK API</button>`);
+        }
+
+        function saveAPI() {
+            const k = document.getElementById('api-key').value;
+            const s = document.getElementById('api-secret').value;
+            if(!k || !s) return alert("API KEY/SECRET WAJIB DIISI");
+            
+            state.isSync = true;
+            state.equity.L3 = 7500000; // Simulasi saldo ditarik dari API
+            closeModal();
+            updateUI();
+            
+            sendTelegramMessage(`🚀 MASTER CONNECTED\nID: ${state.user.id.slice(-3)}\nStatus: SYNC ON\nEquity: Rp ${state.equity.L3.toLocaleString()}`);
+        }
+
+        function runAutopilot() {
+            // Supreme Intelligence Logic
+            const bestCoin = marketData.find(c => c.change > 4 && c.strategy !== "SCALP");
+            if(bestCoin && state.trades.L3.length < 10) {
+                executeBuy(bestCoin.symbol);
+                sendTelegramMessage(`🎯 AI EXECUTION\nPair: ${bestCoin.symbol}\nStrategy: ${bestCoin.strategy}\nStatus: Locked`);
+            }
+
+            // Trailing Stop Loss (TSL) 2%
+            state.trades.L3.forEach((t, i) => {
+                const current = marketData.find(c => c.symbol === t.symbol)?.price || t.entry;
+                const pnl = ((current - t.entry) / t.entry) * 100;
+                if(pnl >= 7 || pnl <= -4) closeTrade(i);
+            });
+        }
+
+        // --- UTILS ---
+        function showModal(title, body, footer) {
+            document.getElementById('modal-title').innerHTML = title;
+            document.getElementById('modal-body').innerHTML = body;
+            document.getElementById('modal-footer').innerHTML = footer;
+            document.getElementById('modal-premium').style.display = 'flex';
+        }
+
+        function closeModal() { document.getElementById('modal-premium').style.display = 'none'; }
+
+        function openMissionBook() {
+            const info = {
+                1: "Level 1: Fokus pada Psikologi. Alokasi 4:4:2. Gunakan saldo simulasi untuk memahami pergerakan Mata Dewa.",
+                2: "Level 2: Transisi Real. Wajib Link Reff Admin. Eksekusi manual untuk memvalidasi sinyal di bursa asli.",
+                3: "Level 3: Autopilot Penuh. AI mengelola aset Anda dengan strategi TSL & High Priority Smart Signals."
+            };
+            showModal("BUKU PANDUAN L"+state.lvl, info[state.lvl], `<button class="btn-titan" onclick="closeModal()">TUTUP</button>`);
+        }
+
+        async function sendTelegramMessage(text) {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${GROUP_ID}&text=${encodeURIComponent(text)}`;
+            await fetch(url);
+        }
+
+        function triggerLogout() {
+            if(state.trades['L'+state.lvl].length > 0) {
+                return alert("PERINGATAN: Masih ada posisi terbuka! Amankan dana sebelum logout.");
+            }
+            if(confirm("Keluar dari TITAN V.13?")) location.reload();
         }
 
     </script>
