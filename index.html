@@ -3,364 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TITAN V.13 - OMNIPOTENT MASTER</title>
+    <title>TITAN V.13 | OMNIPOTENT SYSTEM</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #05070a;
-            --glass: rgba(255, 255, 255, 0.05);
-            --emerald: #00ff88;
-            --rose: #ff3e3e;
-            --gold: #ffcc00;
-            --font: 'Inter', sans-serif;
+            --neon-emerald: #00ff88;
+            --neon-gold: #ffcc00;
+            --neon-rose: #ff2d55;
+            --bg-deep: #020408;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font); }
-        body { background: var(--bg); color: white; overflow: hidden; }
-
-        /* SECURITY BREACH OVERLAY */
-        #security-breach {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: red; color: white; display: none; flex-direction: column;
-            justify-content: center; align-items: center; z-index: 9999;
-            text-align: center; font-weight: bold;
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        body { 
+            background: var(--bg-deep); 
+            color: #e0e0e0; 
+            font-family: 'Rajdhani', sans-serif; 
+            overflow: hidden;
+            height: 100vh;
         }
 
-        /* DASHBOARD STRUCTURE */
-        .app-container { display: none; height: 100vh; flex-direction: column; }
-        
-        .header {
-            height: 60px; padding: 0 20px; display: flex; align-items: center;
-            justify-content: space-between; border-bottom: 1px solid var(--glass);
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(10px);
+        /* --- PRE-LOADER / SECURITY BREACH --- */
+        #security-alert {
+            position: fixed; inset: 0; background: radial-gradient(circle, #400, #000);
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 99999; text-transform: uppercase; letter-spacing: 5px; color: #fff;
         }
 
-        .node-status { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-        .sync-on { color: var(--emerald); }
-        .sync-off { color: var(--rose); }
-
-        .main-content {
-            flex: 1; display: grid; grid-template-columns: 1fr 1fr 1fr;
-            gap: 15px; padding: 15px; overflow-x: auto;
+        /* --- AUTH INTERFACE (SMART SCAN) --- */
+        #master-auth {
+            position: fixed; inset: 0; background: var(--bg-deep);
+            z-index: 10000; display: flex; justify-content: center; align-items: center;
         }
 
-        /* CARDS & RADAR */
-        .column { background: var(--glass); border-radius: 15px; display: flex; flex-direction: column; height: 100%; }
-        .column-header { padding: 15px; border-bottom: 1px solid var(--glass); display: flex; justify-content: space-between; }
-        .card-list { flex: 1; overflow-y: auto; padding: 10px; }
-
-        .signal-card {
-            background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px;
-            margin-bottom: 10px; border: 1px solid var(--glass); position: relative;
-            transition: 0.3s;
+        .auth-card {
+            width: 350px; padding: 30px; background: var(--glass);
+            border: 1px solid var(--glass-border); border-radius: 20px;
+            backdrop-filter: blur(20px); text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        .glow-pulse { animation: pulse-gold 1.5s infinite; border: 1px solid var(--gold); }
-        @keyframes pulse-gold { 
-            0% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.4); }
-            70% { box-shadow: 0 0 0 15px rgba(255, 204, 0, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+        .face-scanner-box {
+            width: 200px; height: 200px; margin: 0 auto 20px;
+            border: 2px solid var(--neon-emerald); border-radius: 20px;
+            position: relative; overflow: hidden; box-shadow: 0 0 20px var(--neon-emerald);
         }
 
-        .blur-locked { filter: blur(8px); pointer-events: none; opacity: 0.5; }
-
-        /* BIOMETRIC MODAL */
-        #auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 1000; display: flex; justify-content: center; align-items: center;
+        .scan-laser {
+            position: absolute; width: 100%; height: 2px; background: var(--neon-emerald);
+            box-shadow: 0 0 15px var(--neon-emerald); animation: laser 2s infinite;
         }
 
-        .face-scanner {
-            width: 250px; height: 250px; border: 2px solid var(--emerald);
-            border-radius: 50%; position: relative; overflow: hidden;
+        @keyframes laser { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
+
+        /* --- MAIN DASHBOARD LAYOUT --- */
+        .titan-terminal { display: none; height: 100vh; flex-direction: column; }
+
+        .top-bar {
+            height: 70px; display: flex; align-items: center; justify-content: space-between;
+            padding: 0 25px; border-bottom: 1px solid var(--glass-border);
+            background: rgba(2, 4, 8, 0.8); backdrop-filter: blur(15px);
         }
 
-        .scan-line {
-            position: absolute; width: 100%; height: 4px; background: var(--emerald);
-            top: 0; animation: scan 2s linear infinite; box-shadow: 0 0 15px var(--emerald);
+        .balance-monitor {
+            flex: 1; text-align: center; font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem; color: var(--neon-emerald); text-shadow: 0 0 10px var(--neon-emerald);
         }
 
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
-
-        /* UTILITY */
-        .btn-premium {
-            background: linear-gradient(45deg, var(--emerald), #00aaff);
-            border: none; color: black; padding: 10px 20px; border-radius: 8px;
-            font-weight: bold; cursor: pointer;
+        /* --- GRID SYSTEM --- */
+        .terminal-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;
+            padding: 20px; flex: 1; overflow: hidden;
         }
 
-        .config-locked { opacity: 0.3; filter: grayscale(1); cursor: not-allowed; }
-        .book-active { color: var(--gold); animation: pulse-text 2s infinite; opacity: 1 !important; }
+        .grid-col {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            border-radius: 15px; display: flex; flex-direction: column; overflow: hidden;
+        }
 
-        /* PERCENTAGE DISPLAY FOR L3 SYNC OFF */
-        .l3-percent { font-size: 24px; font-weight: bold; color: var(--emerald); }
+        .col-header {
+            padding: 15px; background: rgba(255,255,255,0.02);
+            font-weight: bold; font-family: 'Orbitron'; font-size: 0.8rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        /* --- CARD STYLING --- */
+        .scroll-area { flex: 1; overflow-y: auto; padding: 15px; scrollbar-width: none; }
+        .scroll-area::-webkit-scrollbar { display: none; }
+
+        .titan-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+        }
+
+        .titan-card:hover { border-color: var(--neon-emerald); background: rgba(0,255,136,0.05); }
+
+        .glow-pulse {
+            animation: glowPulse 2s infinite;
+            border: 1px solid var(--neon-gold) !important;
+        }
+
+        @keyframes glowPulse {
+            0% { box-shadow: 0 0 5px var(--neon-gold); }
+            50% { box-shadow: 0 0 20px var(--neon-gold); }
+            100% { box-shadow: 0 0 5px var(--neon-gold); }
+        }
+
+        /* --- UI ELEMENTS --- */
+        .badge {
+            font-size: 10px; padding: 2px 8px; border-radius: 4px;
+            background: var(--glass-border); color: #aaa;
+        }
+
+        .btn-action {
+            background: var(--neon-emerald); color: #000; border: none;
+            padding: 8px 15px; border-radius: 5px; font-weight: bold;
+            font-family: 'Orbitron'; cursor: pointer; font-size: 0.7rem;
+        }
+
+        .btn-locked { filter: grayscale(1); opacity: 0.3; cursor: not-allowed; }
+
+        /* --- SYNC INDICATORS --- */
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }
+        .on { background: var(--neon-emerald); box-shadow: 0 0 10px var(--neon-emerald); }
+        .off { background: var(--neon-rose); box-shadow: 0 0 10px var(--neon-rose); }
+
     </style>
 </head>
 <body>
 
-    <div id="security-breach">
-        <h1>SECURITY BREACH</h1>
-        <p>DETECTED: ILLEGAL ACCESS / VPN / INSPECT ELEMENT</p>
-        <p>DEVICE PERMANENTLY BLACKLISTED</p>
+    <div id="security-alert">
+        <h1>Critical Breach</h1>
+        <p id="breach-msg">Unauthorized Access Detected</p>
     </div>
 
-    <div id="auth-overlay">
-        <div style="text-align: center; width: 300px;">
-            <div id="master-chip" onclick="handleMasterKnock()" style="font-size: 40px; margin-bottom: 20px; cursor: pointer;">🏷️</div>
-            <div class="face-scanner">
-                <div class="scan-line"></div>
-                <video id="video" width="250" height="250" autoplay muted style="object-fit: cover; border-radius: 50%;"></video>
+    <section id="master-auth">
+        <div class="auth-card">
+            <div id="master-chip" onclick="unlockAdmin()" style="font-size: 30px; cursor: pointer; opacity: 0.5;">💠</div>
+            <h2 style="font-family: 'Orbitron'; margin-bottom: 20px; letter-spacing: 2px;">V.13 CORE</h2>
+            <div class="face-scanner-box">
+                <div class="scan-laser"></div>
+                <video id="bio-feed" autoplay muted style="width:100%; height:100%; object-fit:cover;"></video>
             </div>
-            <h2 id="auth-title" style="margin-top: 20px;">BIOMETRIC SCAN</h2>
-            <div id="login-form">
-                <input type="text" id="tg-id" placeholder="ID Telegram" style="width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none;">
-                <input type="password" id="tg-pass" placeholder="Password" style="width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: none;">
-                <button class="btn-premium" onclick="executeLogin()" style="width: 100%; margin-top: 15px;">LOGIN MASTER</button>
-                <p onclick="showRegister()" style="font-size: 12px; margin-top: 15px; cursor: pointer; color: var(--emerald);">Belum Terdaftar? Daftar Disini</p>
-            </div>
-        </div>
-    </div>
-
-    <div class="app-container" id="main-app">
-        <div class="header">
-            <div class="node-status">
-                <span id="sync-status" class="sync-off">● SYNC OFF</span>
-                <span id="live-online">LIVE: 1,284</span>
-            </div>
-            <div id="level-switcher">
-                <button onclick="switchLevel(1)" id="btn-l1">L1</button>
-                <button onclick="switchLevel(2)" id="btn-l2">L2</button>
-                <button onclick="switchLevel(3)" id="btn-l3">L3</button>
-            </div>
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <span id="book-misi" class="book-active" onclick="showMisi()" style="cursor: pointer; font-size: 20px;">📖</span>
-                <span id="config-gear" class="config-locked" onclick="openConfig()" style="cursor: pointer; font-size: 20px;">⚙️</span>
-                <span onclick="confirmLogout()" style="cursor: pointer; font-size: 20px; color: var(--rose);">⏻</span>
+            <div id="auth-form">
+                <input type="text" id="master-id" placeholder="TELEGRAM ID" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); padding:12px; color:#fff; border-radius:8px; margin-bottom:10px;">
+                <input type="password" id="master-key" placeholder="SECURE KEY" style="width:100%; background:var(--glass); border:1px solid var(--glass-border); padding:12px; color:#fff; border-radius:8px; margin-bottom:20px;">
+                <button class="btn-action" onclick="initSystem()" style="width:100%; height:45px;">AUTHORIZE ACCESS</button>
             </div>
         </div>
+    </section>
 
-        <div class="header" style="height: 40px; background: rgba(255,255,255,0.02);">
-            <div id="balance-display" style="width: 100%; text-align: center; font-weight: bold; letter-spacing: 1px;">
-                SALDO: <span id="main-balance">0%</span>
+    <main class="titan-terminal" id="terminal">
+        <header class="top-bar">
+            <div style="display:flex; align-items:center; gap:15px;">
+                <span id="sync-dot" class="status-dot off"></span>
+                <span style="font-size:0.7rem; letter-spacing:2px;" id="node-text">NODE: SYNC_OFF</span>
             </div>
-        </div>
+            
+            <div class="balance-monitor" id="dashboard-balance">
+                0% <span style="font-size:0.8rem; color:#666;">PROFIT_POOL</span>
+            </div>
 
-        <div class="main-content">
-            <div class="column">
-                <div class="column-header">
-                    <span>RADAR MASTER</span>
-                    <span id="slot-info" style="color: var(--gold);">SLOTS: 0/10</span>
+            <div style="display:flex; gap:20px; align-items:center;">
+                <span id="book-icon" class="book-active" style="cursor:pointer; font-size:1.2rem;">📖</span>
+                <span id="config-btn" onclick="openConfig()" style="cursor:pointer; font-size:1.2rem; opacity:0.3;">⚙️</span>
+                <span onclick="systemShutdown()" style="cursor:pointer; font-size:1.2rem; color:var(--neon-rose);">⏻</span>
+            </div>
+        </header>
+
+        <nav style="display:flex; justify-content:center; gap:10px; padding:10px; background:rgba(0,0,0,0.3);">
+            <button onclick="switchMode(1)" class="btn-action" id="nav-l1">LEVEL_01</button>
+            <button onclick="switchMode(2)" class="btn-action btn-locked" id="nav-l2">LEVEL_02</button>
+            <button onclick="switchMode(3)" class="btn-action btn-locked" id="nav-l3">LEVEL_03</button>
+        </nav>
+
+        <section class="terminal-grid">
+            <div class="grid-col">
+                <div class="col-header">
+                    <span>RADAR_SCANNER</span>
+                    <span id="slot-count" style="color:var(--neon-gold);">0/10 SLOT</span>
                 </div>
-                <div id="radar-list" class="card-list"></div>
+                <div class="scroll-area" id="radar-engine"></div>
             </div>
 
-            <div class="column">
-                <div class="column-header">ACTIVE TRADES</div>
-                <div id="active-list" class="card-list"></div>
+            <div class="grid-col">
+                <div class="col-header">ACTIVE_EXECUTIONS</div>
+                <div class="scroll-area" id="active-engine"></div>
             </div>
 
-            <div class="column">
-                <div class="column-header">VAULT ARCHIVE</div>
-                <div id="vault-list" class="card-list"></div>
+            <div class="grid-col">
+                <div class="col-header">VAULT_ARCHIVE</div>
+                <div class="scroll-area" id="vault-engine"></div>
             </div>
-        </div>
-    </div>
+        </section>
+    </main>
 
     <script>
-        // --- MASTER CONFIGURATION ---
-        const MASTER_ID = "1319700866";
-        const BOT_TOKEN = "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4";
-        const GROUP_ID = "-1003254379333";
-        const REFF_LINKS = {
-            indodax: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon",
-            gate: "https://app.mbm06.com/referral/earn-together/invite/BFZFVFlX?ref=BFZFVFlX&ref_type=103",
-            jupiter: "https://jup.ag/?refId=yuf0dh4il1xs"
+        // --- MASTER DATA & CONFIG ---
+        const MASTER_CONFIG = {
+            id: "1319700866",
+            token: "8295607704:AAFdy_U8bFL-x2Ol90n8f2KDOHXztybcuj4",
+            group: "-1003254379333",
+            links: {
+                indodax: "https://indodax.onelink.me/qyYY/referral?deep_link_value=page:register,id:marselsalmon",
+                gate: "https://app.mbm06.com/referral/earn-together/invite/BFZFVFlX?ref=BFZFVFlX",
+                jupiter: "https://jup.ag/?refId=yuf0dh4il1xs"
+            }
         };
 
-        let state = {
-            user: null,
-            lvl: 1,
+        let sysState = {
+            currentLvl: 1,
             isSync: false,
-            equity: 0,
+            knock: 0,
             simEquity: 0,
-            activeSlots: 0,
-            trades: [],
-            vault: [],
-            targetReached: false,
-            knockCount: 0
+            realEquity: 0,
+            slots: 0,
+            activePositions: [],
+            vault: []
         };
 
-        // --- SECURITY GUARD ---
-        const checkSecurity = () => {
-            // Anti F12
-            const threshold = 160;
-            if (window.outerWidth - window.innerWidth > threshold || window.outerHeight - window.innerHeight > threshold) {
-                triggerBreach();
-            }
+        // --- SECURITY ENGINE ---
+        const securityGuard = () => {
+            const devtools = /./;
+            devtools.toString = function() {
+                triggerBreach("DevTools Detected");
+            };
+            
+            // Check orientation and VPN simulation
+            window.addEventListener('resize', () => {
+                if(window.outerWidth - window.innerWidth > 100) triggerBreach("Resize Violation");
+            });
         };
 
-        const triggerBreach = () => {
-            document.getElementById('security-breach').style.display = 'flex';
+        function triggerBreach(reason) {
+            document.getElementById('security-alert').style.display = 'flex';
+            document.getElementById('breach-msg').innerText = `PROTOCOL_VIOLATION: ${reason}`;
             localStorage.clear();
-            // In reality, send IP to Telegram Master
-            sendToTelegram("🚨 SECURITY BREACH: User detected using Inspect Element.");
-        };
+            setTimeout(() => location.reload(), 3000);
+        }
 
-        setInterval(checkSecurity, 1000);
-
-        // --- AUTH LOGIC ---
-        function handleMasterKnock() {
-            state.knockCount++;
-            if(state.knockCount >= 5) {
-                document.getElementById('tg-id').value = MASTER_ID;
-                document.getElementById('tg-pass').value = "MahadhareV13Master";
-                executeLogin();
+        // --- AUTH SYSTEM ---
+        function unlockAdmin() {
+            sysState.knock++;
+            if(sysState.knock >= 5) {
+                document.getElementById('master-id').value = MASTER_CONFIG.id;
+                document.getElementById('master-key').value = "TITAN_V13_MASTER";
+                initSystem();
             }
         }
 
-        async function executeLogin() {
-            const id = document.getElementById('tg-id').value;
-            const pass = document.getElementById('tg-pass').value;
-
-            if(id === MASTER_ID && pass === "MahadhareV13Master") {
-                loginSuccess({id: MASTER_ID, rank: "MASTER"});
-            } else {
-                // Biometric simulation delay
-                document.getElementById('auth-title').innerText = "VERIFYING...";
-                setTimeout(() => {
-                    alert("Login Gagal. Wajah tidak cocok atau Password salah.");
-                }, 2000);
-            }
+        async function initSystem() {
+            const mid = document.getElementById('master-id').value;
+            if(mid !== MASTER_CONFIG.id) return alert("BIOMETRIC MISMATCH");
+            
+            document.getElementById('master-auth').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('master-auth').style.display = 'none';
+                document.getElementById('terminal').style.display = 'flex';
+                startMataDewa();
+            }, 500);
         }
 
-        function loginSuccess(userData) {
-            state.user = userData;
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('main-app').style.display = 'flex';
-            initApp();
-            sendToTelegram(`🟢 MASTER LOGIN: ID ${state.user.id} accessed the terminal.`);
+        // --- MATA DEWA AI ENGINE ---
+        const assetPool = ["BTC", "ETH", "SOL", "BNB", "TIA", "JUP", "PEPE", "LINK", "AVAX", "NEAR", "INJ", "RNDR"];
+
+        function startMataDewa() {
+            setInterval(updateRadar, 7000);
+            renderUI();
         }
 
-        // --- TRADING ENGINE (MATA DEWA) ---
-        const coins = ["BTC", "ETH", "SOL", "PEPE", "BNB", "TIA", "JUP", "DOGE", "ARB", "LINK", "AVAX", "BONK"];
-        
         function updateRadar() {
-            if(state.targetReached) return;
-            
-            const radarList = document.getElementById('radar-list');
-            radarList.innerHTML = '';
-            
-            // Sort koin yang glow-pulse ke atas
-            const marketData = coins.map(symbol => ({
-                symbol,
-                change: (Math.random() * 10 - 4).toFixed(2),
-                price: (Math.random() * 50000).toFixed(2),
-                type: Math.random() > 0.6 ? 'SMART' : (Math.random() > 0.8 ? 'MOONSHOT' : 'SCALP')
-            })).sort((a, b) => b.change - a.change);
+            const radar = document.getElementById('radar-engine');
+            radar.innerHTML = '';
 
-            marketData.forEach(coin => {
+            const market = assetPool.map(sym => ({
+                sym,
+                price: (Math.random() * 60000).toFixed(2),
+                change: (Math.random() * 12 - 5).toFixed(2),
+                strategy: Math.random() > 0.7 ? 'MOONSHOT' : (Math.random() > 0.4 ? 'SMART' : 'SCALP')
+            })).sort((a,b) => b.change - a.change);
+
+            market.forEach(coin => {
                 const isHot = coin.change > 4;
                 const card = document.createElement('div');
-                card.className = `signal-card ${isHot ? 'glow-pulse' : ''}`;
+                card.className = `titan-card ${isHot ? 'glow-pulse' : ''}`;
                 card.innerHTML = `
-                    <div style="display:flex; justify-content:space-between">
-                        <strong>${coin.symbol}/USDT</strong>
-                        <span style="color:${coin.change > 0 ? 'var(--emerald)' : 'var(--rose)'}">${coin.change}%</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-family:'Orbitron'; font-size:0.9rem;">${coin.sym}/USDT</span>
+                        <span style="color:${coin.change > 0 ? 'var(--neon-emerald)' : 'var(--neon-rose)'}">${coin.change}%</span>
                     </div>
-                    <div style="font-size:10px; margin-top:5px; opacity:0.7">Strategy: ${coin.type} | Exchange: Indodax</div>
-                    <div style="margin-top:10px; display:flex; justify-content:space-between; align-items:center">
-                        <span>$${coin.price}</span>
-                        ${state.lvl != 3 ? `<button onclick="executeBuy('${coin.symbol}', ${coin.price}, '${coin.type}')" class="btn-premium" style="padding:5px 10px; font-size:10px">BUY</button>` : ''}
+                    <div style="font-size:10px; margin:8px 0; color:#888;">${coin.strategy} • LIQUIDITY_HIGH</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-weight:bold;">$${coin.price}</span>
+                        ${sysState.currentLvl < 3 ? `<button onclick="executeBuy('${coin.sym}', ${coin.price}, '${coin.strategy}')" class="btn-action">EXECUTE</button>` : ''}
                     </div>
                 `;
-                radarList.appendChild(card);
+                radar.appendChild(card);
             });
         }
 
-        function executeBuy(symbol, price, type) {
-            if(state.activeSlots >= 10) return alert("SLOT PENUH (10/10)");
+        // --- TRADING LOGIC ---
+        function executeBuy(sym, price, strat) {
+            if(sysState.slots >= 10) return alert("MAX_SLOTS_REACHED");
             
-            const trade = {
+            const pos = {
                 id: Date.now(),
-                symbol,
+                sym,
                 entry: price,
-                type,
-                profit: 0,
-                status: 'ACTIVE'
+                strat,
+                profit: 0
             };
-            
-            state.trades.push(trade);
-            state.activeSlots++;
-            updateActiveList();
-            updateHeader();
+            sysState.activePositions.push(pos);
+            sysState.slots++;
+            renderActive();
+            document.getElementById('slot-count').innerText = `${sysState.slots}/10 SLOT`;
         }
 
-        // --- LEVEL LOGIC ---
-        function switchLevel(lvl) {
-            if(lvl > state.lvl && !state.user.isAdmin) {
-                return alert("LOCKED: Selesaikan misi level sebelumnya!");
-            }
-            state.lvl = lvl;
-            renderLevelUI();
+        function renderActive() {
+            const area = document.getElementById('active-engine');
+            area.innerHTML = '';
+            sysState.activePositions.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'titan-card';
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>${p.sym}</span>
+                        <span class="badge" style="background:var(--neon-emerald); color:#000;">${p.strat}</span>
+                    </div>
+                    <div style="margin:10px 0; font-family:'Orbitron'; color:var(--neon-emerald);">+${(Math.random()*5).toFixed(2)}%</div>
+                    <button class="btn-action" style="width:100%; background:var(--neon-rose);" onclick="executeSell(${p.id})">CLOSE_POSITION</button>
+                `;
+                area.appendChild(card);
+            });
         }
 
-        function renderLevelUI() {
-            const configGear = document.getElementById('config-gear');
-            const syncStatus = document.getElementById('sync-status');
-            const mainBal = document.getElementById('main-balance');
+        function executeSell(id) {
+            sysState.activePositions = sysState.activePositions.filter(p => p.id !== id);
+            sysState.slots--;
+            document.getElementById('slot-count').innerText = `${sysState.slots}/10 SLOT`;
+            renderActive();
+            // Add to vault logic here...
+        }
 
-            if(state.lvl === 3) {
-                configGear.classList.remove('config-locked');
-                syncStatus.innerText = state.isSync ? "● SYNC ON" : "● SYNC OFF";
-                syncStatus.className = state.isSync ? "sync-on" : "sync-off";
-                mainBal.innerText = state.isSync ? "Rp 12.500.000" : "0%";
+        // --- NAVIGATION & LVL LOGIC ---
+        function switchMode(lvl) {
+            if(lvl === 3) {
+                document.getElementById('config-btn').style.opacity = '1';
+                document.getElementById('dashboard-balance').innerHTML = sysState.isSync ? "Rp 25.000.000" : "0% <span style='font-size:0.8rem; color:#666;'>PROFIT_POOL</span>";
             } else {
-                configGear.classList.add('config-locked');
-                syncStatus.innerText = "● L"+state.lvl+" ACTIVE";
-                syncStatus.className = "";
-                mainBal.innerText = "Rp " + (state.lvl === 1 ? state.simEquity.toLocaleString() : state.equity.toLocaleString());
+                document.getElementById('config-btn').style.opacity = '0.3';
+                document.getElementById('dashboard-balance').innerText = "Rp 1.000.000";
             }
+            sysState.currentLvl = lvl;
             updateRadar();
         }
 
-        // --- SYSTEM CORE ---
-        function initApp() {
-            state.simEquity = 1000000;
-            renderLevelUI();
-            setInterval(updateRadar, 8000); // Mata Dewa scan every 8s
-            setInterval(processAutopilot, 5000);
+        function openConfig() {
+            if(sysState.currentLvl < 3) return alert("KHUSUS LEVEL 3 MASTER");
+            // API Setup Popup Logic...
+            alert("API BRIDGE READY: Menunggu Kredensial Master.");
         }
 
-        function processAutopilot() {
-            if(state.lvl === 3) {
-                // AI Logic: Cari koin glow-pulse dan buy otomatis
-                // TSL Logic: Jika profit turun 2% dari peak, sell otomatis
-                console.log("AI Scanning for opportunities...");
-            }
+        function renderUI() {
+            // Initial Camera Feed for Pro-Look
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => document.getElementById('bio-feed').srcObject = stream)
+                .catch(e => console.log("Bio-Feed Offline"));
+            
+            updateRadar();
+            securityGuard();
         }
 
-        async function sendToTelegram(msg) {
-            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${GROUP_ID}&text=${encodeURIComponent(msg)}&parse_mode=html`;
-            fetch(url);
+        function systemShutdown() {
+            if(confirm("TERMINATE ALL SESSIONS?")) location.reload();
         }
-
-        function confirmLogout() {
-            if(state.trades.length > 0) {
-                alert("PERINGATAN: Masih ada posisi terbuka di dompet/bursa. Amankan dana sebelum logout!");
-            }
-            if(confirm("Apakah Anda yakin ingin keluar dari Terminal Master?")) {
-                location.reload();
-            }
-        }
-
-        // Startup Verification
-        window.onload = () => {
-            console.log("TITAN V.13 OMNIPOTENT INITIALIZED");
-            // Setup Camera for Biometric Simulation
-            navigator.mediaDevices.getUserMedia({ video: true }).then(stream => {
-                document.getElementById('video').srcObject = stream;
-            }).catch(err => console.log("Camera access denied - Using static profile"));
-        };
 
     </script>
 </body>
